@@ -115,7 +115,8 @@ def add_host(asyncId,hosts,login):
     else:
         import ansible_lib
         ret=ansible_lib.connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
-
+    app_log.info("connect with"+str(hosts)+" with :"+str(newlogin) )
+        
     #处理结果
     success=[]
     failed=[]

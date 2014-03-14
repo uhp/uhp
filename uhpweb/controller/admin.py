@@ -363,7 +363,7 @@ class AdminBackHandler(BaseHandler):
             return
         
         id = async.async_setup()
-        async.async_run(async.add_host,(id,host_array,(port,user,passwd,sudopasswd)))
+        async.async_run(async.add_host,(id,host_array,(user,port,passwd,sudopasswd)))
         self.ret("ok", "", {"runningId": [id]})
     
     def check_add_host(self,hostArray):
