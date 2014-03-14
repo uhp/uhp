@@ -1,0 +1,11 @@
+
+- name: stop hive metastore with shell
+  sudo: yes
+  shell: service hive-metastore stop
+
+
+
+#- name: stop hive metastore
+#  sudo: yes
+#  service: name=hive-metastore state=stopped
+

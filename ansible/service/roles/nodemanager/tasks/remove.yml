@@ -1,0 +1,9 @@
+---
+# Playbook for  Hadoop master servers
+
+- name: Install the namenode packages
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - hadoop-yarn-nodemanager
+

@@ -1,0 +1,51 @@
+<div  ng-controller="TemplateCtrl">
+	<div style="margin-top: 10px">
+		<div class="input-prepend" >
+           <span class="add-on">目录</span>
+           <select ng-model="nowdir" ng-options="dir as dir for (dir,files) in templates"></select>
+        </div>
+		<div class="input-prepend" >
+           <span class="add-on">文件</span>
+           <select ng-model="nowfile" ng-options="file for file in templates[nowdir]"></select>
+        </div>
+        <button class="btn" ng-click="reset()" style="margin-bottom:10px;">重置</button>
+        <button class="btn" ng-click="save()" style="margin-bottom:10px;">保存</button>
+        <div class="input-prepend">
+           <span class="add-on">针对指定机器查看生成的配置文件</span>
+           <select ng-model="nowhost" ng-options="host for host in hosts"></select>
+           <button class="btn" ng-click="build()" >查看</button>
+        </div>
+        
+        <div>
+        	<textarea ng-model="nowContent" style="resize:none;width:900px;" rows=[[nowContentMaxRow]]></textarea>
+        </div>
+        <div id="templateModal" class="modal hide fade" aria-hidden="true" data-backdrop="static" style="width:950px;left:auto;margin-left:0px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h3>生成配置文件</h3>
+            </div>
+            <div class="modal-body">
+            	<label>针对[[nowhost]]的配置项，查看最终生成的[[nowdir]]的[[nowfile]]配置文件如下</label>
+	            <textarea ng-model="buildContent" style="resize:none;width:900px;" rows=[[buildContentMaxRow]] readonly="readonly"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="saveConf('del')" ng-show="nowConfVar.del" >删除</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveConf()" >确定</button>
+            </div>
+        </div>
+        <div id="templateSaveModal" class="modal hide fade" aria-hidden="true" style="width:950px;left:auto;margin-left:0px;">
+            <div class="modal-header">
+                <h3>保存模板文件</h3>
+            </div>
+            <div class="modal-body">
+            	<label>保存中 ...</label>
+	        </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+	</div>
+</div>
+

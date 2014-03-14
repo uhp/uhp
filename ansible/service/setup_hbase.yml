@@ -1,0 +1,19 @@
+
+
+- hosts: HBASEMASTER
+  tasks:
+  - include: roles/hbasemaster/tasks/setup.yml
+
+- hosts: REGIONSERVER
+  tasks:
+  - include: roles/regionserver/tasks/setup.yml
+
+
+- hosts: 
+  - HBASEMASTER[0]
+  tasks:
+  - name: mkdir hdfs dir
+    sudo: yes
+    sudo_user: hdfs
+    shell: hdfs dfs -mkdir -p {{hbase__hbase_rootdir}} ; hdfs dfs -chown hbase:hbase {{hbase__hbase_rootdir}}
+

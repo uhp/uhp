@@ -1,0 +1,14 @@
+{
+"groups":[
+{"name":"all"},
+{"name":"g1"},
+{"name":"g2"}
+],
+"hosts":[
+{"name":"hadoop1"},
+{"name":"hadoop2"},
+{"name":"hadoop3"},
+{"name":"hadoop4"},
+{"name":"hadoop5"}
+]
+}

@@ -1,0 +1,9 @@
+{
+"hosts":{
+	"hadoop1":{"info":{"ip":"192.168.1.1","cpu":"4core","mem":"16G","disk":"2T*1"}},
+	"hadoop2":{"info":{"ip":"192.168.1.2","cpu":"5core","mem":"17G","disk":"2T*1"}},
+	"hadoop3":{"info":{"ip":"192.168.1.3","cpu":"5core","mem":"18G","disk":"2T*1"}},
+	"hadoop4":{"info":{"ip":"192.168.1.4","cpu":"6core","mem":"19G","disk":"2T*1"}},
+	"hadoop5":{"info":{"ip":"192.168.1.5","cpu":"7core","mem":"20G","disk":"2T*1"}}
+}
+}

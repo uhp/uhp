@@ -1,0 +1,26 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1098" measuredH="600" mockupW="800" mockupH="600">
+  <controls>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Image" x="604" y="77" w="180" h="176" measuredW="192" measuredH="192" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>none</borderStyle>
+        <src>./hadoop.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::TextInput" x="638" y="269" w="117" h="-1" measuredW="46" measuredH="27" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>name</text>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::TextInput" x="638" y="305" w="117" h="-1" measuredW="57" measuredH="27" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>passwd</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Button" x="706" y="347" w="-1" h="-1" measuredW="49" measuredH="27" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>login</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::Canvas" x="298" y="0" w="800" h="600" measuredW="100" measuredH="70" zOrder="0" locked="false" isInGroup="-1"/>
+  </controls>
+</mockup>

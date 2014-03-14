@@ -1,0 +1,6 @@
+---
+
+- hosts: 
+  - NAMENODE[0]
+  tasks:
+  - include: roles/checker/tasks/hdfs.yml

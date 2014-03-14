@@ -1,0 +1,10 @@
+{
+"ret":"ok","msg":"",
+"templates":{
+	"zookeeper":["zoo.cfg"],
+	"hadoop":["core-site.xml"],
+	"hbase":["hbase-site.xml"],
+	"hive":["hive-site.xml"]
+	}
+
+}

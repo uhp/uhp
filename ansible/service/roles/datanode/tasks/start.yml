@@ -1,0 +1,8 @@
+
+- include: ../../conf/tasks/hdfs.yml
+
+- name: start datanode
+  sudo: yes
+  service: name=hadoop-hdfs-datanode state=started
+
+

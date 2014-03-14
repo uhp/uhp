@@ -1,0 +1,10 @@
+
+
+- hosts:
+  - HIVEMETASTORE[0]
+  tasks:
+  - include: roles/hivemetastore/tasks/init_hdfs.yml
+
+
+
+#  - include: roles/hivemetastore/tasks/init_mysql.yml

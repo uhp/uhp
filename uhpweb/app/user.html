@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html data-ng-app="uhpApp">
+<head>
+<meta charset="UTF-8" />
+<title>UHP管理平台</title>
+<link rel="stylesheet" href="/statics/css/bootstrap.css" />
+<link rel="stylesheet" href="/statics/css/bootstrap-responsive.css" />
+<link rel="stylesheet" href="/statics/css/home.css" />
+<script type="text/javascript" src="/statics/jslib/vendor/jquery.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/jquery.nicescroll.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular-animate.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular-route.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular-locale_zh-cn.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular-resource.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/bootstrap.js"></script>
+<!-- <script type="text/javascript" src="/statics/js/vendor/ui-bootstrap-tpls-0.10.0.min.js"></script>  -->
+<link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings.png" />
+<link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings-white.png" />
+
+</head>
+<body>
+	<div class="container">
+			<div class="row" ng-controller="NarCtrl">
+				<div class="navbar" >
+					<div class="navbar-inner">
+						<h3 style="float:left;">开发者界面</h3>
+						<div class="pull-right">
+							<label class="hor">[[user.name]]</label>
+							<button class="btn" type="button" ng-show="user.type==0"><a href="/admin">切换到管理者界面</a></button>
+							<button class="btn" type="button"><a href="/logout">登出</a></button>
+						</div>
+					</div>
+				</div>
+				
+				<div class="btn-group">
+					<button class="btn btn-large [[isActiveSubmenu(submenu.name)]]" ng-repeat="submenu in submenus" >
+					<a href="[[submenu.href]]">[[submenu.display]]</a>
+					</button>
+				</div>
+			</div>
+			
+			<div class="row" style="margin-top:30px">
+				<div ng-view class="reveal-animation"></div>
+			</div>
+	</div>
+	<!-- 全局共用HTML -->
+	<!-- 模式对话框的进度条  -->
+	<div id="progressModal" class="modal hide fade" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                &times;
+            </button>
+            <h3>工作正在执行</h3>
+        </div>
+        <div class="modal-body">
+        	<div class="progress progress-striped active">
+			  <div id="progressbar" class="bar" style="width: [[progress]]%;"></div>
+			</div>
+			<div>
+				<pre>[[progressMessage]]</pre>
+			</div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn" data-dismiss="modal" ng-show="!success" ng-click="closeProgress()">返回</button>
+        	<button type="button" class="btn btn-primary" data-dismiss="modal" ng-show="success">确定</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="/statics/js/base.js"></script>
+<script type="text/javascript" src="/statics/js/user.js"></script>
+<script type="text/javascript">
+    angular.element(document).ready(function () {
+    });
+</script>
+</html>

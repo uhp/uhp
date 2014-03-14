@@ -1,0 +1,32 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1048" measuredH="584" mockupW="986" mockupH="584">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::MenuBar" x="248" y="0" w="800" h="31" measuredW="128" measuredH="29" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>1</selectedIndex>
+        <text>Admin%2C%20User</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::TabBar" x="248" y="31" w="799" h="553" measuredW="375" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>4</selectedIndex>
+        <text>%u6587%u4EF6%u5B58%u50A8%2C%u5B9E%u65F6%u4F5C%u4E1A%2C%u4F5C%u4E1A%u67E5%u8BE2%2Chbase%2Chive%2Cimpala</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::TextArea" x="272" y="88" w="750" h="372" measuredW="200" measuredH="140" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Hive%20history%20file%3D/tmp/qiujw/hive_job_log_qiujw_201401171102_991436920.txt%0Ahive%3E%20show%20tables%3B%0AOK%0Acheck%0ATime%20taken%3A%202.403%20seconds%0Ahive%3E%20select%20*%20from%20check%20limit%201%3B%0AOK%0Atom%20%20%20%20%2010%20%20%20%20%20%20100%0ATime%20taken%3A%201.359%20seconds%0Ahive%3E%20</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Arrow" x="136" y="128" w="-1" h="-1" measuredW="150" measuredH="100" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>bottom</direction>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::StickyNote" x="62" y="228" w="171" h="170" measuredW="109" measuredH="123" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u521D%u671F%u53EF%u4EE5%u505A%u7EC8%u7AEF%20%u4F7F%u7528webssh%u76F4%u63A5%u6574%u5408%0A%20%0ATODO%20%u8BBE%u8BA1%u6210%u4EFB%u52A1%u7684%u5F02%u6B65%u63D0%u4EA4%uFF0C%u5F02%u6B65%u83B7%u53D6%u7ED3%u679C</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

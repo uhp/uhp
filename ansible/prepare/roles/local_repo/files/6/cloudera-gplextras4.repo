@@ -1,0 +1,6 @@
+[cloudera-gplextras4]
+# Packages for Cloudera's Distribution for Hadoop, Version 4, on RedHat	or CentOS 6 x86_64
+name=Cloudera's Distribution for Hadoop, Version 4
+baseurl=http://archive.cloudera.com/gplextras/redhat/6/x86_64/gplextras/4.2.0/
+gpgkey = http://archive.cloudera.com/gplextras/redhat/6/x86_64/gplextras/RPM-GPG-KEY-cloudera    
+gpgcheck = 1

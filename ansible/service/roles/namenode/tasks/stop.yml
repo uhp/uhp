@@ -1,0 +1,7 @@
+- name: stop namenode
+  sudo: yes
+  service: name=hadoop-hdfs-namenode state=stopped
+
+- name: stop zkfc
+  sudo: yes
+  service: name=hadoop-hdfs-zkfc state=stopped

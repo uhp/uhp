@@ -1,0 +1,172 @@
+#本地仓库搭建选项
+#是否使用本地仓库，否则使用CDH4的官方仓库
+#local_repo_enabled: false
+#http服务器端口，用于生产本地仓库的配置文件和修改nginx的配置文件
+#local_http_url: http://localhost:8080/
+#JAVA的安装包
+#java_tar: /home/qiujw/java/jdk1.6.0_45.tar.gz
+#java_untar_floder: jdk1.6.0_45
+
+#以下是hadoop相关配置
+hadoop_conf_dir: /etc/hadoop/conf
+#hdfs的用户目录,NM的HDFS用户的相互信任，需要加入SHH互信
+hdfs_user_home: /var/lib/hadoop-hdfs
+
+HDFS_HOME: /usr/lib/hadoop-hdfs
+YARN_HOME: /usr/lib/hadoop-yarn
+HBASE_HOME: /usr/lib/hbase
+HIVE_HOME: /usr/lib/hive
+
+#以下是启动的java参数
+#自动添加到所有服务启动的参数
+SERVER_OPTS: " -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:+UseCMSCompactAtFullCollection -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN" 
+
+#以下是各个服务的配置
+#格式服务__变量名字 : 值
+
+zookeeper__zookeeper_client_port: "2181"
+zookeeper__zookeeper_leader_port: "2888"
+zookeeper__zookeeper_election_port: "3888"
+zookeeper__zoo_id: "0"
+
+#Variables for java opts
+
+hdfs__HADOOP_NAMENODE_OPTS: " -Xmx1024m -Dhdfs.audit.logger=INFO,RFAAUDIT -Dsecurity.audit.logger=INFO,RFAS "
+hdfs__HADOOP_SECONDARYNAMENODE_OPTS: " "
+hdfs__HADOOP_DATANODE_OPTS: " -Xmx1024m "
+hdfs__HADOOP_BALANCER_OPTS: " -Xmx1024m"
+hdfs__HADOOP_CLIENT_OPTS: " -Xmx256m "
+
+#Variables for <core-site_xml>
+
+hdfs__net_topology_script_file_name: ""
+hdfs__nameservice_id: "mycluster"
+hdfs__fs_default_FS_port: "50900"
+
+#Variables for <hdfs-site_xml> 
+    
+hdfs__dfs_namenode_support_allow_format: true
+hdfs__dfs_namenode_http_address_port: 50070
+hdfs__dfs_namenode_https_address_port: 50470
+hdfs__dfs_include_hosts: []
+hdfs__dfs_exclude_hosts: []
+
+hdfs__dfs_ha_fencing_methods: "sshfence(hdfs:9922)"
+hdfs__dfs_ha_fencing_ssh_private_key_files: "/var/lib/hadoop-hdfs/.ssh/id_rsa"
+
+hdfs__dfs_permissions_superusergroup: hdfs
+hdfs__dfs_namenode_name_dir: 
+    - /uhp/namedir/
+
+hdfs__dfs_replication: 3
+hdfs__dfs_blocksize: 134217728
+hdfs__dfs_datanode_address_port: 50010
+hdfs__dfs_datanode_http_address_port: 50075
+hdfs__dfs_datanode_ipc_address_port:  50020
+hdfs__dfs_datanode_failed_volumes_tolerated: 0
+hdfs__dfs_datanode_du_reserved: 5368709120
+
+hdfs__dfs_ha_zkfc_port: 8019
+hdfs__qjournal_port: 8485  
+hdfs__qjournal_http_port: 8480 
+hdfs__dfs_journalnode_edits_dir: /uhp/journaldir/
+
+hdfs__dfs_datanode_data_dir:
+    - /uhp/all_data_dir
+        
+
+yarn__YARN_RESOURCEMANAGER_OPTS: " -Xmx1024m "
+yarn__YARN_NODEMANAGER_OPTS: " -Xmx1024m "
+yarn__HADOOP_JOBTRACKER_OPTS: " "
+    
+#Variables for <mapred-site_xml> - common
+   
+yarn__mapreduce_shuffle_port: 18080
+yarn__mapreduce_jobhistory_port: 50120
+yarn__mapreduce_jobhistory_webapp_port: 50888
+yarn__yarn_app_mapreduce_am_command_opts: " -Xmx400m "
+yarn__yarn_app_mapreduce_am_resource_mb: 640
+yarn__mapreduce_map_java_opts: " -Xmx400m "
+yarn__mapreduce_map_memory_mb: 640
+yarn__mapreduce_reduce_java_opts: " -Xmx400m "
+yarn__mapreduce_reduce_memory_mb: 640
+yarn__mapreduce_admin_map_child_java_opts: " -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN "
+yarn__mapreduce_admin_reduce_child_java_opts: " -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN "
+
+#Variables for <yarn-site_xml> 
+
+yarn__mapreduce_jobhistory_intermediate_done_dir: /user/history
+yarn__mapreduce_jobhistory_done_dir: /user/history
+yarn__yarn_application_classpath:
+  - $HADOOP_CONF_DIR
+  - $HADOOP_COMMON_HOME/*
+  - $HADOOP_COMMON_HOME/lib/*
+  - $HADOOP_HDFS_HOME/*
+  - $HADOOP_HDFS_HOME/lib/*
+  - $HADOOP_MAPRED_HOME/*
+  - $HADOOP_MAPRED_HOME/lib/*
+  - $YARN_HOME/*
+  - $YARN_HOME/lib/*
+yarn__yarn_nodes_exclude_hosts: []
+yarn__yarn_nodes_include_hosts: []
+yarn__yarn_rm_port: 50040
+yarn__yarn_rm_admin_port: 50141
+yarn__yarn_rm_scheduler_port: 50030
+yarn__yarn_rm_resource_tracker_port: 50025
+yarn__yarn_rm_webapp_port: 50088
+yarn__yarn_nm_webapp_port: 50088
+yarn__yarn_nm_port: 50841
+yarn__yarn_nm_localizer_port: 50840
+yarn__yarn_nm_remote_app_log_dir: /var/log/hadoop-yarn
+yarn__yarn_nm_remote_app_log_dir_suffix: app-logs
+yarn__yarn_nm_resource_memory_mb: 1024
+
+yarn__yarn_nm_local_dirs: 
+    - /uhp/all_local_dir
+yarn__yarn_nm_log_dirs: 
+    - /uhp/all_log_dir
+
+
+hbase__HBASE_MASTER_OPTS: " -Xmx256m "
+hbase__HBASE_REGIONSERVER_OPTS: " -Xmx1024m "
+hbase__HBASE_THRIFT_OPTS: " -Xmx256m "
+
+#默认前缀是hdfs://mycluster
+hbase__hbase_rootdir: /hbase
+hbase__hbase_master_port: 50600
+hbase__hbase_master_info_port: 50610
+hbase__hbase_master_handler_count: 25
+hbase__hbase_resigionserver_port: 50620
+hbase__hbase_resigionserver_info_port: 50630
+hbase__hbase_regionserver_handler_count: 10
+
+
+    
+hive__mysql_host: hadoop1
+hive__mysql_port: 3306
+hive__mysql_database: uhp_hive
+hive__mysql_user: uhp
+hive__mysql_passwd: "DFAUHFUH734B3BDJFS"
+hive__hive_metastore_warehouse_dir: /user/hive/warehouse
+hive__hive_metastore_port: 19083
+hive__hive_semantic_analyzer_hook: ""
+hive__hive_support_concurrency: "false"
+
+hive__hive_server_thrift_port: 59200
+hive__hive_server2_thrift_port: 59300
+#NONE LDAP KERBEROS
+hive__hive_server2_authentication: NONE
+
+
+impala__impala_server_user: impala
+impala__impala_state_store_port: 24000
+impala__impala_state_store_web_port: 25010
+
+impala__impala_backend_port: 22000
+impala__impala_server_web_port: 25000
+impala__impala_server_beeswax_port: 21000
+impala__impala_server_fe_port: 21000
+impala__impala_server_hs2_port: 21050
+impala__impala_server_mem_limit: 2G
+
+

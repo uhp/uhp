@@ -1,0 +1,16 @@
+---
+
+- name: Install the hbase client
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - hadoop
+   - hadoop-client
+   - hadoop-lzo-cdh4
+   - bigtop-utils
+   - hbase
+
+- include: config.yml
+
+
+

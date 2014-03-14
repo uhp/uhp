@@ -1,0 +1,6 @@
+
+
+- hosts:
+  - HBASEMASTER[0]
+  tasks:
+  - include: roles/checker/tasks/hbase.yml

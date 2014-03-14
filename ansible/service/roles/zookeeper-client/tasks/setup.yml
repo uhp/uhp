@@ -1,0 +1,12 @@
+---
+
+- name: Install the zookeeper packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - zookeeper
+
+- include: config.yml
+
+
+

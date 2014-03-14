@@ -1,0 +1,20 @@
+
+- include: ../../conf/tasks/impala.yml
+
+- name: change premission for /var/log/impala
+  sudo: yes
+  shell: chown -R {{ impala__impala_server_user }}:{{ impala__impala_server_user }} /var/log/impala 
+
+- name: change the start script's SVC_USER
+  sudo: yes
+  shell:  sed 's#SVC_USER=".*"#SVC_USER="{{ impala__impala_server_user }}"#g' /etc/init.d/impala-server -i
+
+- name: change the start script's install line
+  sudo: yes
+  shell:  sed "s#-o \(.*\) -g \(.*\) /var#-o {{ impala__impala_server_user }} -g {{ impala__impala_server_user }} /var#g" /etc/init.d/impala-server -i
+
+- name: start impala server
+  sudo: yes
+  service: name=impala-server state=started
+
+

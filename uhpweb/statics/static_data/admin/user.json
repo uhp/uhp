@@ -1,0 +1,10 @@
+{
+"user":{"name":"qus","email":"qiujw@ucweb.com"},
+"menus":[{"name":"admin","display":"管理员","href":"#admin"},{"name":"user","display":"用户","href":"#user"}],
+"submenus":[
+{"name":"service","display":"服务","href":"#admin-service"},
+{"name":"host","display":"机器","href":"#admin-host"},
+{"name":"task","display":"任务","href":"#admin-task"},
+{"name":"history","display":"历史","href":"#admin-history"}
+]
+}

@@ -1,0 +1,18 @@
+
+
+- name: install mysql
+  sudo: yes
+  yum: name=mysql state=installed
+
+- name: mkdir temp
+  file: path=/tmp/ansible/hive mode=777 state=directory
+
+- name: copy file
+  copy: src={{item}} dest=/tmp/ansible/hive/{{item}}
+  with_items:
+  - hive-schema-0.10.0.mysql.sql
+
+- name: init hive database
+  shell: cat /tmp/ansible/hive/{{item}} | mysql -h{{hive['mysql_host']}} -P{{hive['mysql_port']}} -u{{hive['mysql_user']}} -p{{hive['mysql_passwd']}} -D{{hive['mysql_database']}}
+  with_items:
+  - hive-schema-0.10.0.mysql.sql

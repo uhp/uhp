@@ -1,0 +1,5 @@
+
+
+- hosts: ZOOKEEPER
+  tasks:
+  - include: roles/zookeeper/tasks/stop.yml

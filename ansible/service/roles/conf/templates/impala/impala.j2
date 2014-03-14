@@ -1,0 +1,58 @@
+IMPALA_STATE_STORE_HOST={{ groups.IMPALASTATESTORE[0] }}
+IMPALA_STATE_STORE_PORT={{ impala__impala_state_store_port }}
+IMPALA_BACKEND_PORT={{ impala__impala_backend_port }}
+IMPALA_LOG_DIR=/var/log/impala
+
+IMPALA_STATE_STORE_ARGS=" 
+    -log_dir=${IMPALA_LOG_DIR} \ 
+    -state_store_port=${IMPALA_STATE_STORE_PORT} \
+    -state_store_pending_task_count_max=0 \
+    -enable_webserver=true \
+    -webserver_port={{ impala__impala_state_store_web_port }} \
+    -state_store_num_server_worker_threads=8 \
+    -log_filename=statestored
+    "
+IMPALA_SERVER_ARGS=" \
+    -log_dir=${IMPALA_LOG_DIR} \
+    -state_store_port=${IMPALA_STATE_STORE_PORT} \
+    -use_statestore \
+    -state_store_host=${IMPALA_STATE_STORE_HOST} \
+    -be_port=${IMPALA_BACKEND_PORT} \
+    -beeswax_port={{ impala__impala_server_beeswax_port }} \
+    -fe_port={{ impala__impala_server_fe_port }} \
+    -hs2_port={{ impala__impala_server_hs2_port }}
+    -mem_limit={{ impala__impala_server_mem_limit }}
+    -webserver_port= {{ impala__impala_server_web_port }}
+	"
+
+ENABLE_CORE_DUMPS=false
+
+# LIBHDFS_OPTS=-Djava.library.path=/usr/lib/impala/lib
+export MYSQL_CONNECTOR_JAR=/usr/share/java/mysql-connector-java.jar
+export IMPALA_BIN=/usr/lib/impala/sbin
+export IMPALA_HOME=/usr/lib/impala
+export HIVE_HOME=/usr/lib/hive
+export HBASE_HOME=/usr/lib/hbase
+# IMPALA_CONF_DIR=/etc/impala/conf
+export HADOOP_CONF_DIR=/etc/hadoop/conf
+export HIVE_CONF_DIR=/etc/hive/conf
+export HBASE_CONF_DIR=/etc/hbase/conf
+
+#backup
+#-beeswax_port=21000
+#-fe_port=21000
+#-be_port=22000
+#-hs2_port=21050
+#-enable_webserver=true
+#-mem_limit=4294967296
+#-webserver_port=25000
+#-state_store_subscriber_port=23000
+#-default_query_options
+#-log_filename=impalad
+#-max_audit_event_log_file_size=5000
+#-abort_on_failed_audit_event=false
+#-hostname=kpi96
+#-state_store_host=vdc21
+#-state_store_port=24000
+#-nn=mycluster
+#-nn_port=50900

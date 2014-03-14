@@ -1,0 +1,18 @@
+
+- name: mkdir the temp dir
+  file: path=/tmp/ansible/hive state=directory mode=777
+
+- name: copy the data and file 
+  copy: src=hive/{{item}} dest=/tmp/ansible/hive/{{item}}
+  with_items:
+   - hive.sql
+   - hive.data
+
+- name: copy the file to hdfs
+  shell: hdfs dfs -copyFromLocal /tmp/ansible/hive/hive.data {{item}} ;  sed "s#hive_data#{{item}}#"  /tmp/ansible/hive/hive.sql -i
+  with_items:
+   -  "/tmp/hive.data.{{ansible_date_time['epoch']}}"
+
+
+- name: run the hive file
+  shell: hive -f /tmp/ansible/hive/hive.sql

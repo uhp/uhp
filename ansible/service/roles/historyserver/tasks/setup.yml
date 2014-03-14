@@ -1,0 +1,31 @@
+---
+# Playbook for  history server servers
+
+- name: Install the history server packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - hadoop-mapreduce-historyserver
+   - hadoop-yarn-proxyserver
+
+- name: clean pre data
+  sudo: yes
+  shell: rm -rf /var/log/hadoop-mapreduce /var/run/hadoop-mapreduce
+
+- name: change the start script's user
+  sudo: yes
+  shell:  sed "s#mapred\([^u]\)#hdfs\1#g" /etc/init.d/hadoop-mapreduce-historyserver -i
+
+- name: change the yarn-idstring
+  sudo: yes
+  shell: sed "s#YARN_IDENT_STRING=mapred#YARN_IDENT_STRING=hdfs#g"  /etc/default/hadoop-mapreduce-historyserver  -i
+
+- name: change the log permission
+  sudo: yes
+  file: path=/var/log/hadoop-mapreduce mode=755 owner=hdfs group=hdfs state=directory
+
+- name: change the run dir permission
+  sudo: yes
+  file: path=/var/run/hadoop-mapreduce mode=755 owner=hdfs group=hdfs state=directory
+
+

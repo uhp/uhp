@@ -1,0 +1,17 @@
+export HADOOP_OPTS="-Djava.net.preferIPv4Stack=true $HADOOP_OPTS"
+
+# Command specific options appended to HADOOP_OPTS when specified
+export HADOOP_NAMENODE_OPTS=" {{SERVER_OPTS}} {{hdfs__HADOOP_NAMENODE_OPTS}} "
+export HADOOP_SECONDARYNAMENODE_OPTS=" {{SERVER_OPTS}} {{hdfs__HADOOP_SECONDARYNAMENODE_OPTS}} "
+export HADOOP_DATANODE_OPTS=" {{SERVER_OPTS}} {{hdfs__HADOOP_DATANODE_OPTS}}"
+export HADOOP_BALANCER_OPTS=" {{SERVER_OPTS}} {{hdfs__HADOOP_BALANCER_OPTS}} "
+export HADOOP_CLIENT_OPTS=" -Xmx256m -Dhadoop.root.logger=INFO.console {{hdfs__HADOOP_CLIENT_OPTS}}  "
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+export HADOOP_MAPRED_HOME=$HADOOP_MAPRED_HOME
+export HADOOP_CLASSPATH=$HADOOP_CLASSPATH
+export JAVA_LIBRARY_PATH=$JAVA_LIBRARY_PATH
+
+export HADOOP_MAPRED_HOME="/usr/lib/hadoop-mapreduce"
+
+export JAVA_HOME="/usr/java/default"

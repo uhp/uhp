@@ -1,0 +1,19 @@
+{
+"services":[
+	{"name":"zookeeper",
+		"role": [ "zookeeper"],
+		"actions":["start","stop","restart"],
+		"active" : 1,
+		"instanceActions":["start","stop","restart"]},
+	{"name":"hdfs",
+		"role": [ "namenode","datanode"],
+		"actions":["start","stop","restart","rollrestart"],
+		"active" : 0,
+		"instanceActions":["start","stop","restart"]},
+	{"name":"yarn",
+		"role": [ "resourcemanager","nodemanager"],
+		"actions":["start","stop","restart","rollrestart"],
+		"active" : 1 ,
+		"instanceActions":["start","stop","restart"]}
+	]
+}

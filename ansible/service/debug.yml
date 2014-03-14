@@ -1,0 +1,7 @@
+
+- hosts: 
+  - hadoop5
+  - hadoop4
+  - hadoop1
+  tasks:
+  - include: roles/conf/tasks/hbase.yml

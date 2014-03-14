@@ -1,0 +1,7 @@
+
+- name: copy hdfs file to hadoop conf
+  sudo: yes
+  template: src={{hadoop_conf_version}}/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
+  with_items:
+    - core-site.xml
+    - hdfs-site.xml

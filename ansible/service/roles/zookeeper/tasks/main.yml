@@ -1,0 +1,4 @@
+---
+# The plays for zookeper daemons
+#
+- include: setup.yml

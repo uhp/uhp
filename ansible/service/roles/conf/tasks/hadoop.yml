@@ -1,0 +1,14 @@
+
+- name: copy key conf
+  sudo: yes
+  template: src=hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
+  with_items:
+    - core-site.xml
+    - hdfs-site.xml
+    - hdfs-site.private.xml
+    - mapred-site.xml
+    - yarn-site.xml
+    - yarn-site.private.xml
+    - log4j.properties
+    - hadoop-env.sh
+    

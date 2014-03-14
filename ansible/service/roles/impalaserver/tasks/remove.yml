@@ -1,0 +1,8 @@
+---
+
+- name: remove impala server
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - impala-server
+

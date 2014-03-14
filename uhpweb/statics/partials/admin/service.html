@@ -1,0 +1,375 @@
+<div ng-controller="ServiceCtrl">
+
+	<div style="margin-bottom: 10px">
+		<button class="btn" ng-click="showSetupService()" ng-show="unactiveServices.length!=0" >添加服务</button>
+	</div>
+	<div class="row">
+		<div class="span2">
+			<ul class="nav nav-tabs nav-stacked">
+				<li ng-click="changeService(service)"
+					ng-repeat="service in activeServices"><a
+					class="[[serviceClass(service)]]">[[service]]</a></li>
+			</ul>
+		</div>
+		<div ng-show="hasService" class="span8">
+			<!-- 标签页切换 -->
+			<ul class="nav nav-tabs" id="serviceTab">
+				<li class="[[tabClass('info')]]"><a ng-click="tab='info'">服务概况</a></li>
+				<li class="[[tabClass('instance')]]"><a
+					ng-click="tab='instance'">运行实例</a></li>
+				<li class="[[tabClass('confvar')]]"><a ng-click="tab='confvar'">配置变量</a></li>
+				<!-- <li class="[[tabClass('conftem')]]"><a  ng-click="tab='conftem'">配置模板</a></li>  -->
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane fade [[tabClass('info','in')]] "
+					style="height: 700px;">
+					<!-- 下拉选择操作  -->
+					<div class="btn-group"
+						style="margin-bottom: 20px; margin-left: 50px;"
+						ng-show="actions.length!=0">
+						<button class="btn drop-down-toggle" data-toggle="dropdown" style="width: 160px;">
+							选择服务操作<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li ng-repeat="action in actions" ng-click="readySendServiceAction(action.name,action.display)"
+								tooltip="[[action.tooptip]]"><a>[[action.display]]</a></li>
+						</ul>
+					</div>
+					<button style="margin-bottom: 20px; margin-left: 10px;"
+						class="btn btn-danger" ng-click="readyDelService()">删除服务</button>
+					<div class="btn-group"
+						style="margin-bottom: 20px; margin-left: 10px;" ng-show="hasurl">
+						<button class="btn drop-down-toggle" data-toggle="dropdown"
+							style="width: 160px;">
+							web界面<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li ng-repeat="url in urls"><a
+								href="http://[[url.host]]:[[url.port]]" target="_blank">[[url.host]]-[[url.role]]</a></li>
+						</ul>
+					</div>
+					<h5>概况</h5>
+					<table style="width: 550px;" cellpadding="0" cellspacing="0"
+						border="0" class="table table-striped table-bordered">
+						<tbody>
+							<tr ng-repeat="(role,info) in summary">
+								<td style="width: 150px;">[[role]]</td>
+								<td style="width: 400px;"><span ng-repeat="(k,v) in info">
+								 <i class="[[ iconMap[k]['class'] ]]" style="[[ iconMap[k]['style'] ]]"></i>
+								  [[v]]_[[k]] </span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="tab-pane fade [[tabClass('instance','in')]] ">
+					<!-- 下拉选择操作  -->
+					<div class="btn-group"
+						style="margin-bottom: 20px; margin-left: 10px;">
+						<button class="btn drop-down-toggle" data-toggle="dropdown"
+							id="instance-action-button">
+							选择实例操作<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li ng-repeat="instanceAction in instanceActions"
+								ng-click="readySendInstanceAction(instanceAction.name)"
+								tooltip="[[instanceAction.tooptip]]"><a>[[instanceAction.display]]</a></li>
+						</ul>
+					</div>
+					<!-- 列表 -->
+					<input type="text" ng-model="instanceSearchText"
+						ng-change="initChosenInstance()" style="margin-bottom: 20px;">
+					<table id="table_id" cellpadding="0" cellspacing="0" border="0"
+						class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>
+									<!-- 使用ng-check --> <input type="checkbox"
+									ng-model="chosenAllInstance">
+								</th>
+								<th>名称</th>
+								<!-- <th>角色</th>
+								<th>机器</th> -->
+								<th>机架</th>
+								<th>状态</th>
+								<th>启动时间</th>
+								<th>健康</th>
+								<th>最近检测</th>
+								<th>检测报告</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="instance in instances|filter:instanceSearchText">
+								<td><input type="checkbox"
+									ng-model="chosenInstance[instance.name]"></td>
+								<td>[[instance.name]]</td>
+								<!-- <td>[[instance.role]]</td>
+								<td>[[instance.host]]</td> -->
+								<td>[[instance.rack]]</td>
+								<td><i class="[[ iconMap[instance.status]['class'] ]]" style="[[ iconMap[instance.status]['style'] ]]"></i>  [[instance.status]]</td>
+								<td>[[instance.uptime]]</td>
+								<td><i class="[[ iconMap[instance.health]['class'] ]]" style="[[ iconMap[instance.health]['style'] ]]"></i>  [[instance.health]]</td>
+								<td>[[instance.monitor_time]] S</td>
+								<td><button class="btn" ng-click="showInstanceMsg(instance)">报告</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- 配置变量页面 -->
+				<div class="tab-pane fade [[tabClass('confvar','in')]] ">
+					<!-- 列表 -->
+					<select ng-model="showType" style="margin-bottom: 20px;">
+						<option value="group">组变量</option>
+						<option value="host">机器变量</option>
+					</select> <select ng-show="showType=='group'" ng-model="nowGroup"
+						ng-options="group for group in groups"
+						style="margin-bottom: 20px;"></select> <input type="text"
+						ng-model="confSearchText" style="margin-bottom: 20px;">
+					<button type="button" class="btn" ng-click="addConfVar()"
+						style="margin-bottom: 20px;">添加配置项</button>
+					<table id="table_id" cellpadding="0" cellspacing="0" border="0"
+						class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>[[showConfTitle(showType)]]</th>
+								<th>配置名称</th>
+								<th>配置数值</th>
+								<th>类型</th>
+								<th>注释</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-dblclick="editConfVar(var)"
+								ng-repeat="var in confVar|filter:confSearchText">
+								<td>[[var.group]]</td>
+								<td>[[var.name]]</td>
+								<td><pre>[[var.value]]</pre></td>
+								<td>[[var.type]]</td>
+								<td>[[var.text]]</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+
+				<!-- <div class="tab-pane fade [[tabClass('conftem','in')]] " >d</div>  -->
+			</div>
+
+		</div>
+		<div ng-show="!hasService" class="span8">
+			<label>没有服务可以显示</label>
+		</div>
+	</div>
+
+	<!-- 以下是模式对话框 -->
+	<!-- 添加服务的模式对话框 -->
+	<div id="serviceSetupModal" class="modal hide fade"
+		data-backdrop="static" aria-hidden="true"
+		style="width: 950px; left: auto; margin-left: 0px;">
+		<div class="modal-header">
+			<h3>添加服务步骤[[setupMove]]</h3>
+		</div>
+		<div class="modal-body">
+			<div class="slide-animate-container">
+				<div class="slide-animate" ng-include="getTemplateUrl(setupMove)"></div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-dismiss="modal">返回</button>
+			<button type="button" ng-show="setupMove!=1" class="btn btn-primary"
+				ng-click="setupMove=setupMove-1">上一步</button>
+			<button type="button" ng-show="setupMove!=lastMove"
+				class="btn btn-primary" ng-click="checkAndNextStep()">下一步</button>
+			<button type="button" ng-show="setupMove==lastMove"
+				class="btn btn-primary" data-dismiss="modal"
+				ng-click="sendSetupService()">提交</button>
+		</div>
+	</div>
+
+	<!-- 提交action的模式对话框 -->
+	<div id="serviceActionModal" class="modal hide fade"
+		data-backdrop="static" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;</button>
+			<h3>确认提交任务</h3>
+		</div>
+		<div class="modal-body">
+			<p>确定要对[[getActionObject()]]执行 [[todoDisplay]] ([[todoAction]]) 操作吗？</p>
+			<pre ng-show="actionType=='instance'">[[instanceList]]</pre>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-dismiss="modal">取消</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal"
+				ng-click="sendAction()">确定</button>
+		</div>
+	</div>
+	<!-- 确认删除服务的模式对话框 -->
+	<div id="delServiceModal" class="modal hide fade"
+		data-backdrop="static" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;</button>
+			<h3>确认删除服务</h3>
+		</div>
+		<div class="modal-body">
+			<p>确定要删除[[nowService ]]服务吗？</p>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-dismiss="modal">取消</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal"
+				ng-click="sendDelService()">确定</button>
+		</div>
+	</div>
+	<!-- 配置的模式对话框 -->
+	<div id="serviceConfModal" class="modal hide fade"
+		data-backdrop="static" aria-hidden="true">
+		<div class="modal-header">
+			<h3>修改配置</h3>
+		</div>
+		<div class="modal-body">
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">服务:</span><input type="text"
+					ng-model="nowConfVar.service" readonly>
+			</div>
+			<div class="input-prepend" ng-show="showType=='group'"
+				style="display: block;">
+				<span class="add-on">配置组:</span><input type="text"
+					ng-model="nowConfVar.group" readonly>
+			</div>
+			<div class="input-prepend" ng-show="showType=='host'"
+				style="display: block;">
+				<span class="add-on">配置机器:</span> <select ng-model="nowConfVar.host"
+					ng-options="host for host in hosts" style="margin-bottom: 20px;"></select>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">配置名称:</span><input type="text"
+					ng-model="nowConfVar.name">
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">值:</span> <input type="text"
+					ng-show="nowConfVar.type=='string'" ng-model="nowConfVar.value">
+				<textarea rows="5" ng-show="nowConfVar.type=='list'"
+					ng-model="nowConfVar.value"></textarea>
+			</div>
+
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">类型:</span> <select ng-model="nowConfVar.type">
+					<option value="string">字符串</option>
+					<option value="list">数组(请使用换行分割)</option>
+				</select>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">注释:</span><input type="text"
+					ng-model="nowConfVar.text">
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-dismiss="modal">取消</button>
+			<button type="button" class="btn btn-danger" data-dismiss="modal"
+				ng-click="saveConf('del')" ng-show="nowConfVar.del">删除</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal"
+				ng-click="saveConf()">确定</button>
+		</div>
+	</div>
+	<!-- 展示心跳报告的模式对话框 -->
+	<div id="showInstanceMsgModal" class="modal hide fade"
+		data-backdrop="static" aria-hidden="true">
+		<div class="modal-header">
+			<h3>心跳报告</h3>
+		</div>
+		<div class="modal-body">
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">名称:</span><input type="text"
+					ng-model="showInstance.name" readonly>
+			</div>
+			<div class="input-prepend" ng-show="showType=='group'"
+				style="display: block;">
+				<span class="add-on">机器:</span><input type="text"
+					ng-model="showInstance.host" readonly>
+			</div>
+			<div class="input-prepend" ng-show="showType=='host'"
+				style="display: block;">
+				<span class="add-on">角色:</span><input type="text"
+					ng-model="showInstance.role" readonly>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">状态:</span><input type="text"
+					ng-model="showInstance.status" readonly>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">启动时间:</span><input type="text"
+					ng-model="showInstance.uptime" readonly>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">健康:</span><input type="text"
+					ng-model="showInstance.health" readonly>	
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">最近检测:</span><input type="text"
+					ng-model="showInstance.monitor_time" readonly>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<!-- <span class="add-on">心跳信息:</span><input type="text"
+					ng-model="showInstance.msg">  -->
+				<label>检测报告:</label>
+				<pre style="border-style:groove">[[showInstance.msg]]</pre>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-primary" data-dismiss="modal" >确定</button>
+		</div>
+	</div>
+	<!-- 迁移RM的模式对话框 -->
+	<!--  
+	<div id="moveRmModal" class="modal hide fade" data-backdrop="static"
+		aria-hidden="true">
+		<div class="modal-header">
+			<h3>手动迁移ResourceManager</h3>
+		</div>
+		<div class="modal-body">
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">当前ResourceManager:</span> <input type="text"
+					ng-model="nowResourceManager" readonly>
+			</div>
+			<div class="input-prepend" style="display: block;">
+				<span class="add-on">迁移目标机器:</span> <select ng-model="targetResourceManager"
+					ng-options="host for host in hosts" style="margin-bottom: 20px;"
+					ng-readonly="sureTargetRM"></select>
+			</div>
+			<div>
+				<table id="table_id" cellpadding="0" cellspacing="0" border="0"
+					class="table table-striped table-bordered" ng-show="sureTargetRM">
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>迁移步骤</th>
+							<th >是否执行</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="step in steps">
+							<td>[[$index+1]]</td>
+							<td>[[step]]</td>
+							<td><input type="checkbox" ng-model="dostep[$index]"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-dismiss="modal">取消</button>
+			<button type="button" class="btn btn-primary" ng-show="!sureTargetRM"
+				ng-click="sureTargetRM=true">选择目标机器</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-show="sureTargetRM"
+				ng-click="sendMoveRm()">提交活动</button>
+		</div>
+	</div> -->
+
+</div>
+
+
+
+<script>
+	$('.dropdown-toggle').dropdown();
+</script>

@@ -1,0 +1,7 @@
+
+
+- name: set port env
+  sudo: yes
+  shell: echo "export PORT='{{item}}'" > /etc/default/hive-server
+  with_items:
+   - " -p {{hive['hive_server_thrift_port']}}"

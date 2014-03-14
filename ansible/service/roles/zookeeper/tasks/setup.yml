@@ -1,0 +1,21 @@
+---
+# The plays for zookeper daemons
+
+- name: Install the zookeeper files
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items:
+   - zookeeper
+   - zookeeper-server
+   - bigtop-utils
+
+- name: rm conf dir file
+  sudo: yes
+  shell: rm /etc/zookeeper/conf/* -rf
+
+- include: ../../conf/tasks/zookeeper.yml
+
+- name: init zookeeper
+  sudo: yes
+  shell:  service zookeeper-server init --myid={{zookeeper__zoo_id}} --force
+

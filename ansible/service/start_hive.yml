@@ -1,0 +1,19 @@
+
+#TODO 连续两次启动将会刷走pid，会导致出错
+
+
+- hosts: HIVEMETASTORE
+  tasks:
+  - include: roles/hivemetastore/tasks/start.yml
+
+- hosts: HIVESERVER
+  tasks:
+  - include: roles/hiveserver/tasks/start.yml
+
+
+- hosts: HIVESERVER2
+  tasks:
+  - include: roles/hiveserver2/tasks/start.yml
+
+
+

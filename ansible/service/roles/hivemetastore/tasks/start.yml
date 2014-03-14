@@ -1,0 +1,21 @@
+
+- include: ../../conf/tasks/hive.yml
+
+- name: set port env
+  sudo: yes
+  shell: echo "export PORT='{{item}}'" > /etc/default/hive-metastore
+  with_items:
+   - " -p {{ hive__hive_metastore_port }}"
+
+- name: start hive metastore
+  sudo: yes
+  script: start.sh {{ hive__hive_metastore_port }}
+
+#bug吗？ 不知道为什么不能启动
+#- name: start hive metastore
+#  sudo: yes
+#  service: name=hive-metastore state=started
+#  environment:
+#    PORT: hive__hive_metastore_port
+
+
