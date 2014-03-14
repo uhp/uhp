@@ -37,7 +37,6 @@ from ansible import utils
 from ansible.runner import Runner
 from ansible import callbacks
 import pdb
-from common import * 
 import lockfile
 import lockfile.pidlockfile
 
