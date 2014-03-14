@@ -26,7 +26,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 		var temp = $scope.chosenHost;
 		$scope.chosenHost={}
 		for(var host in $scope.hosts){
-			if( inArray(temp,host) ){
+			if( host in temp ){
 				$scope.chosenHost[host] = temp[host];
 			}
 			else{
