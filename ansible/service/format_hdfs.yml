@@ -56,10 +56,14 @@
   - NAMENODE[0]
   sudo: yes
   tasks:
+  - name: clean old file
+    shell: rm /tmp/ansible -rf
+    sudo: yes
   - name: tar the name dir 
     script: script/tarName.sh {{hdfs__dfs_namenode_name_dir[0]}} name.tar.gz
     sudo: yes
   - name: copy the name tar from first namenode
+    sudo: yes
     fetch: src=/tmp/name.tar.gz dest=/tmp/ansible 
 
 - hosts:

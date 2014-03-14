@@ -8,4 +8,5 @@
     - mapred-site.xml
     - yarn-site.xml
     - yarn-site.private.xml
+    - yarn-env.sh
     

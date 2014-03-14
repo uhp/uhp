@@ -36,4 +36,5 @@ sudo pip install mysql-python
 sudo pip install lockfile
 sudo pip install python-daemon 
 
+chmod +x $UHP_HOME/inventor/mysqlinventory.py 
 
