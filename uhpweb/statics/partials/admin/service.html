@@ -121,7 +121,8 @@
 					<select ng-model="showType" style="margin-bottom: 20px;">
 						<option value="group">组变量</option>
 						<option value="host">机器变量</option>
-					</select> <select ng-show="showType=='group'" ng-model="nowGroup"
+					</select> 
+					<select ng-show="showType=='group'" ng-model="nowGroup"
 						ng-options="group for group in groups"
 						style="margin-bottom: 20px;"></select> <input type="text"
 						ng-model="confSearchText" style="margin-bottom: 20px;">

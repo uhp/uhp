@@ -1,10 +1,14 @@
 uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$rootScope,$http){
-	$rootScope.menu="admin";
-	$rootScope.submenu="setting";	
+	
 	$scope.initConf=function(){
 		$http({
 	        method: 'GET',
-	        url: '/adminback/global_conf_var',
+	        url: '/adminback/conf_var',
+	        params:  { 
+	        	"showType" : $scope.showType,
+	        	"service" : "",
+	        	"group" : "all"
+	        }
 	    }).success(function(response, status, headers, config){
 	        $scope.confVar=response["conf"];
 	        //将所有的list的逗号转换为\n
@@ -14,14 +18,32 @@ uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$
 		        }
 		    });
 	    }).error(function(data, status) {
-	    	$rootScope.alert("发送 global_conf_var请求失败");
+	    	$rootScope.alert("发送 conf_var请求失败");
+	    });
+		
+		$http({
+	        method: 'GET',
+	        url: '/adminback/hosts'
+	    }).success(function(response, status, headers, config){
+	        $scope.hosts = [];
+	        for(var host in response["hosts"]){
+	        	$scope.hosts.push(host)
+	        }
+	    }).error(function(data, status) {
+	    	$rootScope.alert("发送hosts请求失败");
 	    });
 	}
-	$scope.initConf();
+	
 	//添加配置
 	$scope.addConfVar=function(){
-		$scope.nowConfVar={"service": "","group": "all","type":"string"};
-		$scope.showConfModal();
+		if ( $scope.showType == "group" ){
+			$scope.nowConfVar={"service": "","group": "all","type":"string"};
+			$scope.showConfModal();
+		}
+		else{
+			$scope.nowConfVar={"service": "","type":"string"};
+			$scope.showConfModal();
+		}
 	}
 	//修改配置
 	$scope.editConfVar=function(oneConfVar){
@@ -29,14 +51,15 @@ uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$
 		for(var key in oneConfVar){
 			$scope.nowConfVar[key]=oneConfVar[key];
 		}
-		$scope.nowConfVar["host"] = "all"
+		$scope.nowConfVar["host"] = oneConfVar["group"]
 		$scope.nowConfVar["service"] = ""
 		$scope.nowConfVar["del"] = true;
-		$scope.showConfModal();
+		$scope.showConfModal()
 	}
 	$scope.showConfModal=function(){
 		$("#settingConfModal").modal();
 	}
+	
 	//保存配置
 	//保存修改删除conf
 	$scope.saveConf=function(del){
@@ -45,9 +68,13 @@ uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$
 		}
 		$http({
 	        method: 'GET',
-	        url: '/adminback/save_global_conf_var',
+	        url: '/adminback/save_conf_var',
 	        params:  {
-        		"name" : $scope.nowConfVar.name,
+	        	"service" : "",
+	        	"showType" : $scope.showType,
+	        	"group" :$scope.nowConfVar.group,
+	        	"host" : $scope.nowConfVar.host,
+	        	"name" : $scope.nowConfVar.name,
         		"value" : $scope.nowConfVar.value,
         		"type" : $scope.nowConfVar.type,
         		"text" : $scope.nowConfVar.text,
@@ -65,4 +92,13 @@ uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$
 	    	$rootScope.alert("发送save_global_conf_var请求失败");
 	    });
 	}
+	
+	$scope.$watch("showType",function(newValue,oldValue){
+		$scope.initConf();
+	});
+	
+	$rootScope.showType = "group"
+	$rootScope.menu = "admin";
+	$rootScope.submenu = "setting";	
+	$scope.initConf();
 }]);

@@ -158,7 +158,6 @@ class AdminBackHandler(BaseHandler):
             groupVars = session.query(GroupVar).filter(and_( GroupVar.service == service , GroupVar.group == group ) )
             
             for groupVar in groupVars:
-                print groupVar
                 temp.append( groupVar.format() );
         else:
             session=self.getsession()
@@ -206,42 +205,57 @@ class AdminBackHandler(BaseHandler):
                     session.delete(hostVar)
                 session.commit()
             else:
+   
                 session=self.getsession()
                 session.merge(hostVar)
                 session.commit()
          
     #获取配置变量的接口 兼容组变量和机器变量，机器变量不过滤机器名称
-    def global_conf_var(self):
-        temp = []
-        session=self.getsession()
-        groupVars = session.query(GroupVar).filter(and_( GroupVar.service == "" , GroupVar.group == "all" ) )
-            
-        for groupVar in groupVars:
-            print groupVar
-            temp.append( groupVar.format() );
-            
-        self.ret("ok", "", {"conf":temp})
+#     def global_conf_var(self):
+#         showType = self.get_argument("showType")
+#         temp = []
+#         session=self.getsession()
+#         
+#         if  showType=="group":
+#             session=self.getsession()
+#             groupVars = session.query(GroupVar).filter(and_( GroupVar.service == "" , GroupVar.group == "all" ) )
+#             for groupVar in groupVars:
+#                 temp.append( groupVar.format() );
+#         else:
+#             session=self.getsession()
+#             hostVars = session.query(HostVar).filter( HostVar.service == "" )
+#             for hostVar in hostVars:
+#                 temp.append( hostVar.format() );
+#             
+#         self.ret("ok", "", {"conf":temp})
         
     #保存全局变量
-    def save_global_conf_var(self):
-        name = self.get_argument("name")
-        value = self.get_argument("value")
-        type = self.get_argument("type")
-        text = self.get_argument("text","")
-        showdel = self.get_argument("del","")
-        groupVar = GroupVar("all","",name,value,type,text)
-        if showdel=="del":
-            session=self.getsession()
-            for groupVar in session.query(GroupVar).filter( and_( GroupVar.service == groupVar.service , \
-                             GroupVar.group == groupVar.group, GroupVar.name == groupVar.name )) :
-                session.delete(groupVar)
-            session.commit()
-        else:
-            session=self.getsession()
-            session.merge(groupVar)
-            session.commit()
-            
-        self.ret("ok", "", {})
+#     def save_global_conf_var(self):
+#         showType = self.get_argument("showType","")
+#         group = 
+#         name = self.get_argument("name")
+#         value = self.get_argument("value")
+#         type = self.get_argument("type")
+#         text = self.get_argument("text","")
+#         showdel = self.get_argument("del","")
+#         
+#         
+#         self.save_var_todb("",showType,group,host,name,value,type,text,showdel)
+#         
+#         
+#         groupVar = GroupVar("all","",name,value,type,text)
+#         if showdel=="del":
+#             session=self.getsession()
+#             for groupVar in session.query(GroupVar).filter( and_( GroupVar.service == groupVar.service , \
+#                              GroupVar.group == groupVar.group, GroupVar.name == groupVar.name )) :
+#                 session.delete(groupVar)
+#             session.commit()
+#         else:
+#             session=self.getsession()
+#             session.merge(groupVar)
+#             session.commit()
+#             
+#         self.ret("ok", "", {})
     
     
     # 提交一个执行任务 
