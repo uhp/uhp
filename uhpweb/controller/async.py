@@ -10,7 +10,7 @@ from sqlalchemy import and_
 import config
 import database
 from model.instance import Instance
-from model.host_group_var import Host,GroupVar
+from model.host_group_var import Host,GroupVar,HostVar
 from model.task import Task
 from model.services import Service
 from controller import callback_lib
@@ -84,7 +84,7 @@ def async_remove(id):
     mutex.release()
    
 #添加机器的服务 
-def add_host(asyncId,hosts,user,port,passwd,sudopasswd):  
+def add_host(asyncId,hosts,login):  
     #保留10秒后清除
     session=database.getSession()
     idMap = {}
@@ -104,16 +104,17 @@ def add_host(asyncId,hosts,user,port,passwd,sudopasswd):
     async_push(asyncId,"progressMsg","ansible connect and install yum python json.As the yum update automatically,it could be long...")
     progress = 20
     async_set(asyncId,"progress",progress) 
-    (user,port,passwd,sudopasswd) = get_default_login(session,user,port,passwd,sudopasswd)
+    newlogin = get_default_login(session, login)
+#     (user,port,passwd,sudopasswd) 
     for host in hosts:
         taskId = idMap[host] 
         database.update_task(session,taskId,Task.STATUS_RUNNING,Task.RESULT_UNFINISH,"") 
     
     if config.fade_windows:
-        ret=fade_connect_host(hosts,user,port,passwd,sudopasswd)
+        ret=fade_connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
     else:
         import ansible_lib
-        ret=ansible_lib.connect_host(hosts,user,port,passwd,sudopasswd)
+        ret=ansible_lib.connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
 
     #处理结果
     success=[]
@@ -139,7 +140,7 @@ def add_host(asyncId,hosts,user,port,passwd,sudopasswd):
             prepareTaskids.append(prepareTaskid)
             callback_lib.add_callback(session,prepareTaskid,"changeHostToReady")
             #假如登录信息跟默认的不一致，保存这些登录信息到数据库
-            #TODO
+            save_login(session, hostName, login)
             
             #更新任务状态
             database.update_task(session,taskId,Task.STATUS_FINISH,Task.RESULT_SUCCESS,"")
@@ -163,14 +164,43 @@ def add_host(asyncId,hosts,user,port,passwd,sudopasswd):
     async_remove(asyncId)
     session.close()
 
-def get_default_login(session,user,port,passwd,sudopasswd):
-    user = database.get_golbal_conf(session,"ansible_ssh_user")
-    port = database.get_golbal_conf(session,"ansible_ssh_port")
-    passwd = database.get_golbal_conf(session,"ansible_ssh_pass")
-    sudopasswd = database.get_golbal_conf(session,"ansible_sudo_pass")
+#检查哪些需要查询的
+def get_default_login(session,login):
+    if login[0] == "" :
+        user = database.get_golbal_conf(session,"ansible_ssh_user")
+    else:
+        user = login[0]
+    if login[1]  == "" :
+        port = database.get_golbal_conf(session,"ansible_ssh_port")
+    else:
+        port = login[1]
+    if login[2]  == "" :
+        passwd = database.get_golbal_conf(session,"ansible_ssh_pass")
+    else:
+        passwd = login[2]
+    if login[3] == "" :
+        sudopasswd = database.get_golbal_conf(session,"ansible_sudo_pass")
+    else:
+        sudopasswd = login[3]
     return (user,port,passwd,sudopasswd)
 
-
+#保存那些特定的登录信息
+def save_login(session,host,login):
+    if login[0] != "" :
+        hv = HostVar(host,"","ansible_ssh_user",login[0])
+        session.merge(hv)
+        app_log.info("save login message"+login[0])
+    if login[1]  != "" :
+        hv = HostVar(host,"","ansible_ssh_port",login[1])
+        session.merge(hv)
+    if login[2]  != "" :
+        hv = HostVar(host,"","ansible_ssh_pass",login[2])
+        session.merge(hv)
+    if login[3]  != "" :
+        hv = HostVar(host,"","ansible_sudo_pass",login[3])
+        session.merge(hv)
+    session.commit()
+        
 ############################################use for test
 def fade_connect_host(hosts,user,port,passwd,sudopasswd):
     time.sleep(5)

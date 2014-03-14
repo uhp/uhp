@@ -44,7 +44,8 @@
 					</table>	
 				</div>	
 				<!-- 增加机器的模式对话框 -->
-			  	<div id="hostNewHostModal" class="modal hide fade" data-backdrop="static" aria-hidden="true">
+			  	<div id="hostNewHostModal" class="modal hide fade" data-backdrop="static" aria-hidden="true"
+			  		style="width:700px;left:350px;margin-left:0px;" >
 		            <div class="modal-header">
 		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 		                    &times;
@@ -52,23 +53,27 @@
 		                <h3>添加机器</h3>
 		            </div>
 		            <div class="modal-body">
-		            	<div class="input-prepend">
-			               <span class="add-on">机器名:</span><textarea rows="15" ng-model="nowHost.hosts" placeholder="请填写hostname(一行一个)"></textarea>
-			            </div>
-			            <!-- 
-			            <div class="input-prepend">
-			               <span class="add-on">用户:</span><input type="text" ng-model="nowHost.user" placeholder="暂不支持特殊登录信息" readonly>
-			            </div>
-			            <div class="input-prepend">
-			               <span class="add-on">端口:</span><input type="text" ng-model="nowHost.port" placeholder="暂不支持特殊登录信息" readonly>
-			            </div>
-			            <div class="input-prepend">
-			               <span class="add-on">密码:</span><input type="text" ng-model="nowHost.passwd" placeholder="暂不支持特殊登录信息" readonly>
-			            </div>
-			            <div class="input-prepend">
-			               <span class="add-on">sudo密码:</span><input type="text" ng-model="nowHost.sudopasswd" placeholder="暂不支持特殊登录信息" readonly>
-			            </div>
-			             -->
+		            	<div  class="row">
+		            		<div class="span" >
+				            	<div class="input-prepend">
+					               <span class="add-on">机器名:</span><textarea rows="15" ng-model="nowHost.hosts" placeholder="请填写hostname(一行一个)"></textarea>
+					            </div>
+				        	</div>	
+		            		<div class="span" >
+				            	<div class="input-prepend" style="display:block">
+					               <span class="add-on">用户:</span><input type="text" ng-model="nowHost.user" placeholder="特殊用户名" >
+					            </div>
+					            <div class="input-prepend" style="display:block">
+					               <span class="add-on">端口:</span><input type="text" ng-model="nowHost.port" placeholder="特殊端口" >
+					            </div>
+					            <div class="input-prepend" style="display:block">
+					               <span class="add-on">密码:</span><input type="text" ng-model="nowHost.passwd" placeholder="特殊密码" >
+					            </div>
+					            <div class="input-prepend" style="display:block">
+					               <span class="add-on">sudo密码:</span><input type="text" ng-model="nowHost.sudopasswd" placeholder="特殊sudo密码" >
+					            </div>
+				        	</div>	
+		            	</div>
 		            </div>
 		            <div class="modal-footer">
 		                <button type="button" class="btn" data-dismiss="modal">取消</button>
