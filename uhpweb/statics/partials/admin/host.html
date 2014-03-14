@@ -115,7 +115,7 @@
 		               <select ng-model="chosenService" ng-options="ser for ser in serviceList" ></select>
 		            </div>
 			  		<input type="text" ng-model="hostSearchText" style="margin-bottom:20px;" placeholder="过滤机器">
-			  		<button type="button" class="btn" style="margin-bottom:20px;" ng-click="initHostRole()">reset</button>
+			  		<button type="button" class="btn" style="margin-bottom:20px;" ng-click="initHostRole(0)">reset</button>
 					<button type="button" class="btn" style="margin-bottom:20px;" ng-click="readySetupInstance()">提交</button>
 					<label ng-show="isDoing" >有安装或者卸载正在进行，不能进行修改</label>
 			  		<table id="table_id" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >

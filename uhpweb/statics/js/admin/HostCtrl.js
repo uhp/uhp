@@ -23,11 +23,19 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    });
 	}
 	$scope.initChosenHost=function(){
+		var temp = $scope.chosenHost;
 		$scope.chosenHost={}
 		for(var host in $scope.hosts){
-			$scope.chosenHost[host]=false;
+			if( inArray(temp,host) ){
+				$scope.chosenHost[host] = temp[host];
+			}
+			else{
+				$scope.chosenHost[host] = false;
+			}
 		}
-		$scope.chosenAllHost=false
+		if( $scope.chosenAllHost == null ){
+			$scope.chosenAllHost = false
+		}
 	}
 	$scope.initRole=function(){
 		$http({
@@ -40,9 +48,11 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	for(var ser in $scope.roles){
 	    		$scope.serviceList.push(ser)
 			}
-	    	$scope.chosenService = $scope.serviceList[0]
+	    	if( $scope.chosenService == null ){
+	    		$scope.chosenService = $scope.serviceList[0]
+	    	}
 	    	$scope.hostroles = response['hostroles']
-	    	$scope.initHostRole()
+	    	$scope.initHostRole(1)
 	    	$scope.doing = response['doing']
 	    	if($scope.doing!=null && $scope.doing.length !=0) $scope.isDoing=true;
 	    	else $scope.isDoing=false;
@@ -58,16 +68,30 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 		return temp
 	}
 	//通过hostroles保存的真实的关系初始化hostRoleMap的对应关系
-	$scope.initHostRole=function(){
+	$scope.initHostRole=function(needOld){
+		var oldMap = null;
+		if( needOld != null && needOld == 1){
+			oldMap = $scope.hostRoleMap ;
+		}
 		var map={};
 		for(var host in $scope.hostroles){
 			map[host]={};
 			var roleList = $scope.hostroles[host]['role']
 			for(var ser in $scope.roles ){
 				for(var index in $scope.roles[ser]){
-					var role = $scope.roles[ser][index]
-					if( inArray(roleList,role) ) map[host][role]=true;
-					else map[host][role]=false;
+					var role = $scope.roles[ser][index];
+					//为了避免刷新会丢失用户的选择加入值传递
+					if( oldMap != null &&  ( host in oldMap) && (role in oldMap[host]) ){
+						map[host][role] = oldMap[host][role];
+					}
+					else{
+						if( inArray(roleList,role) ) {
+							map[host][role]=true;
+						}
+						else {
+							map[host][role]=false;
+						}
+					}
 				}
 			}
 		}
@@ -374,7 +398,6 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	$scope.autoFlush = function(){
 		$scope.initHost();
 		$scope.initRole();
-		$scope.initGroup();
 	}
 	
 	//tab操作和跳转
