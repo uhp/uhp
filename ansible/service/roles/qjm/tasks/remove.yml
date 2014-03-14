@@ -1,3 +1,0 @@
-- name: start qjm
-  sudo: yes
-  yum: name=hadoop-hdfs-journalnode state=removed

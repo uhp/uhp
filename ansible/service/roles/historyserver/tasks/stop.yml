@@ -1,6 +1,0 @@
-
-- name: stop mapreduce-history
-  sudo: yes
-  service: name=hadoop-mapreduce-historyserver state=stopped
-
-

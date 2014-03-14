@@ -1,5 +1,0 @@
-
-- name: stop datanode
-  sudo: yes
-  service: name=hadoop-hdfs-datanode state=stopped
-

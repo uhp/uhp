@@ -1,8 +1,0 @@
-{
-	"ret":"ok",
-	"msg":"",
-	"quotas":[
-	{"path":"/user/qiujw","fdQuota":"10000","fdLeft":"99990","fdUsed":"10","dirUsed":"2","fileUsed":"8",
-	"spaceQuota":"10737418240","spaceLeft":"10737187006","spaceUsed":"231234","duSize":"77078","avgReplcation":"3"}
-	]
-}

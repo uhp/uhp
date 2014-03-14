@@ -1,4 +1,0 @@
-- name: stop qjm
-  sudo: yes
-  service: name=hadoop-hdfs-journalnode state=stopped
-

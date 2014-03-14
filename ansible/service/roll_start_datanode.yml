@@ -1,5 +1,0 @@
-
-- hosts: DATANODE
-  tasks:
-  - include: roles/datanode/tasks/restart.yml
-  serial: 1

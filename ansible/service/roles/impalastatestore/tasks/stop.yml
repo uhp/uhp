@@ -1,5 +1,0 @@
-
-- name: stop impala state store
-  sudo: yes
-  service: name=impala-state-store state=stopped
-

@@ -1,8 +1,0 @@
-
-
-- name: create the warehouse
-  sudo: yes
-  sudo_user: hdfs
-  shell: hdfs dfs -mkdir {{item}} ; hdfs dfs -chown hive:hive {{item}} ; hdfs dfs -chmod 1777 {{item}}
-  with_items:
-  - "{{hive__hive_metastore_warehouse_dir}}"

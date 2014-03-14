@@ -1,9 +1,0 @@
-
-- name: remove the zookeeper
-  sudo: yes
-  yum: name={{item}} state=removed
-  with_items:
-   - zookeeper-server
-
-
-

@@ -1,5 +1,0 @@
-
-
-- hosts: ZOOKEEPER
-  tasks:
-  - include: roles/zookeeper/tasks/start.yml

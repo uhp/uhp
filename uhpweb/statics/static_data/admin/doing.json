@@ -1,6 +1,0 @@
-{
-"doing":[
-{"host":"hadoop1","role":"namenode","status":"setup"},
-{"host":"hadoop2","role":"namenode","status":"remove"}
-]
-}

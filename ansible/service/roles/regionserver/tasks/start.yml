@@ -1,7 +1,0 @@
-
-- include: ../../conf/tasks/hbase.yml
-
-- name: start regionserver
-  sudo: yes
-  service: name=hbase-regionserver state=started
-

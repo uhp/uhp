@@ -1,5 +1,0 @@
-export HBASE_CLASSPATH=$HBASE_CLASSPATH
-export HBASE_MASTER_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_MASTER_OPTS}} "
-export HBASE_REGIONSERVER_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_REGIONSERVER_OPTS}} "
-export HBASE_THRIFT_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_THRIFT_OPTS}} "
-export HBASE_OPTS=" -Xmx256m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:+CMSIncrementalMode $HBASE_OPTS "

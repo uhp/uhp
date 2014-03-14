@@ -1,5 +1,0 @@
-
-- name: stop hive server2
-  sudo: yes
-  service: name=hive-server2 state=stopped
-
