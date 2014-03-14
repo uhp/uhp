@@ -1,0 +1,10 @@
+
+- name: check weather to add limit
+  shell: cat /etc/security/limits.d/90-nproc.conf|grep nofile|wc -l
+  register: need_limit
+
+
+- name: set ulimit 
+  sudo: yes
+  shell: echo '* - nofile 51200' >> /etc/security/limits.d/90-nproc.conf ; echo '* - noproc 10240' >> /etc/security/limits.d/90-nproc.conf
+  when: need_limit.stdout|int == 0

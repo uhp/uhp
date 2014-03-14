@@ -1,0 +1,274 @@
+<script type="text/javascript" src="static/jslib/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+<link href="static/jslib/datetimepicker/css/datetimepicker.css " rel="stylesheet">
+<div>
+	<h3>YARN</h3>
+	<div>
+		<div>
+			<ul class="nav nav-tabs" id="serviceTab">
+			  <li class="[[tabClass('quota')]]"><a ng-click="initQuota()" >资源配额</a></li>
+			  <!-- for uhp1.0
+			  <li class="[[tabClass('running')]]"><a ng-click="initRunning()" >当前运行作业</a></li>
+			  <li class="[[tabClass('history')]]"><a ng-click="initHistory()">历史作业查询</a></li>
+			 	 -->
+			</ul>
+		</div>
+		<div class="tab-content">
+			<!-- 资源配额-->	
+		  	<div class="tab-pane fade [[tabClass('quota','in')]] ">
+		  		<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
+					<thead>
+						<tr>
+				           <th rowspan="2">队列</th>
+				           <th colspan="6">资源配置</th>
+				           <th colspan="3">当前状态</th>
+				        </tr>
+				        <tr>
+				           <th>最大资源上限</th>
+				           <th>最小共享量</th>
+				           <th>队列权重</th>
+				           <th>最大运行应用数量</th>
+				           <th>可提交用户</th>
+				           <th>队列内资源调度策略</th>
+				           <th>排队应用</th>
+				           <th>运行应用</th>
+				           <th>使用资源</th>
+				        </tr>
+				    </thead>
+				    <tbody>
+				        <tr ng-repeat="quato in quotas">
+				            <td>[[quato.queue]]</td>
+				            
+				            <td>[[quato.static.maxResources]]</td>
+				            <td>[[quato.static.minResources]]</td>
+				            <td>[[quato.static.weight]]</td>
+				            <td>[[quato.static.maxRunningApps]]</td>
+				            <td>[[quato.static.aclSubmitApps]]</td>
+				            <td>[[quato.static.schedulingPolicy]]</td>
+				            
+				            <td>[[quato.now.pendingApp]]</td>
+				            <td>[[quato.now.activeApp]]</td>
+				            <td>[[quato.now.usedResource]]</td>
+				        </tr>
+				    </tbody>	
+				</table>
+		  	</div>
+		  	<!-- 运行作业-->	
+		  	<div class="tab-pane fade [[tabClass('running','in')]] ">
+		  		<button class="btn" ng-click="getRunning()">实时更新</button>
+		  		<div class="panel-group">
+		  			<div class="panel panel-default" ng-repeat="(queue,apps) in queues">
+		  				<div class="panel-heading">
+		  					<h4 class="panel-title">[[queue]]</h4>
+		  				</div>
+		  				<div class="panel-body">
+		  					<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered small-table"  >
+								<thead>
+									<tr>
+							           <th rowspan="2" style="width=72px;">应用id</th>
+							           <th rowspan="2">用户</th>
+							           <th rowspan="2" style="width=300px;">名称</th>
+							           <th rowspan="2">AM</th>
+							           <th rowspan="2">提交至今</th>
+							           <th rowspan="2">进度</th>
+							           <th rowspan="2">运行至今</th>
+							           <th colspan="5">Map数量</th>
+							           <th colspan="5">Reduce数量</th>
+							        </tr>
+							        <tr>
+							           <th>All</th>
+							           <th>Pend</th>
+							           <th>Run</th>
+							           <th>Fail</th>
+							           <th>Kill</th>
+							           <th>Succ</th>
+							           <th>All</th>
+							           <th>Pend</th>
+							           <th>Run</th>
+							           <th>Fail</th>
+							           <th>Kill</th>
+							           <th>Succ</th>
+							        </tr>
+							    </thead>
+							    <tbody>
+							        <tr ng-repeat="(app,info) in apps">
+							            <td><a href="http://[[rmhost]]:[[rmport]]/proxy/[[app]]">[[info.id]]</a></td>
+							            <td>[[info.user]]</td>
+							            <td style="word-wrap: break-word; word-break: break-all;width=100px;">[[info.name]]</td>
+							            <td>[[info.amHost]]</td>
+							            <td>[[info.elapsedTime]]</td>
+							            <td>[[info.progress]]</td>
+							            <td>[[info.startedTime]]</td>
+							            
+							            <td>[[ mr[app]['map']['All'] ]]</td>
+							            <td>[[ mr[app]['map']['Pend'] ]]</td>
+							            <td>[[ mr[app]['map']['Run'] ]]</td>
+							            <td>[[ mr[app]['map']['Fail'] ]]</td>
+							            <td>[[ mr[app]['map']['Kill'] ]]</td>
+							            <td>[[ mr[app]['map']['Succ'] ]]</td>
+							                           
+							            <td>[[ mr[app]['reduce']['All'] ]]</td>
+							            <td>[[ mr[app]['reduce']['Pend'] ]]</td>
+							            <td>[[ mr[app]['reduce']['Run'] ]]</td>
+							            <td>[[ mr[app]['reduce']['Fail'] ]]</td>
+							            <td>[[ mr[app]['reduce']['Kill'] ]]</td>
+							            <td>[[ mr[app]['reduce']['Succ'] ]]</td> 
+							        </tr>
+							    </tbody>	
+							</table>
+		  				</div>
+		  			</div>
+		  		</div>
+		  	</div>
+		  	<!-- 历史作业查询-->	
+		  	<div class="tab-pane fade [[tabClass('history','in')]] ">
+		  		<!-- 过滤条件 -->
+		  		<div>
+		  			<h5>过滤条件</h5>
+		  			<div class="input-prepend" >
+		               <span class="add-on">appid</span>
+		               <input type="text" ng-model="filter.appid">
+		            </div>
+		            <div class="input-prepend" >
+		               <span class="add-on">name</span>
+		               <input type="text" ng-model="filter.name">
+		            </div>
+		            <div class="input-prepend">
+		            	<span class="add-on">finalStatus</span>
+		              	<select ng-model="filter.finalStatus">
+		               		<option>SUCCEEDED</option>
+		               		<option>FAILED</option>
+		               		<option>KILLED</option>
+		               	</select>
+		            </div>
+		            <div>
+			            <div class="input-prepend">
+			            	<span class="add-on">开始时间</span>
+			              	<select ng-model="filter.startTime" style="width:130px;" >
+			               		 <option selected="selected" value ="-1">无</option>
+								  <option value ="10">最近10分钟</option>
+								  <option value ="60">最近1小时</option>
+								  <option value ="180">最近3小时</option>
+								  <option value="720">最近12小时</option>
+								  <option value="1440">最近24小时</option>
+								  <option value="4320">最近3天</option>
+								  <option value="10080">最近7天</option>
+								  <option value ="-2">自定义</option>
+			               	</select>
+			            </div >
+			            <div ng-show="filter.startTime==-2" style="display:inline;">
+							<input type="text" style="width:130px;" class="form_datetime" value="" ng-model="filter.minStartTime">
+							<lebal> &lt; 开始时间 &lt; </lebal>
+							<input type="text" style="width:130px;" class="form_datetime" value="" ng-model="filter.maxStartTime">
+						</div>
+					</div>
+					<div>
+			            <div class="input-prepend" >
+			            	<span class="add-on">结束时间</span>
+			              	<select ng-model="filter.endTime" style="width:130px;" >
+			               		 <option selected="selected" value ="-1">无</option>
+								  <option value ="10">最近10分钟</option>
+								  <option value ="60">最近1小时</option>
+								  <option value ="180">最近3小时</option>
+								  <option value="720">最近12小时</option>
+								  <option value="1440">最近24小时</option>
+								  <option value="4320">最近3天</option>
+								  <option value="10080">最近7天</option>
+								  <option value ="-2">自定义</option>
+			               	</select>
+			            </div>
+			            <div ng-show="filter.endTime==-2" style="display:inline;">
+							<input type="text" style="width:130px;"  class="form_datetime" value="" ng-model="filter.minEndTime">
+							<lebal> &lt; finishTime &lt; </lebal>
+							<input type="text" style="width:130px;"  class="form_datetime" value="" ng-model="filter.maxEndTime">
+						</div>
+					</div>
+		            <script  type="text/javascript">
+		            	$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+		            </script>
+		            <div>
+		            	<button class="btn" ng-click="query()">查询</button>
+		            </div>
+		  		</div >
+		  		<!-- 汇总 -->
+		  		<div class="aspre">
+一共有 <em class="hl">[[resultRecord.appidCount]]</em> 个Appid符合筛选。
+
+产生 <em class="hl">[[resultRecord.mapsTotalSum]]</em> 个map任务 ,完成了 <em class="hl">[[resultRecord.mapsCompletedSum]]</em>  个，完成率 <em class="hl">[[float1(resultRecord.mapsCompletedSum,resultRecord.mapsTotalSum)]]</em> %。
+进行了  <em class="hl">[[resultRecord.successfulMapAttemptsSum+resultRecord.killedMapAttemptsSum+resultRecord.failedMapAttemptsSum]]</em> 次map的尝试，成功了 <em class="hl">[[resultRecord.successfulMapAttemptsSum]]</em> 次，失败了 <em class="hl">[[resultRecord.failedMapAttemptsSum]]</em> 次, 终止了 <em class="hl">[[resultRecord.killedMapAttemptsSum]]</em> 次。
+本地map调度 <em class="hl">[[resultRecord.localMapSum]]</em> 次，调度率占 <em class="hl">[[float1(resultRecord.localMapSum,resultRecord.mapsTotalSum)]]</em> %。 机架map调度 <em class="hl">[[resultRecord.rackMapSum]]</em> 次，调度率占 <em class="hl">[[float1(resultRecord.rackMapSum,resultRecord.mapsTotalSum)]]</em> %
+
+产生 <em class="hl">[[resultRecord.reducesTotalSum]]</em> 个reduce任务 ,完成了 <em class="hl">[[resultRecord.reducesCompletedSum]]</em>  个，完成率 <em class="hl">[[float1(resultRecord.reducesCompletedSum,resultRecord.reducesTotalSum)]]</em> %。
+进行了  <em class="hl">[[resultRecord.successfulReduceAttemptsSum+resultRecord.killedReduceAttemptsSum+resultRecord.failedReduceAttemptsSum]]</em> 次reduce的尝试，成功了 <em class="hl">[[resultRecord.successfulReduceAttemptsSum]]</em> 次，失败了 <em class="hl">[[resultRecord.failedReduceAttemptsSum]]</em> 次, 终止了 <em class="hl">[[resultRecord.killedReduceAttemptsSum]]</em> 次。
+
+读了  <em class="hl">[[formatGB(resultRecord.hdfsReadSum)]]</em> G,写了 <em class="hl">[[formatGB(resultRecord.hdfsWriteSum)]]</em> G HDFS的文件, 读了 <em class="hl">[[formatGB(resultRecord.fileReadSum)]]</em> G,写了 <em class="hl">[[formatGB(resultRecord.fileWriteSum)]]</em> G 的本地中间文件。
+		  		</div>
+		  		<!-- 表格 -->
+		  		<div>
+		  			<label>结果显示:</label>
+		  			<div class="btn-group" >
+					  <button type="button" class="btn [[isActive('showBaseInfo')]]" ng-click="choose('showBaseInfo')">显示基本信息</button>
+					  <button type="button" class="btn [[isActive('showMap')]]" ng-click="choose('showMap')">显示Map数量</button>
+					  <button type="button" class="btn [[isActive('showReduce')]]" ng-click="choose('showReduce')">显示reduce数量</button>
+					  <button type="button" class="btn [[isActive('showIO')]]" ng-click="choose('showIO')">显示IO状态</button>
+					</div>
+		  		</div>
+		  		<div>
+		  			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered mini-table"  >
+						<thead>
+							<tr>
+					           <th  style="width=72px;">应用id</th>
+					           <th >用户</th>
+					           <th  style="width=300px;">名称</th>
+					           <th ng-show="showBaseInfo">队列</th>
+					           <th >开始时间</th>
+					           <th >结束时间</th>
+					           <th ng-show="showBaseInfo">状态</th>
+					           <th ng-show="showBaseInfo">结果</th>
+					           <th ng-show="showBaseInfo">重试</th>
+					           
+					           <th ng-show="showMap" colspan="6">Map(全部,完成,成功,终止,失败,时间)</th>
+					           <th ng-show="showReduce" colspan="6">Reduce(全部,完成,成功,终止,失败,时间)</th>
+					           <th  ng-show="showIO" colspan="2">本地读写</th>
+					           <th  ng-show="showIO" colspan="2">Hdfs读写</th>
+					        </tr>
+					    </thead>
+					    <tbody>
+					        <tr ng-repeat="app in applist">
+					            <td><a href="http://[[rmhost]]:[[rmport]]/proxy/[[ app['appid'] ]]">[[ app['id'] ]]</a></td>
+					            <td>[[ app['user'] ]]</td> 
+					            <td style="word-wrap: break-word; word-break: break-all;width:300px;">[[ app['name'] ]]</td> 
+					            <td ng-show="showBaseInfo">[[ app['queue'] ]]</td>
+					            <td>[[ app['startedTime'] ]]</td>
+					            <td>[[ app['finishedTime'] ]]</td> 
+					            <td ng-show="showBaseInfo">[[ app['state'] ]]</td> 
+					            <td ng-show="showBaseInfo">[[ app['finalStatus'] ]]</td>
+					            <td ng-show="showBaseInfo">[[ app['attemptNumber'] ]]</td> 
+					            
+					            <td ng-show="showMap">[[ app['mapsTotal'] ]]</td>
+								<td ng-show="showMap">[[ app['mapsCompleted'] ]]</td>
+								<td ng-show="showMap">[[ app['successfulMapAttempts'] ]]</td>
+								<td ng-show="showMap">[[ app['killedMapAttempts' ] ]]</td>
+								<td ng-show="showMap">[[ app['failedMapAttempts'] ]]</td>
+								<td ng-show="showMap">[[ app['avgMapTime'] ]]</td>
+								
+								<td ng-show="showReduce" >[[ app['reducesTotal'] ]]</td>
+								<td ng-show="showReduce" >[[ app['reducesCompleted'] ]]</td>
+								<td ng-show="showReduce" >[[ app['successfulReduceAttempts'] ]]</td>
+								<td ng-show="showReduce" >[[ app['killedReduceAttempts'] ]]</td>
+								<td ng-show="showReduce" >[[ app['failedReduceAttempts'] ]]</td>
+								<td ng-show="showReduce" >[[ app['avgReduceTime'] ]]</td>
+								
+								<td ng-show="showIO">[[ app['fileRead'] ]]</td>
+								<td ng-show="showIO">[[ app['fileWrite'] ]]</td>
+								
+								<td ng-show="showIO">[[ app['hdfsRead'] ]]</td>
+								<td ng-show="showIO">[[ app['hdfsWrite'] ]]</td>
+								
+					        </tr>
+					    </tbody>	
+					</table>
+		  		</div>
+		  	</div>
+		</div>	
+	</div>
+</div>

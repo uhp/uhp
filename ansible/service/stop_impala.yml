@@ -1,0 +1,10 @@
+
+- hosts: IMPALASTATESTORE
+  tasks:
+  - include: roles/impalastatestore/tasks/stop.yml
+
+- hosts: IMPALASERVER
+  tasks:
+  - include: roles/impalaserver/tasks/stop.yml
+
+

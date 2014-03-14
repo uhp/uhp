@@ -1,0 +1,4 @@
+
+- name: stop zookeeper-server
+  sudo: yes
+  service: name=zookeeper-server state=stopped

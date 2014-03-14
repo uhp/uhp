@@ -1,0 +1,22 @@
+# UHP-Worker
+
+## 安装
+
+## 依赖
+
+  pip instll ... 
+
+* threadpool
+* ansible
+* daemon
+
+## 配置
+
+配置文件固定为 ./conf/monitor.conf
+
+## log
+
+日志的配置文件固定为 ./conf/monitor.log.conf
+
+## 运行
+

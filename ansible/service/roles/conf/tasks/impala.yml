@@ -1,0 +1,7 @@
+
+- name: copy impala conf
+  sudo: yes
+  template: src=impala/{{item}}.j2 dest=/etc/default/{{item}}
+  with_items:
+    - impala
+    

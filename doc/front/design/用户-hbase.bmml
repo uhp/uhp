@@ -1,0 +1,21 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1048" measuredH="584" mockupW="800" mockupH="584">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::MenuBar" x="248" y="0" w="800" h="31" measuredW="128" measuredH="29" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>1</selectedIndex>
+        <text>Admin%2C%20User</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::TabBar" x="248" y="31" w="799" h="553" measuredW="375" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>3</selectedIndex>
+        <text>%u6587%u4EF6%u5B58%u50A8%2C%u5B9E%u65F6%u4F5C%u4E1A%2C%u4F5C%u4E1A%u67E5%u8BE2%2Chbase%2Chive%2Cimpala</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::TextArea" x="270" y="74" w="750" h="446" measuredW="200" measuredH="140" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Version%200.94.2-cdh4.2.1%2C%20rUnknown%2C%20Mon%20Apr%2022%2010%3A54%3A24%20PDT%202013%0A%20%0Ahbase%28main%29%3A001%3A0%3E%20list%0ATABLE%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0Ahbase_live%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A1%20row%28s%29%20in%201.3750%20seconds%0A%20%0A%3D%3E%20%5B%22hbase_live%22%5D%0Ahbase%28main%29%3A002%3A0%3E%20scan%20sh%0ANameError%3A%20undefined%20local%20variable%20or%20method%20%60sh%27%20for%20%23%3CObject%3A0x39341183%3E%0A%20%0Ahbase%28main%29%3A003%3A0%3E%20scan%20hbase_list%0ANameError%3A%20undefined%20local%20variable%20or%20method%20%60hbase_list%27%20for%20%23%3CObject%3A0x39341183%3E%0A%20%0Ahbase%28main%29%3A004%3A0%3E%20scan%20hbase_list%0ANameError%3A%20undefined%20local%20variable%20or%20method%20%60hbase_list%27%20for%20%23%3CObject%3A0x39341183%3E%0A%20%0Ahbase%28main%29%3A005%3A0%3E%20scan%20hbase_live%0ANameError%3A%20undefined%20local%20variable%20or%20method%20%60hbase_live%27%20for%20%23%3CObject%3A0x39341183%3E%0A%20%0Ahbase%28main%29%3A006%3A0%3E%20</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

@@ -1,0 +1,36 @@
+
+- hosts: QJM
+  tasks:
+  - include: roles/qjm/tasks/setup.yml
+
+- hosts: NAMENODE
+  tasks:
+  - include: roles/namenode/tasks/setup.yml
+
+- hosts: DATANODE
+  tasks:
+  - include: roles/datanode/tasks/setup.yml
+
+- hosts: RESOURCEMANAGER
+  tasks:
+  - include: roles/resourcemanager/tasks/setup.yml
+
+- hosts: NODEMANAGER
+  tasks:
+  - include: roles/nodemanager/tasks/setup.yml
+
+- hosts: HISTORYSERVER
+  tasks:
+  - include: roles/historyserver/tasks/setup.yml
+
+- hosts: HADOOP_ALL
+  tasks:
+  - include: roles/conf/tasks/hadoop.yml
+
+- hosts: NAMENODE
+  tasks:
+  - include: roles/conf/tasks/namenode.yml
+
+- hosts: RESOURCEMANAGER
+  tasks:
+  - include: roles/conf/tasks/resourcemanager.yml

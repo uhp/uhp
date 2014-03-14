@@ -1,0 +1,6 @@
+[cloudera-impala]
+name=Impala
+baseurl=http://archive.cloudera.com/impala/redhat/6/x86_64/impala/1.1.1/
+gpgkey = http://archive.cloudera.com/impala/redhat/6/x86_64/impala/RPM-GPG-KEY-cloudera    
+gpgcheck = 1
+

@@ -1,0 +1,13 @@
+
+- hosts: QJM
+  tasks:
+  - include: roles/qjm/tasks/start.yml
+
+- hosts: NAMENODE
+  tasks:
+  - include: roles/namenode/tasks/start.yml
+
+- hosts: DATANODE
+  tasks:
+  - include: roles/datanode/tasks/start.yml
+

@@ -1,0 +1,1 @@
+{"msg": "", "task": {"status": "finish", "task": "connect", "service": "add_host", "sumbitTime": "2014-02-24 17:57:35", "host": "hadoop1", "role": "machine", "result": "success", "taskType": "async", "id": 1}, "ret": "ok"}

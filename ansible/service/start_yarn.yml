@@ -1,0 +1,12 @@
+
+- hosts: RESOURCEMANAGER
+  tasks:
+  - include: roles/resourcemanager/tasks/start.yml
+
+- hosts: NODEMANAGER
+  tasks:
+  - include: roles/nodemanager/tasks/start.yml
+
+- hosts: HISTORYSERVER
+  tasks:
+  - include: roles/historyserver/tasks/start.yml

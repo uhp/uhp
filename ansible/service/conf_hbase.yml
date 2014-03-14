@@ -1,0 +1,7 @@
+---
+# 分发hadoop配置
+#
+- hosts: HBASE_ALL
+  tasks:
+  - include: roles/conf/tasks/hbase.yml
+

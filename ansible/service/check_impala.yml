@@ -1,0 +1,6 @@
+
+
+- hosts:
+  - IMPALASERVER[0]
+  tasks:
+  - include: roles/checker/tasks/impala.yml

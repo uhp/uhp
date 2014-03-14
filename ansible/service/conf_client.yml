@@ -1,0 +1,8 @@
+---
+# 分发hadoop配置
+#
+- hosts: CLIENT
+  tasks:
+  - include: roles/conf/tasks/hadoop.yml
+  - include: roles/conf/tasks/hbase.yml
+  - include: roles/conf/tasks/hive.yml

@@ -1,0 +1,9 @@
+---
+# 部署系统环境的 playbook
+
+- hosts: DEBUG
+  roles:
+  - system
+  - { role: java , version: '1.6.0_45' }
+
+  

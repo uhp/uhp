@@ -1,0 +1,5 @@
+
+- name: clean the dfs_journalnode_edits_dir dir
+  sudo: yes
+  shell: rm {{hdfs__dfs_journalnode_edits_dir}}/* -rf
+

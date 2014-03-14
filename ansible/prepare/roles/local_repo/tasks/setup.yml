@@ -1,0 +1,29 @@
+
+
+- name: copy the yum file {{repo_name}}.repo
+  sudo: yes
+  copy: src={{repo_name}}.repo dest=/etc/yum.repos.d/
+
+- name: install createrepo
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items:
+  - yum-utils
+  - createrepo
+
+
+- name: mkdir temp file
+  sudo: yes
+  file: path=/tmp/ansible/repo state=directory mode=777
+
+- name: download the package TODO use script to do and throw the error 
+  shell: cd /tmp/ansible/repo/ ;  reposync -r {{repo_name}} ; createrepo {{repo_name}}
+
+
+- include: nginx.yml
+  when: auto_nginx_enabled
+
+- name: move the file to http root
+  sudo: yes
+  shell: rm -rf {{http_root}}/{{repo_name}} ; mv  /tmp/ansible/repo/{{repo_name}} {{http_root}}
+

@@ -1,0 +1,10 @@
+
+
+- hosts: HBASEMASTER
+  tasks:
+  - include: roles/hbasemaster/tasks/start.yml
+
+- hosts: REGIONSERVER
+  tasks:
+  - include: roles/regionserver/tasks/start.yml
+

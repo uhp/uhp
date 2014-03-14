@@ -1,0 +1,11 @@
+{
+"ret":"ok","msg":"",
+"tasks":[
+{"id":"1","sumbitTime":"0000-00-00 00:00:00","taskType":"ansible","service":"hdfs","host":"-","role":"-","task":"start","status":"完成","result":"成功"},
+{"id":"2","sumbitTime":"0000-00-00 00:00:00","taskType":"ansible","service":"hdfs","host":"hadoop1","role":"datanode","task":"start","status":"完成","result":"成功"},
+{"id":"3","sumbitTime":"0000-00-00 00:00:00","taskType":"ansible","service":"hdfs","host":"hadoop1","role":"datanode","task":"start","status":"完成","result":"成功"},
+{"id":"4","sumbitTime":"0000-00-00 00:00:00","taskType":"ansible","service":"hdfs","host":"hadoop2","role":"datanode","task":"stop","status":"完成","result":"成功"},
+{"id":"5","sumbitTime":"0000-00-00 00:00:00","taskType":"ansible","service":"hdfs","host":"hadoop1","role":"namenode","task":"start","status":"完成","result":"成功"}
+],
+"totalTask":1001
+}

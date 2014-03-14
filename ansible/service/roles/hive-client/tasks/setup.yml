@@ -1,0 +1,18 @@
+---
+
+
+- name: Install the hive client
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - hadoop
+   - hadoop-client
+   - hadoop-lzo-cdh4
+   - bigtop-utils
+   - hive
+
+- include: ../../jar/tasks/hive.yml
+- include: config.yml
+
+
+

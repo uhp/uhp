@@ -1,0 +1,14 @@
+
+- hosts: HIVESERVER
+  tasks:
+  - include: roles/hiveserver/tasks/setup.yml
+
+
+- hosts: HIVESERVER2
+  tasks:
+  - include: roles/hiveserver2/tasks/setup.yml
+
+
+- hosts: HIVEMETASTORE
+  tasks:
+  - include: roles/hivemetastore/tasks/setup.yml

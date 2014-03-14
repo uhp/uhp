@@ -1,0 +1,138 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1388" measuredH="596" mockupW="1377" mockupH="596">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::MenuBar" x="248" y="0" w="800" h="31" measuredW="128" measuredH="29" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>Admin%2C%20User</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="990" y="2" w="-1" h="-1" measuredW="59" measuredH="27" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>logout</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="940" y="5" w="-1" h="-1" measuredW="40" measuredH="22" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Name</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::TabBar" x="249" y="31" w="799" h="553" measuredW="270" measuredH="100" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>Service%2C%20Hosts%2C%20Active%20%2C%20History</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Accordion" x="261" y="80" w="100" h="315" measuredW="150" measuredH="302" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>3</selectedIndex>
+        <text>Zookeeper%0A-%20leader/follower%0A-%20observer%0AHdfs%0A-%20qjm%0A-%20%20namenode%0A-%20datanode%0Ayarn%0A-%20rm%0A-%20nodemanager%0Ahbase%0A-%20master%0A-%20regionserver%0Ahive%0A-%20metastore%0A-%20thrift</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::TabBar" x="376" y="80" w="650" h="484" measuredW="322" measuredH="100" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>2</selectedIndex>
+        <text>%u670D%u52A1%u6982%u51B5%2C%u8FD0%u884C%u5B9E%u4F8B%2C%u914D%u7F6E%u53D8%u91CF%2C%u914D%u7F6E%u6A21%u677F</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::DataGrid" x="401" y="152" w="600" h="373" measuredW="586" measuredH="415" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hasHeader>false</hasHeader>
+        <selectedIndex>3</selectedIndex>
+        <text>Group%2CName%20%5Ev%2C%20Value%20%5Ev%2CType%2C%20Text%0Ahadoop%2Cfs_default_FS_string%2C50900%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_namenode_http_address_string%2C50070%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_datanode_data_dir%2C/uhp/all_data_dir%5Cr/uhp/all_data_dir%2Clist%2Chdfs%u7684datanode%u7684%u76EE%u5F55%0Ahadoop%2Cfs_default_FS_string%2C50900%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_namenode_http_address_string%2C50070%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_datanode_data_dir%2C/uhp/all_data_dir%5Cr/uhp/all_data_dir%2Clist%2Chdfs%u7684datanode%u7684%u76EE%u5F55%0Ahadoop%2Cfs_default_FS_string%2C50900%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_namenode_http_address_string%2C50070%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_datanode_data_dir%2C/uhp/all_data_dir%5Cr/uhp/all_data_dir%2Clist%2Chdfs%u7684datanode%u7684%u76EE%u5F55%0Ahadoop%2Cfs_default_FS_string%2C50900%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_namenode_http_address_string%2C50070%2Cstring%2Chdfs%u7684%u9ED8%u8BA4%u7AEF%u53E3%0Ahadoop%2Cdfs_datanode_data_dir%2C/uhp/all_data_dir%5Cr/uhp/all_data_dir%2Clist%2Chdfs%u7684datanode%u7684%u76EE%u5F55</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::SearchBox" x="536" y="113" w="-1" h="-1" measuredW="120" measuredH="26" zOrder="7" locked="false" isInGroup="-1"/>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::Arrow" x="982" y="239" w="-1" h="-1" measuredW="150" measuredH="100" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::Canvas" x="1116" y="341" w="272" h="255" measuredW="100" measuredH="70" zOrder="9" locked="false" isInGroup="-1"/>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Label" x="1132" y="359" w="-1" h="-1" measuredW="41" measuredH="22" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Group</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Label" x="1132" y="398" w="-1" h="-1" measuredW="40" measuredH="22" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Name</text>
+      </controlProperties>
+    </control>
+    <control controlID="17" controlTypeID="com.balsamiq.mockups::Label" x="1137" y="436" w="-1" h="-1" measuredW="34" measuredH="22" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Type</text>
+      </controlProperties>
+    </control>
+    <control controlID="18" controlTypeID="com.balsamiq.mockups::Label" x="1134" y="489" w="-1" h="-1" measuredW="39" measuredH="22" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Value</text>
+      </controlProperties>
+    </control>
+    <control controlID="19" controlTypeID="com.balsamiq.mockups::TextInput" x="1182" y="356" w="-1" h="-1" measuredW="56" measuredH="28" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>hadoop</text>
+      </controlProperties>
+    </control>
+    <control controlID="20" controlTypeID="com.balsamiq.mockups::TextInput" x="1182" y="395" w="-1" h="-1" measuredW="144" measuredH="28" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>dfs_datanode_data_dir</text>
+      </controlProperties>
+    </control>
+    <control controlID="22" controlTypeID="com.balsamiq.mockups::ComboBox" x="361" y="114" w="120" h="-1" measuredW="67" measuredH="156" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Group%0A%09All%0A%09Datanode_g1%0A%09Datanode_g2%0AHost%0A%09hadoop1%0A%09hadoop2%0A%09hadoop3</text>
+      </controlProperties>
+    </control>
+    <control controlID="25" controlTypeID="com.balsamiq.mockups::ComboBox" x="1182" y="434" w="-1" h="-1" measuredW="66" measuredH="50" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>String%0AList</text>
+      </controlProperties>
+    </control>
+    <control controlID="28" controlTypeID="com.balsamiq.mockups::TextInput" x="1182" y="489" w="-1" h="-1" measuredW="109" measuredH="28" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>/uhp/all_data_dir</text>
+      </controlProperties>
+    </control>
+    <control controlID="29" controlTypeID="com.balsamiq.mockups::TextInput" x="1182" y="525" w="-1" h="-1" measuredW="116" measuredH="28" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>/uhp/all_data_dir2</text>
+      </controlProperties>
+    </control>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::Button" x="1305" y="489" w="-1" h="-1" measuredW="47" measuredH="27" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add</text>
+      </controlProperties>
+    </control>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::Button" x="1182" y="563" w="-1" h="-1" measuredW="50" measuredH="27" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>save</text>
+      </controlProperties>
+    </control>
+    <control controlID="32" controlTypeID="com.balsamiq.mockups::Button" x="1248" y="563" w="-1" h="-1" measuredW="62" measuredH="27" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>cancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="33" controlTypeID="com.balsamiq.mockups::StickyNote" x="11" y="46" w="177" h="184" measuredW="109" measuredH="123" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u53EF%u4EE5%u9009%u62E9%u7EC4%u6216%u8005%u5355%u4E2A%u673A%u5668%u8BBE%u7F6E%u53D8%u91CF%u3002%u8FD9%u4E9B%u53D8%u91CF%u6700%u7EC8%u4F1A%u6CE8%u5165%u5230%u914D%u7F6E%u6A21%u677F%u6587%u4EF6%u4E2D%u3002</text>
+      </controlProperties>
+    </control>
+    <control controlID="34" controlTypeID="com.balsamiq.mockups::Arrow" x="75" y="31" w="408" h="85" measuredW="150" measuredH="100" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="35" controlTypeID="com.balsamiq.mockups::StickyNote" x="90" y="339" w="-1" h="-1" measuredW="109" measuredH="123" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u4F7F%u7528conf/var%u63A5%u53E3</text>
+      </controlProperties>
+    </control>
+    <control controlID="36" controlTypeID="com.balsamiq.mockups::Arrow" x="203" y="293" w="229" h="70" measuredW="150" measuredH="100" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>bottom</direction>
+        <text/>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

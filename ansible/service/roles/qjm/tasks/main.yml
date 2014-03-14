@@ -1,0 +1,5 @@
+---
+# Playbook for the qjournal nodes
+
+- name: do nothing
+

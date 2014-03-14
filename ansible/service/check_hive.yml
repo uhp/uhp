@@ -1,0 +1,6 @@
+
+
+- hosts:
+  - HIVEMETASTORE[0]
+  tasks:
+  - include: roles/checker/tasks/hive.yml

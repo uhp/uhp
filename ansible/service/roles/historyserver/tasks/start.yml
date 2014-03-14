@@ -1,0 +1,9 @@
+
+
+- include: ../../conf/tasks/yarn.yml
+
+- name: start mapreduce-history
+  sudo: yes
+  service: name=hadoop-mapreduce-historyserver state=started
+
+

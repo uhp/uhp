@@ -1,0 +1,56 @@
+---
+
+- name: depoly the local repo
+  sudo: yes
+  template: src={{item}}.j2 dest=/etc/yum.repos.d/{{item}}
+  when: local_repo_enabled == "true"
+  with_items:
+    - cloudera-cdh4.repo
+    - cloudera-gplextras4.repo  
+    - cloudera-impala.repo
+
+- name: depoly the orignal repo
+  sudo: yes
+  copy: src=repo/{{ ansible_lsb.major_release }}/{{ item }} dest=/etc/yum.repos.d/{{item}}
+  when: local_repo_enabled == "false"
+  with_items:
+    - cloudera-cdh4.repo
+    - cloudera-gplextras4.repo  
+    - cloudera-impala.repo
+
+- name: clear yum
+  sudo: yes
+  shell: yum clean all
+
+
+
+#- name: weather to repo again
+#  shell: cat /etc/yum.repos.d/*| grep "uhp_need_repo" |wc -l
+#  register: need_repo
+#
+#
+#- name: depoly the local repo
+#  sudo: yes
+#  template: src={{item}}.j2 dest=/etc/yum.repos.d/{{item}}
+#  when: local_repo_enabled and need_repo.stdout|int == 0
+#  with_items:
+#    - cloudera-cdh4.repo
+#    - cloudera-gplextras4.repo  
+#    - cloudera-impala.repo
+#
+#- name: depoly the orignal repo
+#  sudo: yes
+#  file: src=repo/{{ ansible_lsb.major_release }}/{{ item }}.repo dest=/etc/yum.repos.d/{{item}}
+#  when: not local_repo_enabled and need_repo.stdout|int == 0    
+#  with_items:
+#    - cloudera-cdh4.repo
+#    - cloudera-gplextras4.repo  
+#    - cloudera-impala.repo
+#
+#- name: clear yum
+#  sudo: yes
+#  shell: yum clean all
+#  when: need_repo.stdout|int == 0
+#
+
+

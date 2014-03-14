@@ -1,0 +1,26 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1048" measuredH="584" mockupW="800" mockupH="584">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::MenuBar" x="248" y="0" w="800" h="31" measuredW="128" measuredH="29" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>1</selectedIndex>
+        <text>Admin%2C%20User</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::TabBar" x="249" y="31" w="799" h="553" measuredW="313" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>HDFS%2CYARN%2CHBASE%2CHIVE%2CIMPALA</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::TextArea" x="272" y="76" w="750" h="100" measuredW="200" measuredH="140" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u5269%u4F59quote%u591A%u5C11%uFF0C%u6587%u4EF6%u6570%u591A%u5C11%uFF0C%u6587%u4EF6%u5907%u4EFD%u6570</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::TextArea" x="272" y="202" w="750" h="305" measuredW="200" measuredH="140" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u5185%u5D4C%u4E00%u4E2AHDFS%u7684%u6587%u4EF6%u6D4F%u89C8%u5668</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

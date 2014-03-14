@@ -1,0 +1,11 @@
+---
+
+- name: Install the datanode packages
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - hadoop-zookeeper
+
+
+
+

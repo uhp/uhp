@@ -1,0 +1,11 @@
+
+- include: yarn.yml
+
+- name: copy resourcemanager conf
+  sudo: yes
+  template: src={{ TEMPLATE_DIR }}/hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
+  with_items:
+    - yarn_nodes_exclude.txt
+    - yarn_nodes_include.txt
+    - fair-scheduler.xml
+    - fair-allocation.xml

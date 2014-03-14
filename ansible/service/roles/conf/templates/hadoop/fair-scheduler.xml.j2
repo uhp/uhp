@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<configuration>
+
+    <property>
+        <name>yarn.scheduler.fair.allocation.file</name>
+        <value>{{hadoop_conf_dir}}/fair-allocation.xml</value>
+    </property>
+
+    <property>
+        <name>yarn.scheduler.fair.user-as-default-queue</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>yarn.scheduler.fair.preemption</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>yarn.scheduler.fair.sizebasedweight</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>yarn.scheduler.fair.assignmultiple</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>yarn.scheduler.fair.max.assign</name>
+        <value>3</value>
+    </property>
+
+    <property>
+        <name>locality.threshold.node</name>
+        <value>0.5</value>
+    </property>
+
+    <property>
+        <name>locality.threshold.rack</name>
+        <value>0.0</value>
+    </property>
+</configuration>

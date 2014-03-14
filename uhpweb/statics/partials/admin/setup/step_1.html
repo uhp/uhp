@@ -1,0 +1,10 @@
+<div >
+    <h3>选择服务</h3>
+    <div>
+    	<label  ng-repeat="service in unactiveServices">
+		  <input type="radio" name="choseService" value="[[service]]" ng-disabled="dependenceCheck(service)">
+		  [[service]] 
+		  <c ng-show="dependenceCheck(service)">(需要依赖[[getDependence(service)]]服务)</c>
+		</label>
+	</div>
+</div>

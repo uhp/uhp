@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html data-ng-app="uhpApp">
+<head>
+<meta charset="UTF-8" />
+<title>UHP管理平台</title>
+<link rel="stylesheet" href="/statics/css/bootstrap.css" />
+<link rel="stylesheet" href="/statics/css/home.css" />
+<script type="text/javascript" src="/statics/jslib/vendor/jquery.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/bootstrap.js"></script>
+<link rel="stylesheet" href="/statics/css/animations.css" />
+<script type="text/javascript" src="/statics/jslib/vendor/jquery.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/jquery.nicescroll.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular-animate.js"></script>
+</head>
+<body>
+	<div ng-controller="Ctrl">
+      <select ng-model="template" ng-options="t.name for t in templates">
+       <option value="">(blank)</option>
+      </select>
+      url of the template: <tt>{{template.url}}</tt>
+      <hr/>
+      <div class="slide-animate-container">
+        <div class="slide-animate" ng-include="template.url"></div>
+      </div>
+    </div>
+</body>
+</html>

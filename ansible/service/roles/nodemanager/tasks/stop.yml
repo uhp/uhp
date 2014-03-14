@@ -1,0 +1,3 @@
+- name: stop nodemanager
+  sudo: yes
+  service: name=hadoop-yarn-nodemanager state=stopped

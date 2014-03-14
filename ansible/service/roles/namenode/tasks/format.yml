@@ -1,0 +1,3 @@
+
+- name: Format the namenode
+  shell: creates=/usr/lib/hadoop/namenode.formatted su - hdfs -c "hadoop namenode -format" && touch /usr/lib/hadoop/namenode.formatted

@@ -1,0 +1,8 @@
+---
+# Hbase master servers
+
+- name: Install the hbase msater packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+  - hbase-master

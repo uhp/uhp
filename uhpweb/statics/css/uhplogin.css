@@ -1,0 +1,10 @@
+
+.container{
+width: 940px;
+display: table;
+}
+
+.form-vertical{
+width: 300px;
+margin: auto;
+}

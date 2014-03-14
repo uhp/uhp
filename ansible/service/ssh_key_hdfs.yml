@@ -1,0 +1,22 @@
+---
+##生成nn1,nn2hdfs的sshkey,并保证互通
+
+- hosts: NAMENODE
+  sudo: yes
+  tasks:
+  - name: mkdir
+    file: path={{hdfs_user_home}}/.ssh owner=hdfs group=hdfs state=directory mode=700
+  - name: copy ssh to namenode's ssh dir
+    copy: src=roles/conf/files/hdfs_ssh/{{item}} dest={{hdfs_user_home}}/.ssh/
+    with_items:
+        - id_rsa
+        - id_rsa.pub
+        - authorized_keys
+  - name: change the ssh key's mode
+    file: path={{hdfs_user_home}}/.ssh/{{item}} owner=hdfs group=hdfs mode=700
+    with_items:
+        - id_rsa
+        - id_rsa.pub
+        - authorized_keys 
+
+

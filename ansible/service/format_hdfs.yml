@@ -1,0 +1,128 @@
+---
+# namenode format playbook
+#
+
+- hosts: QJM
+  tasks:
+  - include: roles/qjm/tasks/clean.yml
+
+- hosts: QJM
+  tasks:
+  - include: roles/qjm/tasks/start.yml
+
+####初始化 namenode 的namedir
+
+- hosts:
+  - NAMENODE[0]
+  tasks:
+  - name: format namenode 's namedir
+    script: script/format.sh nn
+    sudo: yes
+    sudo_user: hdfs
+
+# 初始化qjm
+- hosts: 
+  - NAMENODE[0]
+  tasks:
+  - name: format qjm with script
+    script: script/format.sh qjm
+    sudo: yes
+    sudo_user: hdfs
+
+#- hosts:
+#  - NAMENODE[0]
+#  tasks:
+#  - name: start the first namenode
+#    sudo: yes
+#    service: name=hadoop-hdfs-namenode state=started
+#
+#- hosts:
+#  - NAMENODE[1]
+#  tasks:
+#  - name: start standy by namenode
+#    sudo: yes
+#    script: script/format.sh snn
+#    sudo_user: hdfs
+#
+#- hosts:
+#  - NAMENODE[0]
+#  tasks:
+#  - name: stop the first namenode
+#    sudo: yes
+#    service: name=hadoop-hdfs-namenode state=stopped
+
+##同步namenode的dir文件夹
+- hosts:
+  - NAMENODE[0]
+  sudo: yes
+  tasks:
+  - name: tar the name dir 
+    script: script/tarName.sh {{hdfs__dfs_namenode_name_dir[0]}} name.tar.gz
+    sudo: yes
+  - name: copy the name tar from first namenode
+    fetch: src=/tmp/name.tar.gz dest=/tmp/ansible 
+
+- hosts:
+  - NAMENODE[1]
+  tasks:
+  - name: mkdir temp dir
+    file: path=/tmp/ansible/download state=directory
+  - name: copt the name tar to second namenode
+    copy: src=/tmp/ansible/{{groups.NAMENODE[0]}}/tmp/name.tar.gz dest=/tmp/ansible/download/name.tar.gz
+  - name: untar the name tar
+    sudo: yes
+    script: script/untarName.sh /tmp/ansible/download/name.tar.gz {{item}}
+    with_items: hdfs__dfs_namenode_name_dir
+
+##初始化ZK
+
+- hosts: ZOOKEEPER
+  tasks:
+  - include: roles/zookeeper/tasks/start.yml
+
+- hosts:
+  - NAMENODE[0]
+  tasks:
+  - name: format zk
+    script: script/format.sh zk
+    sudo: yes
+    sudo_user: hdfs
+
+##生成nn1,nn2hdfs的sshkey,并保证互通
+
+- hosts: NAMENODE
+  sudo: yes
+  tasks:
+  - name: mkdir
+    file: path={{hdfs_user_home}}/.ssh owner=hdfs group=hdfs state=directory mode=700
+  - name: copy ssh to namenode's ssh dir
+    copy: src=roles/conf/files/hdfs_ssh/{{item}} dest={{hdfs_user_home}}/.ssh/
+    with_items:
+        - id_rsa
+        - id_rsa.pub
+        - authorized_keys
+  - name: change the ssh key's mode
+    file: path={{hdfs_user_home}}/.ssh/{{item}} owner=hdfs group=hdfs mode=700
+    with_items:
+        - id_rsa
+        - id_rsa.pub
+        - authorized_keys 
+
+
+
+##清空datanode的数据
+#不清空会导致注册失败
+
+- hosts: DATANODE
+  tasks:
+  - name: clear old data
+    sudo: yes
+    shell: rm {{item}}/* -rf
+    with_items: hdfs__dfs_datanode_data_dir
+
+- hosts: QJM
+  tasks:
+  - include: roles/qjm/tasks/stop.yml
+
+
+

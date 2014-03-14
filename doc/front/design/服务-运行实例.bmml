@@ -1,0 +1,99 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1250" measuredH="584" mockupW="1235" mockupH="584">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::MenuBar" x="248" y="0" w="800" h="31" measuredW="128" measuredH="29" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>Admin%2C%20User</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="990" y="2" w="-1" h="-1" measuredW="59" measuredH="27" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>logout</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Label" x="940" y="5" w="-1" h="-1" measuredW="40" measuredH="22" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Name</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::TabBar" x="249" y="31" w="799" h="553" measuredW="270" measuredH="100" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>Service%2C%20Hosts%2C%20Active%20%2C%20History</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::Accordion" x="261" y="80" w="100" h="315" measuredW="150" measuredH="302" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>3</selectedIndex>
+        <text>Zookeeper%0A-%20leader/follower%0A-%20observer%0AHdfs%0A-%20qjm%0A-%20%20namenode%0A-%20datanode%0Ayarn%0A-%20rm%0A-%20nodemanager%0Ahbase%0A-%20master%0A-%20regionserver%0Ahive%0A-%20metastore%0A-%20thrift</text>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::TabBar" x="384" y="79" w="650" h="484" measuredW="322" measuredH="100" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>1</selectedIndex>
+        <text>%u670D%u52A1%u6982%u51B5%2C%u8FD0%u884C%u5B9E%u4F8B%2C%u914D%u7F6E%u53D8%u91CF%2C%u914D%u7F6E%u6A21%u677F</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::DataGrid" x="408" y="167" w="600" h="309" measuredW="455" measuredH="174" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Select%20v%2CName%20%5Ev%2CRole%20%2C%20Host%20%5Ev%2C%20Rack%20%5Ev%2CStatus%0A%20%5Bx%5D%2C%20namenode%28hadoop2%29%2Cnamenode%2Chadoop2%2Crack1%2Cgood%0A%20%5Bx%5D%2C%20namenode%28hadoop4%29%2Cnamenode%2Chadoop4%2Crack1%2Cgood%0A%20%5Bx%5D%2C%20datanode%28hadoop2%29%2Cdatanode%2Chadoop2%2Crack1%2Cgood%0A%20%5B%5D%2C%20%20datanode%28hadoop3%29%2Cdatanode%2Chadoop3%2Crack1%2Cgood%0A%20%5Bx%5D%2C%20datanode%28hadoop4%29%2Cdatanode%2Chadoop4%2Crack1%2Cgood</text>
+        <verticalScrollbar>false</verticalScrollbar>
+        <vLines>false</vLines>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::ComboBox" x="550" y="124" w="66" h="-1" measuredW="69" measuredH="102" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Action%0Astart%0Astop%0Arestart%0Asend%20conf</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Arrow" x="171" y="125" w="237" h="100" measuredW="150" measuredH="100" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>bottom</direction>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::TitleWindow" x="15" y="221" w="300" h="200" measuredW="450" measuredH="400" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Info</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::TextArea" x="33" y="251" w="200" h="83" measuredW="200" measuredH="140" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <backgroundAlpha>1</backgroundAlpha>
+        <text>%u786E%u8BA4%u9488%u5BF9%0Ahadoop1%2Chadoop2%2Chadoop3%0A%20%0A%u8FDB%u884C%20start%20%u64CD%u4F5C</text>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::SearchBox" x="415" y="122" w="-1" h="-1" measuredW="120" measuredH="26" zOrder="11" locked="false" isInGroup="-1"/>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Button" x="72" y="349" w="-1" h="-1" measuredW="63" measuredH="27" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>sumbit</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::StickyNote" x="1074" y="338" w="176" h="57" measuredW="109" measuredH="123" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u4F7F%u7528service/instance%u63A5%u53E3</text>
+      </controlProperties>
+    </control>
+    <control controlID="17" controlTypeID="com.balsamiq.mockups::Arrow" x="993" y="239" w="-1" h="-1" measuredW="150" measuredH="100" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="18" controlTypeID="com.balsamiq.mockups::StickyNote" x="47" y="406" w="172" h="71" measuredW="109" measuredH="123" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u4F7F%u7528instance/action%u63A5%u53E3</text>
+      </controlProperties>
+    </control>
+    <control controlID="19" controlTypeID="com.balsamiq.mockups::Arrow" x="127" y="34" w="443" h="85" measuredW="150" measuredH="100" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="20" controlTypeID="com.balsamiq.mockups::StickyNote" x="45" y="34" w="145" h="62" measuredW="109" measuredH="123" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%u4F7F%u7528service/info</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

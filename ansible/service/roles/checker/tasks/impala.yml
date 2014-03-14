@@ -1,0 +1,5 @@
+
+- name: run impala sql , the hive's check table must exist!
+  sudo: yes
+  sudo_user: hdfs
+  shell:  impala-shell -q "select * from check limit 10"

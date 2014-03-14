@@ -1,0 +1,5 @@
+
+- name: stop hbase regionsrever
+  sudo: yes
+  service: name=hbase-regionserver state=stopped
+

@@ -1,0 +1,7 @@
+---
+
+- include: ../../conf/tasks/hdfs.yml
+ 
+- name: start qjm
+  sudo: yes
+  service: name=hadoop-hdfs-journalnode state=started

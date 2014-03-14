@@ -1,0 +1,5 @@
+---
+# Playbook for  Hadoop master servers
+
+- name: do nothing
+

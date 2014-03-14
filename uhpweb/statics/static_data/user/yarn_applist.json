@@ -1,0 +1,96 @@
+{
+    "rmport": "50088",
+    "applist": [
+        [
+            "application_1384857622207_1343792",
+            "kpi",
+            "select pt,fr,ver,qd,m...by\n\nfr,ver,qd,mod,pt(Stage-1)",
+            "default",
+            1392604069,
+            1392604113,
+            "FINISHED",
+            "SUCCEEDED",
+            1,
+            
+            39,
+            39,
+            0,
+            0,
+            0,
+            0,
+            
+            39,
+            39,
+            0,
+            0,
+            0,
+            0,
+            
+            176354,
+            7516615,
+            4811358548,
+            1343792
+        ],
+        [
+            "application_1384857622207_1343792",
+            "kpi",
+            "select pt,fr,ver,qd,m...by\n\nfr,ver,qd,mod,pt(Stage-1)",
+            "default",
+            1392604069,
+            1392604113,
+            "FINISHED",
+            "SUCCEEDED",
+            1,
+            
+            39,
+            39,
+            0,
+            0,
+            0,
+            0,
+            
+            39,
+            39,
+            0,
+            0,
+            0,
+            0,
+            
+            176354,
+            7516615,
+            4811358548,
+            1343792
+        ],
+        [
+            "application_1384857622207_1343792",
+            "kpi",
+            "select pt,fr,ver,qd,m...by\n\nfr,ver,qd,mod,pt(Stage-1)",
+            "default",
+            1392604069,
+            1392604113,
+            "FINISHED",
+            "SUCCEEDED",
+            1,
+            
+            39,
+            39,
+            0,
+            0,
+            0,
+            0,
+            
+            39,
+            39,
+            0,
+            0,
+            0,
+            0,
+            
+            176354,
+            7516615,
+            4811358548,
+            1343792
+        ]
+    ],
+    "rmhost": "vdc21"
+}

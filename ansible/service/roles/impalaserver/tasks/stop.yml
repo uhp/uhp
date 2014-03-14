@@ -1,0 +1,5 @@
+
+- name: stop impala server
+  sudo: yes
+  service: name=impala-server state=stopped
+

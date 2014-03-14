@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html data-ng-app="uhpApp">
+<head>
+<meta charset="UTF-8" />
+<title>{{title}}</title>
+<link rel="stylesheet" href="/statics/css/bootstrap.css" />
+<link rel="stylesheet" href="/statics/css/uhplogin.css" />
+</head>
+<body>
+	<div id="loginbox" class="container">
+		<form id="loginform" class="form-vertical" action="/login"
+			method="post">
+			<div class="control-group normal_text">
+				<h2>UHP管理平台</h2>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<div class="main_input_box">
+						<span class="add-on bg_lg"><i class="icon-user"></i></span> <input
+							type="text" placeholder="用户名" name="useranme" />
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<div class="main_input_box">
+						<span class="add-on bg_ly"><i class="icon-lock"></i></span> <input
+							type="password" placeholder="密码" name="password" />
+					</div>
+				</div>
+			</div>
+			<div class="form-actions">
+				<span><button type="submit" href="index.html"
+						class="btn btn-success" /> 登录
+					</button></span>
+			</div>
+		</form>
+	</div>
+
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+"name":"hdfs",
+"summary":{"namenode": {"unknow": 1,"health":5,"unhealth":"4","down":"3"},"datanode":{"health":1}},
+"instances":[
+	{"name":"hadoop1-namenode","role":"namenode","host":"hadoop1","rack":"default","status":"good"},
+	{"name":"hadoop2-datanode","role":"datanode","host":"hadoop2","rack":"default","status":"good"},
+	{"name":"hadoop1-namenode","role":"namenode","host":"hadoop3","rack":"default","status":"good"},
+	{"name":"hadoop4-datanode","role":"datanode","host":"hadoop4","rack":"default","status":"good"}
+	]
+}

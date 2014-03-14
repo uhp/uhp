@@ -1,0 +1,4 @@
+
+- hosts: CLIENT
+  tasks:
+  - include: roles/client/tasks/setup.yml

@@ -1,0 +1,9 @@
+
+- name: copy zookeeper conf
+  sudo: yes
+  template: src={{TEMPLATE_DIR}}/zookeeper/{{item}}.j2 dest=/etc/zookeeper/conf/{{item}}
+  with_items:
+    - zoo.cfg
+    - configuration.xsl
+    - log4j.properties
+    

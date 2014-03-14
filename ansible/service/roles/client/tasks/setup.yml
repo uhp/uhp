@@ -1,0 +1,15 @@
+---
+# Playbook for  Hadoop master servers
+
+- name: Install the client packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - hadoop
+   - hadoop-client
+   - hadoop-lzo-cdh4
+   - bigtop-utils
+   - hbase
+   - hive
+
+

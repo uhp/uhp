@@ -1,0 +1,5 @@
+
+#TODO use java progame to deal with timeout when hbase is not use
+
+- name: run the hbase check
+  script: check_hbase.sh

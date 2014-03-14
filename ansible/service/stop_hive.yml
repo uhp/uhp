@@ -1,0 +1,16 @@
+
+- hosts: HIVEMETASTORE
+  tasks:
+  - include: roles/hivemetastore/tasks/stop.yml
+
+- hosts: HIVESERVER
+  tasks:
+  - include: roles/hiveserver/tasks/stop.yml
+
+
+- hosts: HIVESERVER2
+  tasks:
+  - include: roles/hiveserver2/tasks/stop.yml
+
+
+

@@ -1,0 +1,16 @@
+
+- name: mkdir tmp dir
+  file: path=/tmp/ansible/download state=directory
+
+
+- name: copy the test data
+  copy: src=testdata/{{item}} dest=/tmp/ansible/download/{{item}}
+  with_items:
+  - file.txt
+  - file.lzo
+
+- name:  test hdfs
+  sudo: yes
+  sudo_user: hdfs
+  script: test_hdfs.sh /tmp/ansible/download/
+

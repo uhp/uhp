@@ -1,0 +1,5 @@
+
+- name: stop hbase master
+  sudo: yes
+  service: name=hbase-master state=stopped
+
