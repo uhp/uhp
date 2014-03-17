@@ -1,0 +1,10 @@
+
+
+- name: check weather need to add tmpwatch 
+  shell: cat /etc/cron.daily/tmpwatch |grep "hsperfdata_hadoop"|wc -l
+  register: need_tmpwatch
+
+- name: add to tmpwatch
+  sudo: yes
+  shell: sed "s#\([0-9]\{1,3\}d* /tmp\)# -x /tmp/hsperfdata_hadoop -x /tmp/hsperfdata_yarn -x /tmp/hsperfdata_hdfs -x /tmp/hsperfdata_mapred -x /tmp/hsperfdata_hive -x /    tmp/hsperfdata_zookeeper -x /tmp/hsperfdata_hbase \1#" /etc/cron.daily/tmpwatch -i
+  when: need_tmpwatch.stdout|int == 0
