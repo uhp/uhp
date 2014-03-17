@@ -22,11 +22,17 @@ from model.host_group_var import Host,Group,GroupHost,HostVar,GroupVar
 from model.services import Service
 from model.callback import CallBack
 
+engine = None
 
 def getEngine(echo=True):
+    global engine
+    if( engine != None ):
+        return engine
     if(string.find(config.connection, 'mysql://') >= 0):
-        return create_engine(config.connection, isolation_level="READ COMMITTED", echo=echo, pool_recycle=3600)
-    return create_engine(config.connection, echo=echo)
+        engine = create_engine(config.connection, isolation_level="READ COMMITTED", echo=echo, pool_recycle=3600)
+    else:
+        engine = create_engine(config.connection, echo=echo)
+    return engine
 
 def getSession(echo=True):
     engine =  getEngine(echo)
@@ -136,11 +142,13 @@ if __name__ == "__main__":
     insert(GroupVar("all","","ansible_ssh_port","9922",0,"*ssh的登录端口"))
     insert(GroupVar("all","","ansible_ssh_pass","just4test",0,"*ssh的登录密码"))
     insert(GroupVar("all","","ansible_sudo_pass","just4test",0,"*ssh登录后的sudo密码"))
-    insert(GroupVar("all","","local_repo_enabled","false",0,"*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url"))
-    insert(GroupVar("all","","local_http_url","http://localhost:8080/uhp",0,"*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url"))
+    insert(GroupVar("all","","local_repo_enabled","true",0,"*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url"))
+    insert(GroupVar("all","","local_http_url","http://localhost:8080/uhp",0,"*本地仓库的HTTP服务local_http_url"))
     
     insert(GroupVar("all","","java_tar","jdk1.6.0_45.tar.gz",0,"*添加机器的时候.检查到没有java的话会安装的java的tar包。请填写绝对路径。"))
     insert(GroupVar("all","","java_untar_floder","jdk1.6.0_45",0,"*安装java的时候tar包解压的名称。推荐安装示例形式填写"))
+
+    insert(GroupVar("all","","services_log_root","/var/log",0,"*各个服务的日志存放地方，需要预留10G空间"))
 
     #初始化服务数据
     for service in static_config.services:
