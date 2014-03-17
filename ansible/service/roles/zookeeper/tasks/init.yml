@@ -4,5 +4,6 @@
 - include: ../../conf/tasks/zookeeper.yml
 
 - name: initialize the zookeper
-  shell: creates=/var/lib/zookeeper/myid service zookeeper-server init --myid={{zookeeper__zoo_id}}
+  sudo: yes
+  shell: creates=/var/lib/zookeeper/myid /sbin/service zookeeper-server init --myid={{zookeeper__zoo_id}}
  
