@@ -25,7 +25,7 @@ from model.callback import CallBack
 
 def getEngine(echo=True):
     if(string.find(config.connection, 'mysql://') >= 0):
-        return create_engine(config.connection, isolation_level="READ COMMITTED",echo=echo)
+        return create_engine(config.connection, isolation_level="READ COMMITTED", echo=echo, pool_recycle=3600)
     return create_engine(config.connection, echo=echo)
 
 def getSession(echo=True):
