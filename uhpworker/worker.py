@@ -185,7 +185,10 @@ class AnsibleExecutor(Executor):
         #sys.stdout = myout
         
         cmd = ["/usr/bin/ansible-playbook", "-i", config.ansible_host_list, pb]
-        log.debug("cmd="+" ".join(cmd))
+        cmd_str = "cmd="+" ".join(cmd)
+        myout.write(cmd_str)
+        myout.write("\n")
+        log.debug(cmd_str)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=config.uhphome, env={'UHP_HOME':config.uhphome})
         task_process_map[task.id] = p
         while p.poll() == None:

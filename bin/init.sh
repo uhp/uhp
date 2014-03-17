@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if [ "$UHP_HOME" == "" ] ; then 
     echo "UHP_HOME is not set; please insert export UHP_HOME=$HOME/uhp into your env" ;
