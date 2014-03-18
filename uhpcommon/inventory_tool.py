@@ -125,25 +125,26 @@ def conf_to_db(dir):
     session.commit()
 
     #读取机器变量
-    for host in os.listdir(host_var_dir):
-        if host.startswith("."):
-            continue
-        stream=open(os.path.join(host_var_dir,host),"r")
-        vars=yaml.load(stream)
-        for name in vars:
-            value = vars[name]
-
-            if name.find("__") > 0:
-                (service,new_name) = name.split("__")  
-            else:
-                service=""
-                new_name=name
-
-            if isinstance(value,list):
-                hv = HostVar(host,service,new_name,",".join(value),1,"")
-            else:
-                hv = HostVar(host,service,new_name,value,0,"")
-            session.merge(hv)
+    if os.path.exists(host_var_dir):
+        for host in os.listdir(host_var_dir):
+            if host.startswith("."):
+                continue
+            stream=open(os.path.join(host_var_dir,host),"r")
+            vars=yaml.load(stream)
+            for name in vars:
+                value = vars[name]
+    
+                if name.find("__") > 0:
+                    (service,new_name) = name.split("__")  
+                else:
+                    service=""
+                    new_name=name
+    
+                if isinstance(value,list):
+                    hv = HostVar(host,service,new_name,",".join(value),1,"")
+                else:
+                    hv = HostVar(host,service,new_name,value,0,"")
+                session.merge(hv)
     session.commit()
 
 #对于host文件约定不使用组继承和设置变量
