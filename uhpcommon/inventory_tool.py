@@ -146,7 +146,8 @@ def conf_to_db(dir):
                     hv = HostVar(host,service,new_name,value,0,"")
                 session.merge(hv)
     session.commit()
-
+    session.close()
+    
 #对于host文件约定不使用组继承和设置变量
 #仅用于列出所有的机器和分组
 def readHostFile(file="/etc/ansible/hosts"):
