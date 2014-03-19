@@ -1,4 +1,7 @@
 
+- name: mkdir /usr/java
+  shell: mkdir -p /usr/java
+  sudo: yes
 
 - name: check weather the java is install
   shell: ls /usr/java/ | grep {{java_untar_floder}} |wc -l

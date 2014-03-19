@@ -1,7 +1,7 @@
 
 - name: stop hive metastore with shell
   sudo: yes
-  shell: service hive-metastore stop
+  shell: /sbin/service hive-metastore stop
 
 
 

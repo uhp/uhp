@@ -17,5 +17,5 @@
 
 - name: init zookeeper
   sudo: yes
-  shell:  service zookeeper-server init --myid={{zookeeper__zoo_id}} --force
+  shell:  /sbin/service zookeeper-server init --myid={{zookeeper__zoo_id}} --force
 

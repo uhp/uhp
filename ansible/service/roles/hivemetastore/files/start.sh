@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function check_start(){
-  status=`service hive-metastore status`
+  status=`/sbin/service hive-metastore status`
   
   if [[ "$status" =~ "metastore is running" ]] ;
   then
@@ -16,6 +16,6 @@ now=`check_start`
 if [ "$now" == "1" ];
 then
     export PORT=$1 
-    service hive-metastore start 
+    /sbin/service hive-metastore start 
     exit `check_start`
 fi;
