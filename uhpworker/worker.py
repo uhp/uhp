@@ -215,7 +215,7 @@ def run(task):
    
         update_running(task)
         try:
-            executor.execute(task)
+            return executor.execute(task)
         finally:
             try:
                 task_process_map.pop(task.id)
