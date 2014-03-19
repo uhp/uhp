@@ -60,7 +60,7 @@ class AdminBackHandler(BaseHandler):
         
     #获取所有服务的静态信息
     def services_info(self):
-        session = self.getsession()
+        session = database.getSession()
         active = []
         for service in session.query(Service):
             if service.status == Service.STATUS_ACTIVE :
@@ -103,6 +103,7 @@ class AdminBackHandler(BaseHandler):
                     
 
         ret = { "services" : services_copy }
+        session.close()
         self.ret("ok", "", ret);
         
     def service_info(self):
@@ -111,15 +112,16 @@ class AdminBackHandler(BaseHandler):
         self.ret("ok", "", ret);
         
     def get_instance(self,service):
-        session = self.getsession()
+        session = database.getSession()
         instances = session.query(Instance).filter(Instance.service == service )
         ret = [];
         for instance in instances:
             ret.append(instance.format());
+        session.close()
         return ret;
         
     def get_service_summary(self,service):
-        session = self.getsession()
+        session = database.getSession()
         ret = {}
         for role in static_config.get_role_from_service(service):
             ret[role] = {}
@@ -128,12 +130,13 @@ class AdminBackHandler(BaseHandler):
             if not ret[instance.role].has_key(instance.health) :
                 ret[instance.role][instance.health] = 0;
             ret[instance.role][instance.health] = ret[instance.role][instance.health] + 1;
-             
+        
+        session.close()
         return ret;
     
     #获取所有的机器和组
     def group_host_list(self):
-        session=self.getsession()
+        session = database.getSession()
         groups = session.query(Group)
         ret={};
         temp=[];
@@ -145,6 +148,7 @@ class AdminBackHandler(BaseHandler):
         for host in hosts:
             temp.append( {"name" : host.hostname});
         ret["hosts"]=temp
+        session.close()
         self.ret("ok", "", ret);
     
     #获取配置变量的接口 兼容组变量和机器变量，机器变量不过滤机器名称
@@ -153,18 +157,16 @@ class AdminBackHandler(BaseHandler):
         group = self.get_argument("group","all")
         showType = self.get_argument("showType")
         temp = []
+        session = database.getSession()
         if  showType=="group":
-            session=self.getsession()
             groupVars = session.query(GroupVar).filter(and_( GroupVar.service == service , GroupVar.group == group ) )
-            
             for groupVar in groupVars:
                 temp.append( groupVar.format() );
         else:
-            session=self.getsession()
             hostVars = session.query(HostVar).filter( HostVar.service == service )
             for hostVar in hostVars:
                 temp.append( hostVar.format() );
-                
+        session.close()       
         self.ret("ok", "", {"conf":temp})
         
     #保存 修改 删除  分组变量或者机器变量
@@ -184,78 +186,27 @@ class AdminBackHandler(BaseHandler):
 
     def save_var_todb(self,service,showType,group,host,name,value,type,text,showdel=""):
         value = str(value)
+        session = database.getSession()
         if  showType=="group":
             groupVar = GroupVar(group,service,name,value,type,text)
             if showdel=="del":
-                session=self.getsession()
                 for groupVar in session.query(GroupVar).filter( and_( GroupVar.service == service , GroupVar.group == group , GroupVar.name == name )) :
                     session.delete(groupVar)
                 session.commit()
             else:
-                session=self.getsession()
                 session.merge(groupVar)
                 session.commit()
            
         else:
             hostVar = HostVar(host,service,name,value,type,text)
-            session=self.getsession()
             if showdel=="del":
-                session=self.getsession()
                 for hostVar in session.query(HostVar).filter( and_( HostVar.service == service , HostVar.host == host , HostVar.name == name )) :
                     session.delete(hostVar)
                 session.commit()
             else:
-   
-                session=self.getsession()
                 session.merge(hostVar)
                 session.commit()
-         
-    #获取配置变量的接口 兼容组变量和机器变量，机器变量不过滤机器名称
-#     def global_conf_var(self):
-#         showType = self.get_argument("showType")
-#         temp = []
-#         session=self.getsession()
-#         
-#         if  showType=="group":
-#             session=self.getsession()
-#             groupVars = session.query(GroupVar).filter(and_( GroupVar.service == "" , GroupVar.group == "all" ) )
-#             for groupVar in groupVars:
-#                 temp.append( groupVar.format() );
-#         else:
-#             session=self.getsession()
-#             hostVars = session.query(HostVar).filter( HostVar.service == "" )
-#             for hostVar in hostVars:
-#                 temp.append( hostVar.format() );
-#             
-#         self.ret("ok", "", {"conf":temp})
-        
-    #保存全局变量
-#     def save_global_conf_var(self):
-#         showType = self.get_argument("showType","")
-#         group = 
-#         name = self.get_argument("name")
-#         value = self.get_argument("value")
-#         type = self.get_argument("type")
-#         text = self.get_argument("text","")
-#         showdel = self.get_argument("del","")
-#         
-#         
-#         self.save_var_todb("",showType,group,host,name,value,type,text,showdel)
-#         
-#         
-#         groupVar = GroupVar("all","",name,value,type,text)
-#         if showdel=="del":
-#             session=self.getsession()
-#             for groupVar in session.query(GroupVar).filter( and_( GroupVar.service == groupVar.service , \
-#                              GroupVar.group == groupVar.group, GroupVar.name == groupVar.name )) :
-#                 session.delete(groupVar)
-#             session.commit()
-#         else:
-#             session=self.getsession()
-#             session.merge(groupVar)
-#             session.commit()
-#             
-#         self.ret("ok", "", {})
+        session.close()
     
     
     # 提交一个执行任务 
@@ -270,7 +221,7 @@ class AdminBackHandler(BaseHandler):
         instances = self.get_argument("instances","")
         taskName = self.get_argument("taskName")
         runningId = []
-        session = self.getsession()
+        session = database.getSession()
         if actionType=="service":
             #针对服务的操作
             self.update_with_service_action(session,service,taskName)
@@ -296,8 +247,8 @@ class AdminBackHandler(BaseHandler):
                     runningId.append(task.id)
         else:
             self.ret("error", "unsport actionType")
-        session.commit();
-        
+        session.commit()
+        session.close()
         #发送消息到MQ
         retMsg = ""
         msg = ','.join([str(id) for id in runningId])
@@ -319,7 +270,7 @@ class AdminBackHandler(BaseHandler):
     #尝试重跑某个失败的task
     def rerun_task(self):
         taskid = self.get_argument("taskid")
-        session = self.getsession()
+        session = database.getSession()
         for task in session.query(Task).filter(Task.id==taskid):
             newTaskid = database.build_task(session,task.taskType,task.service,task.host,task.role,task.task)
             
@@ -330,7 +281,7 @@ class AdminBackHandler(BaseHandler):
             retMsg = "send message to worker error"
         
         app_log.info("send msg to mq")
-            
+        session.close()    
         self.ret("ok", retMsg, {"taskid":newTaskid} )
     
     #进行状态管理
@@ -381,13 +332,14 @@ class AdminBackHandler(BaseHandler):
         self.ret("ok", "", {"runningId": [id]})
     
     def check_add_host(self,hostArray):
-        session = self.getsession()
+        session = database.getSession()
         for host in hostArray:
             num = session.query(Host).filter(Host.hostname==host).count()
             if util.look_like_ip(host) :
                 return (False,host+" look like ip, please check")
             if num != 0 :
                 return (False,host+" is already in host table")
+        session.close()
         return (True,"")
     
     #查询进度
@@ -396,23 +348,24 @@ class AdminBackHandler(BaseHandler):
         ids = json.loads(id)
         progress = 0;
         progress_msg = "";
+        session = database.getSession()
         for nid in ids:
-            (pg,msg) = self.query_id_process(nid)
+            (pg,msg) = self.query_id_process(session,nid)
             if nid < 0:
                 progress_msg += "SyncTask  taskid: (%d) %s \n" % (-nid,msg);
             else:
                 progress_msg += "Task  taskid:(%d) %s \n" % (nid,msg);
             progress += int(pg)
+        session.close()
         progress /= len(ids)
         self.ret("ok", "", {"id": ids,"progress":progress,"progressMsg":progress_msg } )
     
-    def query_id_process(self,id):
+    def query_id_process(self,session,nid):
         if id <0 :
             #同步任务
             return (async.async_get(id,"progress","0"),async.async_pop(id,"progressMsg",""))
         else:
             #worker 任务
-            session=self.getsession()
             queryTask = session.query(Task).filter(Task.id==id)
             if queryTask.count() == 0:
                 return (0,str(id)+" isn't exist")
@@ -422,20 +375,22 @@ class AdminBackHandler(BaseHandler):
     
     #获取机器列表
     def hosts(self):
-        session=self.getsession()
+        session = database.getSession()
         hosts = session.query(Host)
         ret={}
         for host in hosts:
             ret[host.hostname]={"info":host.format()}
+        session.close()
         self.ret("ok", "", {"hosts":ret})
          
     def del_host(self):
         hosts = self.get_argument("hosts")
-        (check,msg)=self.check_del_host(hosts)
+        session = database.getSession()
+        (check,msg)=self.check_del_host(session,hosts)
         if not check:
             self.ret("error", msg)
             return
-        session=self.getsession()
+        
         #删除机器
         queryHosts = session.query(Host).filter(Host.hostname.in_(hosts.split(",")))
         for host in queryHosts:
@@ -445,10 +400,10 @@ class AdminBackHandler(BaseHandler):
         for gh in queryGH:
             session.delete(gh)
         session.commit()
+        session.close()
         self.ret("ok", "")
     
-    def check_del_host(self,hosts):
-        session=self.getsession()
+    def check_del_host(self,session,hosts):
         num = session.query(Instance).filter(Instance.host.in_(hosts.split(","))).count()
         if num != 0 :
             return (False,"some host find in instance.please remove them first")
@@ -457,7 +412,7 @@ class AdminBackHandler(BaseHandler):
     #查询机器和角色的关系
     def host_role(self):
         
-        session= self.getsession()
+        session= database.getSession()
         active=[]
         for service in session.query(Service):
             if service.status == Service.STATUS_ACTIVE :
@@ -485,20 +440,20 @@ class AdminBackHandler(BaseHandler):
             if instance.status == Instance.STATUS_SETUP or instance.status == Instance.STATUS_REMOVING :
                 doing.append({"host":host,"role":role,"status":instance.status})
             
-        
+        session.close()
         self.ret("ok", "",{"roles":roles,"hostroles":hostroles,"doing":doing})
     
     #查询正在进行的服务
     def doing(self):
         doing = []
-        session=self.getsession()
+        session = database.getSession()
         instances = session.query(Instance)
         for instance in instances:
             role = instance.role
             host = instance.host
             if instance.status == Instance.STATUS_SETUP or instance.status == Instance.STATUS_REMOVING :
                 doing.append({"host":host,"role":role,"status":instance.status})
-        
+        session.close()
         self.ret("ok", "",{"doing":doing})
         
     #添加一个服务
@@ -518,18 +473,20 @@ class AdminBackHandler(BaseHandler):
         
         #开启服务
         new_ser = Service(service,Service.STATUS_ACTIVE)
-        session = self.getsession()
+        session = database.getSession()
         session.merge(new_ser)
         session.commit()
+        session.close()
         
         self.inner_add_del_instance(add_instance, [])
        
     def can_del_service(self):
         service = self.get_argument("service")
-        session = self.getsession()
+        session = database.getSession()
         instances = [];
         for instance in session.query(Instance).filter(Instance.service == service):
             instances.append(instance.host+"-"+instance.role)
+        session.close()
         if len(instances) == 0:
             self.ret("ok", "")
         else:
@@ -538,13 +495,12 @@ class AdminBackHandler(BaseHandler):
     def del_service(self):
         service = self.get_argument("service")
          
-        session = self.getsession()
         #关闭服务
         new_ser = Service(service,Service.STATUS_INIT)
-        session = self.getsession()
+        session = database.getSession()
         session.merge(new_ser)
         session.commit()
-        
+        session.close()
         self.ret("ok", "")
         
     #添加删除实例instance
@@ -567,12 +523,13 @@ class AdminBackHandler(BaseHandler):
         self.inner_add_del_instance(add_instance,del_instance)
 
     def inner_add_del_instance(self,add_instance,del_instance):
-        (check,msg)=self.check_add_instance(add_instance)
+        session = database.getSession()
+        (check,msg)=self.check_add_instance( session, add_instance)
         if not check:
             self.ret("error", msg);
             return;
         
-        (check,msg)=self.check_del_instance(del_instance)
+        (check,msg)=self.check_del_instance( session, del_instance)
         if not check:
             self.ret("error", msg);   
             return;
@@ -586,11 +543,11 @@ class AdminBackHandler(BaseHandler):
        
 #         async.async_run(async.add_del_service,(addRunningId,delRunningId))
         for taskid in add_running_id:
-            callback_lib.add_callback(self.getsession(),taskid,"dealAddInstance")
+            callback_lib.add_callback(session,taskid,"dealAddInstance")
             
         for taskid in del_running_id:
-            callback_lib.add_callback(self.getsession(),taskid,"dealDelInstance")
-            
+            callback_lib.add_callback(session,taskid,"dealDelInstance")
+        session.close()  
         if config.fade_add_del:
             async.async_run(async.fade_add_del_service,(add_running_id,del_running_id))
         
@@ -605,7 +562,7 @@ class AdminBackHandler(BaseHandler):
         
     def add_instance(self,addInstance):
         #将add插入到instance表    
-        session = self.getsession()
+        session = database.getSession()
         for add_inst in addInstance:
             temp_service = static_config.get_service_from_role(add_inst["role"])
             new_in = Instance(temp_service,add_inst["host"],add_inst["role"])
@@ -621,12 +578,12 @@ class AdminBackHandler(BaseHandler):
             running_id.append(taskid)
             
         session.commit()
-        
+        session.close()
         return running_id
     
     def del_instance(self,delInstance):
         #更新instance表的对应状态为removing
-        session = self.getsession()
+        session = database.getSession()
         for delInst in delInstance:
             tempService = static_config.get_service_from_role(delInst["role"])
             newIn = Instance(tempService,delInst["host"],delInst["role"])
@@ -643,21 +600,20 @@ class AdminBackHandler(BaseHandler):
             running_id.append(newTask.id)
             
         session.commit()
+        session.close()
         return running_id
     
-    def check_add_instance(self,addInstance):   
-        session = self.getsession()
+    def check_add_instance(self,session,addInstance):   
         for addInst in addInstance:
-            num = session.query(Instance).filter(and_(Instance.host == addInst["host"],\
+            num = session.query(Instance).filter(and_(Instance.host == addInst["host"], \
                                                        Instance.role == addInst["role"])).count()
             if num == 1:
                 return (False,"instance is exist (%s,%s) " % (addInst["host"],addInst["role"]) )
         return (True,"" )
     
-    def check_del_instance(self,delInstance):   
-        session = self.getsession()
+    def check_del_instance(self,session,delInstance):   
         for delInst in delInstance:
-            query = session.query(Instance).filter(and_(Instance.host == delInst["host"],\
+            query = session.query(Instance).filter(and_(Instance.host == delInst["host"], \
                                                         Instance.role == delInst["role"]))
             num = query.count();
             if num == 0 or num > 1:
@@ -678,7 +634,7 @@ class AdminBackHandler(BaseHandler):
         offset = self.get_argument("offset","")
         limit = self.get_argument("limit","")
         
-        session = self.getsession()
+        session = database.getSession()
         query = session.query(Task)
         if search != "" :
             search='%'+search+'%'
@@ -695,21 +651,23 @@ class AdminBackHandler(BaseHandler):
         task_list=[]
         for task in query:
             task_list.append(task.format())
-        
+            
+        session.close()
         self.ret("ok", "", {"tasks":task_list,"totalTask":total_task})
     
     #查询单个任务的详细
     def task_detail(self):
         taskid = self.get_argument("taskid")
-        session = self.getsession()
+        session = database.getSession()
         task = session.query(Task).filter(Task.id==taskid).first()
         tf = task.format()
         tf['msg'] = task.msg
+        session.close()
         self.ret("ok", "", {"task":tf})
         
     #查询机器和组的对应关系
     def host_group(self):
-        session=self.getsession()
+        session = database.getSession()
         groups = {}
         hostgroups = {}
         for host in  session.query(Host).filter(Host.status ==  Host.STATUS_READY ):
@@ -719,6 +677,7 @@ class AdminBackHandler(BaseHandler):
             groups[group.group]=group.text
         for gh in session.query(GroupHost):
             hostgroups[gh.hostname]["group"].append(gh.group)
+        session.close()
         self.ret("ok","",{"groups":groups,"hostgroups":hostgroups})
         
     #保存组
@@ -728,16 +687,15 @@ class AdminBackHandler(BaseHandler):
         toDel = self.get_argument("del","")
         
         nowGroup = Group(name,text)
+        session = database.getSession()
         if toDel=="del":
-            session = self.getsession()
             for group in session.query(Group).filter(Group.group==name):
                 session.delete(group)
             session.commit()
         else:
-            session = self.getsession()
             session.merge(nowGroup)
             session.commit()
-        
+        session.close()
         self.ret("ok","")
         
     #修改机器和分组的关系
@@ -748,7 +706,7 @@ class AdminBackHandler(BaseHandler):
         add_groups = json.loads(add_args)
         del_groups = json.loads(del_args)
         
-        session = self.getsession()
+        session = database.getSession()
         for addGroup in add_groups:
             gh = GroupHost(addGroup['group'],addGroup['host'])
             session.merge(gh)
@@ -759,7 +717,7 @@ class AdminBackHandler(BaseHandler):
             for gh in query:
                 session.delete(gh)
         session.commit()
-        
+        session.close()
         self.ret("ok","")
         
     #******************************************************    
@@ -845,7 +803,7 @@ class AdminBackHandler(BaseHandler):
     def manual_query(self):
         sql = self.get_argument("sql")
         
-        session = self.getsession()
+        session = database.getSession()
         result = session.execute(sql)
         data = []
         for record in result:
@@ -853,14 +811,16 @@ class AdminBackHandler(BaseHandler):
             for value in record:
                 temp.append(value)
             data.append(temp);
+        session.close()
         self.ret("ok","",{"column":result.keys(),"data":data})
         
     #修改数据库 直接使用merge进行合并
     def manual_execute(self):
         sql = self.get_argument("sql")
-        session = self.getsession()
+        session = database.getSession()
         result = session.execute(sql)
         session.commit()
         session.flush()
+        session.close()
         self.ret("ok","")
         

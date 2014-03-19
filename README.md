@@ -24,6 +24,7 @@ UHP的目标：
 	
 	本项目需要python2.6或以上,pip,一个可用的mysql，请自行安装。
 	设置UHP_HOME环境变量,指向本项目的根目录(请不要随意更改根目录,否则可能会导致不可用)。
+    设置ANSIBLE_CONFIG环境变量，指向$UHP_HOME/conf/ansible.cfg。
 	初次启动请运行bin/init.sh安装依赖，同时会创建一系列的运行目录等
 
 ###数据库初始化

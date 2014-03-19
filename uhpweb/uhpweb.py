@@ -70,8 +70,6 @@ class Application(tornado.web.Application):
             debug=True,
         )
         tornado.web.Application.__init__(self, handlers, **settings)
-        
-        self.engine = database.getEngine();
 
 
 def main(config_file):

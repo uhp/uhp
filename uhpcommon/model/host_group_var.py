@@ -14,7 +14,7 @@ class Host(BASE, UHPBase):
 
     hostname = Column(String(32), primary_key=True)
     status = Column(String(16),nullable=False)
-    ip = Column(String(24), nullable=False)
+    ip = Column(String(36), nullable=False)
     cpu = Column(String(16))
     mem = Column(String(16))
     disk = Column(String(16))

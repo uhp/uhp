@@ -29,7 +29,7 @@ def getEngine(echo=True):
     if( engine != None ):
         return engine
     if(string.find(config.connection, 'mysql://') >= 0):
-        engine = create_engine(config.connection, isolation_level="READ COMMITTED", echo=echo, pool_recycle=3600)
+        engine = create_engine(config.connection, isolation_level="READ COMMITTED", echo=echo, pool_recycle=3600, pool_size=15 )
     else:
         engine = create_engine(config.connection, echo=echo)
     return engine
