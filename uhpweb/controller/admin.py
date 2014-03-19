@@ -736,6 +736,7 @@ class AdminBackHandler(BaseHandler):
                     if os.path.exists(filePath) and os.path.isfile(filePath):
                         file = file.replace(".j2","")
                         templates[dir].append(file);
+                templates[dir].sort()
         self.ret("ok","",{"templates":templates})
     
     #获取指定的文件内容
