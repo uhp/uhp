@@ -1,26 +1,13 @@
 # -*- coding: UTF-8 -*-
 import tornado
-import static_config
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import and_
+
+import database
+import static_config
 from model.user import User
 
-session = None
-
 class BaseHandler(tornado.web.RequestHandler):
-    session = None
-
-    @property
-    def engine(self):
-        return self.application.engine
-
-    def getsession(self, new=False):
-        """ if new is True then create a new session otherwise return the global one """
-        if new:
-            return sessionmaker(bind=self.application.engine)()
-        if not BaseHandler.session:
-            BaseHandler.session = sessionmaker(bind=self.application.engine)()
-        return BaseHandler.session
 
     def get_current_user(self):
         user = self.get_secure_cookie("user")
@@ -45,8 +32,9 @@ class LoginHandler(BaseHandler):
     def post(self):
         username = self.get_argument('useranme')
         password = self.get_argument('password')
-        user = self.getsession().query(User).filter(and_(User.name == username, User.password == password)).first()
-
+        session = database.getSession()
+        user = session.query(User).filter(and_(User.name == username, User.password == password)).first()
+        session.close()
         if user:
             self.set_current_user({'name': user.name, 'password': user.password,"type": user.type })
             if user.type==0 :

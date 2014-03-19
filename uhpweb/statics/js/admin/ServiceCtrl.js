@@ -330,7 +330,7 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	        params:  { 
 	        	"service" : $scope.nowService ,
 	        	"group": $scope.nowGroup,
-	        	"showType" : $scope.showType,
+	        	"showType" : $scope.showType
 	        }
 	    }).success(function(response, status, headers, config){
 	        $scope.confVar=response["conf"];
