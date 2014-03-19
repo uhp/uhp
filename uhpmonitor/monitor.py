@@ -114,11 +114,10 @@ def test():
     sys.exit(0)
 
 def check_one_instance(ins, ports):
-    return execute(ins, ports)
-    #try:
-    #    return 
-    #except Exception, e:
-    #    log.exception(e)
+    try:
+        return execute(ins, ports)
+    except BaseException, e:
+        raise Exception(e)
 
 # @param ins   : instance object
 # @parma ports : [port]
