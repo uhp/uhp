@@ -19,7 +19,7 @@ UHP是UC Hadoop Platfrom的缩写,是用于管理Hadoop的工具。UHP由UcWeb�
 
 ## 更多
 
-[wiki](https://github.com/uhp/uhp/wiki)
+[WIKI](https://github.com/uhp/uhp/wiki)
 
 [UHP介绍](https://github.com/uhp/uhp/wiki/UHP介绍)
 
