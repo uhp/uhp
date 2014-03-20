@@ -204,19 +204,25 @@ class AnsibleExecutor(Executor):
 
 # run in 
 def run(task):
-    log.debug("run task: %d" % task.id)
-    if(task.taskType == "ansible" ):
-        executor = AnsibleExecutor()
-    elif(type == "shell"):
-        executor = ShellExecutor()
-    else:
-        raise Exception("task type[%s] is not known." % type)
-   
-    update_running(task)
     try:
-        executor.execute(task)
-    finally:
-        task_process_map.pop(task.id)
+        log.debug("run task: %d" % task.id)
+        if(task.taskType == "ansible" ):
+            executor = AnsibleExecutor()
+        elif(task.taskType == "shell"):
+            executor = ShellExecutor()
+        else:
+            raise Exception("task type[%s] is not known." % task.taskType)
+   
+        update_running(task)
+        try:
+            return executor.execute(task)
+        finally:
+            try:
+                task_process_map.pop(task.id)
+            except Exception:
+                pass
+    except BaseException, e:
+        raise Exception(e)
 
 # 使用多线程
 def run_tasks(tasks):
@@ -230,7 +236,6 @@ def run_tasks(tasks):
     log.debug("run tasks over") 
 
 # ids: [id]
-# 为保证omit task和sending task不冲突，task的运行统一从此处理，并使用锁
 # 会阻塞，直到全部完成
 def do_tasks_by_ids(ids):
     try:
