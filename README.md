@@ -3,17 +3,7 @@ uc-hadoop-platform
 
 ##UHP是什么？
 
-UHP是UC Hadoop Platfrom的缩写，是公司内部共用的Hadoop基础平台。
-
-为什么需要UHP?
-1. 节约硬件成本：建设一个Hadoop集群需要较多的硬件成本，中小业务单独建设集群不现实。
-2. 节约运维成本：Hadoop需要专业的工程师运维，学习成本高，运维难度大。
-3. 数据共享：集群间的数据共享非常麻烦，多业务共用集群有利于数据共享。
-
-UHP的目标：
-1.  实现多租户接入，完善底层鉴权和权限，让数据共享更灵活更安全。
-2.  降低运维成本，让Hadoop平台运维自动化，安装部署监控一体化。
-3.  提供基本的大数据处理工具（作业调度、Hive查询、Impala查询）。
+UHP是UC Hadoop Platfrom的缩写,是用于管理Hadoop的工具。UHP由UcWeb自主研发,是一个以Hadoop为核心的大数据平台,囊括了Zookeeper,Hdfs,Yarn,Hbase,Hive,Impala等常用服务,后续会根据需要添加更多的诸如storm,spark等的大数据相关的服务。
 
 ## UHP的一些特性
 
