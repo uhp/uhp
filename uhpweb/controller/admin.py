@@ -344,8 +344,8 @@ class AdminBackHandler(BaseHandler):
     
     #查询进度
     def query_progress(self):
-        id = self.get_argument("id")
-        ids = json.loads(id)
+        idList = self.get_argument("id")
+        ids = json.loads(idList)
         progress = 0;
         progress_msg = "";
         session = database.getSession()
@@ -361,12 +361,12 @@ class AdminBackHandler(BaseHandler):
         self.ret("ok", "", {"id": ids,"progress":progress,"progressMsg":progress_msg } )
     
     def query_id_process(self,session,nid):
-        if id <0 :
+        if nid <0 :
             #同步任务
-            return (async.async_get(id,"progress","0"),async.async_pop(id,"progressMsg",""))
+            return (async.async_get(nid,"progress","0"),async.async_pop(nid,"progressMsg",""))
         else:
             #worker 任务
-            queryTask = session.query(Task).filter(Task.id==id)
+            queryTask = session.query(Task).filter(Task.id==nid)
             if queryTask.count() == 0:
                 return (0,str(id)+" isn't exist")
             else:

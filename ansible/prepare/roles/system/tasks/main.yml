@@ -1,3 +1,0 @@
-- name: set ulimit 
-  sudo: yes
-  shell: echo '* - nofile 51200' >> /etc/security/limits.d/90-nproc.conf ; echo '* - noproc 10240' >> /etc/security/limits.d/90-nproc.conf
