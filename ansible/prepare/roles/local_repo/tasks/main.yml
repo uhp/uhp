@@ -1,5 +1,0 @@
-
-- include: setup.yml
-  with_items:
-  - { repo_name:'cloudera-cdh4' , repo_file: 'cloudera-cdh4.repo' }
-  - { repo_name:'cloudera-gplextras' ,  repo_file: 'cloudera-gplextras.repo' }
