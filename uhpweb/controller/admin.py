@@ -363,7 +363,7 @@ class AdminBackHandler(BaseHandler):
     def query_id_process(self,session,nid):
         if nid <0 :
             #同步任务
-            return (async.async_get(id,"progress","0"),async.async_pop(nid,"progressMsg",""))
+            return (async.async_get(nid,"progress","0"),async.async_pop(nid,"progressMsg",""))
         else:
             #worker 任务
             queryTask = session.query(Task).filter(Task.id==nid)
