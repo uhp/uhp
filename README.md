@@ -16,8 +16,11 @@ UHP是UC Hadoop Platfrom的缩写,是用于管理Hadoop的工具。UHP由UcWeb�
 *   UHP安装在单一用户下，要求此用户有sudo权限。
 
 
+## 协议
 
-## 更多
+[GNU Version 2](https://github.com/uhp/uhp/blob/master/LICENSE)
+
+## 了解更多
 
 [WIKI](https://github.com/uhp/uhp/wiki)
 
