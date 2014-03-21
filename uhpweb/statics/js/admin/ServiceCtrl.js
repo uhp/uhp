@@ -10,6 +10,7 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	        url: '/adminback/services_info'
 	    }).success(function(response, status, headers, config){
 	    	$scope.services = response["services"];
+	    	$scope.roleCheckMap = response["role_check_map"];
 	    	$scope.activeServices = []
 	    	$scope.unactiveServices = []
 	    	for(var index in $scope.services){
@@ -132,16 +133,50 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 				$scope.setupHostRoleMap=buildMap($scope.hosts,$scope.setupRoles)
 			}
 			else{
-				$rootScope.alert("请选择服务");
+				$rootScope.alert("请选择服务","now");
 				return;
 			}
 		}
-		else if($scope.setupMove==2){
+		else if( $scope.setupMove == 2 ){
 			//计算安装的服务
 			if( !$scope.readySetupService() ){
 				return
 			}
-			//检查服务数量 TODO
+			//检查实例数量
+			if( $scope.roleCheckMap != null ){
+				roleNum = {}
+				for(var index in $scope.addService){
+					var temp = $scope.addService[index]
+					if( temp['role'] in roleNum )
+						roleNum[temp['role']] += 1
+					else{
+						roleNum[temp['role']] = 1
+					}
+				}
+				console.log(roleNum)
+				for(var index in $scope.setupRoles){
+					var role = $scope.setupRoles[index]
+					var num = 0
+					if( role in roleNum ){
+						num = roleNum[role];
+					}
+					if(role in $scope.roleCheckMap ){
+						var rule = $scope.roleCheckMap[role]
+						if( "max" in rule && num > rule["max"]){
+							$rootScope.alert("角色"+role+"的数量必须不大于"+rule["max"],"now");
+							return;
+						}
+						if( "min" in rule && num < rule["min"]){
+							$rootScope.alert("角色"+role+"的数量必须不小于"+rule["min"],"now");
+							return;
+						}
+						if( "equal" in rule && num != rule["equal"]){
+							$rootScope.alert("角色"+role+"的数量必须等于"+rule["equal"],"now");
+							return;
+						}
+					}
+				}
+			}
 		}
 		else if($scope.setupMove==3){
 			//TODO
@@ -159,7 +194,7 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 		}
 		$scope.addService=add;
 		if($scope.addService.length==0){
-			$rootScope.alert("请选择角色");
+			$rootScope.alert("请选择角色","now");
 			return false;
 		}
 		
@@ -200,6 +235,12 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	        	$rootScope.alert("提交失败 信息:"+response["msg"]);
 	        }
 	    	else{
+	    		var warn_msg = response["msg"]
+	    		console.log(warn_msg)
+	    		warn_msg  = warn_msg.split("\n")
+	    		for( index in warn_msg ){
+	    			$rootScope.alert("警告: "+warn_msg[index],"warn");	
+	    		}
 		    	var runningId=response['addRunningId']
 		    	$rootScope.beginProgress(runningId,$scope.init);
 	    	}

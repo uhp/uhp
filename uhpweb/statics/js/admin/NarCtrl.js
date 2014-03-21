@@ -74,13 +74,17 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 	}
 	$rootScope.alerts=[]
 	$rootScope.alert=function(msg,type){
-		if( type==null || type==""){
+		if( type == null || type==""){
 			type="danger"
 		}
-		$rootScope.alerts.push({"msg": msg,"type":type});
-		if($rootScope.alerts.length>3){
-			$rootScope.alerts.splice(0, 1);
+		if( type == "now"){
+			alert(msg);
+			return;
 		}
+		$rootScope.alerts.push({"msg": msg,"type":type});
+//		if($rootScope.alerts.length>3){
+//			$rootScope.alerts.splice(0, 1);
+//		}
 	}
 	$rootScope.closeAlert = function(index) {
 		$rootScope.alerts.splice(index, 1);

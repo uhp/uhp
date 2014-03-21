@@ -53,7 +53,7 @@
 						<a href="[[submenu.href]]">[[submenu.display]]</a>					
 						</button>
 					</div>
-					<div style="display:inline-block;width:500px;height:90px;border:1px solid rgb(221, 221, 221);" class="pull-right">
+					<div style="display:inline-block;width:500px;height:90px;border:1px solid rgb(221, 221, 221);overflow-y: scroll;" class="pull-right">
 						<alert  ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">[[alert.msg]]</alert>
 					</div>
 				</div>

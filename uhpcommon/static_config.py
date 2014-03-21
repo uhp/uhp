@@ -113,6 +113,15 @@ services = [
      },       
     ]   
 
+role_check_map = { 
+    "zookeeper" : { "min" : 1 },
+    "qjm" : { "min" : 1 },
+    "namenode" : { "equal" : 2 },
+    "datanode" : { "min" : 1 },
+    "resourcemanager" : { "equal" : 1 }, 
+    "nodemanager" : { "min" : 1 }, 
+    "historyserver" : { "equal" : 1 }, 
+    }
 
 def get_service_from_role(role):
     for service in services:
