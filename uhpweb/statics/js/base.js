@@ -1,3 +1,35 @@
+//cookie操作
+function setCookie(name,value,option){
+ //用于存储赋值给document.cookie的cookie格式字符串
+ var str=name+"="+escape(value);  
+ if(option){
+  //如果设置了过期时间
+  if(option.expireDays){
+   var date=new Date();
+   var ms=option.expireDays*24*3600*1000;
+   date.setTime(date.getTime()+ms);
+   str+="; expires="+date.toGMTString();
+  } 
+  if(option.path)str+="; path="+path;   //设置访问路径
+  if(option.domain)str+="; domain"+domain; //设置访问主机
+  if(option.secure)str+="; true";    //设置安全性
+ }
+ document.cookie=str;
+}
+function getCookie(name){
+ var cookieArray=document.cookie.split("; "); //得到分割的cookie名值对
+ var cookie=new Object();
+ for(var i=0;i<cookieArray.length;i++){
+  var arr=cookieArray[i].split("=");    //将名和值分开
+  if(arr[0]==name)return unescape(arr[1]); //如果是指定的cookie，则返回它的值
+ }
+ return "";
+}
+
+function deleteCookie(name){
+ this.setCookie(name,"",{expireDays:-1}); //将过期时间设置为过去来删除一个cookie
+}
+
 // setup the angularjs
 function inArray(array,str){
 	for(var i in array){
@@ -40,6 +72,10 @@ function unix_to_datetime(unix) {
     var now = new Date(parseInt(unix));
     return now.getFullYear()+"-"+padZero(now.getMonth()+1,2)+"-"+padZero(now.getDate(),2)+" "
     	+padZero(now.getHours(),2)+":"+padZero(now.getMinutes(),2)+":"+padZero(now.getSeconds());
+}
+function get_now_hms(){
+	var now = new Date();
+	return padZero(now.getHours(),2)+":"+padZero(now.getMinutes(),2)+":"+padZero(now.getSeconds())
 }
 function unix_to_datetimeNoSecond(unix) {
     var now = new Date(parseInt(unix));

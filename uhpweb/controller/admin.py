@@ -221,8 +221,18 @@ class AdminBackHandler(BaseHandler):
         actionType = self.get_argument("actionType")
         instances = self.get_argument("instances","")
         taskName = self.get_argument("taskName")
-        runningId = []
+        running_id = []
         session = database.getSession()
+        
+        #在执行action之前,检查角色的数量是不是符合要求
+        #如果不符合,给出提示
+        ret_msg = []
+        #角色数量检查
+        (check,warn_msg) = self.check_role_num_by_service(session, service, "It could make the task fail.")
+        
+        if not check:
+            ret_msg += warn_msg
+        
         if actionType=="service":
             #针对服务的操作
             self.update_with_service_action(session,service,taskName)
@@ -230,7 +240,7 @@ class AdminBackHandler(BaseHandler):
             task = Task(taskType,service,"","",taskName);
             session.add(task)
             session.flush()
-            runningId.append(task.id)
+            running_id.append(task.id)
             
         elif actionType=="instance":
             for instance in instances.split(","):
@@ -245,18 +255,17 @@ class AdminBackHandler(BaseHandler):
                     self.update_with_instance_action(session,service,host,role,taskName)
                     
                     session.flush()
-                    runningId.append(task.id)
+                    running_id.append(task.id)
         else:
             self.ret("error", "unsport actionType")
         session.commit()
         session.close()
         #发送消息到MQ
-        retMsg = ""
-        msg = ','.join([str(id) for id in runningId])
+        msg = ','.join([str(rid) for rid in running_id])
         if not mm.send(msg):
-            retMsg = "send message to worker error"
+            ret_msg.append("send message to worker error")
         
-        self.ret("ok", retMsg, {"runningid": runningId})
+        self.ret("ok", ",".join(ret_msg), {"runningid": running_id})
     
     #对某个task发送kill命令
     def kill_task(self):
@@ -606,6 +615,7 @@ class AdminBackHandler(BaseHandler):
             self.ret("error", "no instance need to add or del");   
             return;
         
+        #角色数量检查
         role_num_query = session.query(Instance.role,func.count(Instance.id)).group_by(Instance.role)
         role_num = {}
         for record in role_num_query:
@@ -645,28 +655,39 @@ class AdminBackHandler(BaseHandler):
             old_num = 0;
             if role_num.has_key(role) :
                 old_num = role_num[role]
-            (check,msg) = self.check_host_num( role, old_num+new_num )
+            (check,msg) = self.check_role_num( role, old_num+new_num )
             if not check :
                 warn_msg.append(msg)
 
         return (True, warn_msg)
     
+    def check_role_num_by_service(self, session, service, add_more_msg=""):
+        #角色数量检查
+        role_num_query = session.query(Instance.role,func.count(Instance.id)).group_by(Instance.role)
+        checkResult = True
+        warnMsg = []
+        for record in role_num_query:
+            (check,msg) = self.check_role_num( record[0], record[1], add_more_msg )
+            if not check:
+                checkResult = False
+                warnMsg.append(msg)
+        return ( checkResult, warnMsg )
     
-    def check_host_num(self, role, new_num):
+    def check_role_num(self, role, new_num, add_more_msg=""):
         """
                    检查这个角色的数量是不是符合要求
         """
         if static_config.role_check_map.has_key( role ) :
             temp = static_config.role_check_map[role]
             if temp.has_key("min") and new_num < temp["min"] :
-                return (False, "role %s 's number %d shoule more than or equal %d after install." 
-                        % ( role, new_num, temp["min"]) )
+                return (False, "role %s 's number %d shoule more than or equal %d.%s"
+                        % ( role, new_num, temp["min"], add_more_msg) )
             if temp.has_key("max") and new_num > temp["max"] :
-                return (False, "role %s 's number %d shoule less than or equal %d after install." 
-                        % ( role, new_num, temp["max"]) )
+                return (False, "role %s 's number %d shoule less than or equal %d.%s" 
+                        % ( role, new_num, temp["max"], add_more_msg) )
             if temp.has_key("equal") and new_num != temp["equal"] :
-                return (False, "role %s 's number %d shoule equal to  %d after install." 
-                        % ( role, new_num, temp["equal"]) )
+                return (False, "role %s 's number %d shoule equal to  %d.%s" 
+                        % ( role, new_num, temp["equal"], add_more_msg) )
         
         return (True,"")
         

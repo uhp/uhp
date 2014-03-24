@@ -236,10 +236,10 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	        }
 	    	else{
 	    		var warn_msg = response["msg"]
-	    		console.log(warn_msg)
+//	    		console.log(warn_msg)
 	    		warn_msg  = warn_msg.split("\n")
 	    		for( index in warn_msg ){
-	    			$rootScope.alert("警告: "+warn_msg[index],"warn");	
+	    			$rootScope.alert(warn_msg[index],"warn");	
 	    		}
 		    	var runningId=response['addRunningId']
 		    	$rootScope.beginProgress(runningId,$scope.init);
@@ -473,6 +473,12 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
 	        }
 	        else{
+	        	var warn_msg = response["msg"]
+//	    		console.log(warn_msg)
+	    		warn_msg  = warn_msg.split("\n")
+	    		for( index in warn_msg ){
+	    			$rootScope.alert(warn_msg[index],"warn");	
+	    		}
 	        	window.location.href="#/admin-task"
 	        	//$scope.initInstance();
 	        }

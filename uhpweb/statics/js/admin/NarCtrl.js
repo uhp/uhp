@@ -1,5 +1,5 @@
 
-uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function($scope,$rootScope,$interval,$http){
+uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$cookieStore',function($scope,$rootScope,$interval,$http,$cookieStore){
 	$scope.user={}
 	$scope.menus={}
 	$scope.submenus={}
@@ -72,8 +72,14 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 			$rootScope.progressCallback();
 		}
 	}
-	$rootScope.alerts=[]
 	$rootScope.alert=function(msg,type){
+		var temp = $cookieStore.get("alerts")
+		if( temp != null ){
+			$rootScope.alerts = temp
+		}
+		else{
+			$rootScope.alerts=[]
+		}
 		if( type == null || type==""){
 			type="danger"
 		}
@@ -81,13 +87,25 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 			alert(msg);
 			return;
 		}
-		$rootScope.alerts.push({"msg": msg,"type":type});
-//		if($rootScope.alerts.length>3){
-//			$rootScope.alerts.splice(0, 1);
-//		}
+		var msgHead = get_now_hms();
+		if( type == "danger" ){
+			msgHead +=" ERROR ";
+		}
+		else if( type == "info" ){
+			msgHead +=" INFO ";
+		}
+		else if( type == "warn" ){
+			msgHead +=" WARN ";
+		}
+		$rootScope.alerts.unshift({"msg": msgHead+msg,"type":type});
+		if($rootScope.alerts.length>10){
+			$rootScope.alerts.splice(0, 1);
+		}
+		$cookieStore.put("alerts",$rootScope.alerts);
 	}
 	$rootScope.closeAlert = function(index) {
 		$rootScope.alerts.splice(index, 1);
+		$cookieStore.put("alerts",$rootScope.alerts);
 	};
 	
 	$rootScope.showFirst = function(){
