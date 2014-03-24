@@ -561,6 +561,8 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 			
 			"start":{"class":"fa fa-play fa-lg","style":"color:rgb(78, 65, 223)"},	
 			"stop":{"class":"fa fa-minus fa-lg","style":"color:rgb(78, 65, 223)"},	
+			"setup":{"class":"fa fa-refresh fa-lg","style":"color:rgb(78, 65, 223)"},
+			"removing":{"class":"fa fa-refresh fa-lg","style":"color:rgb(78, 65, 223)"}
 		}
 	
 	$rootScope.menu="admin";

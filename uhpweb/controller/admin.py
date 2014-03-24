@@ -265,7 +265,11 @@ class AdminBackHandler(BaseHandler):
         if not mm.send(msg):
             ret_msg.append("send message to worker error")
         
-        self.ret("ok", ",".join(ret_msg), {"runningid": running_id})
+        ret_msg_str = ""
+        if len(ret_msg) != 0:
+            ret_msg_str =  ",".join(ret_msg)
+            
+        self.ret("ok", ret_msg_str, {"runningid": running_id})
     
     #对某个task发送kill命令
     def kill_task(self):
