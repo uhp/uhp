@@ -239,7 +239,9 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 //	    		console.log(warn_msg)
 	    		warn_msg  = warn_msg.split("\n")
 	    		for( index in warn_msg ){
-	    			$rootScope.alert(warn_msg[index],"warn");	
+	    			if( warn_msg[index] !=null && warn_msg[index] !=""){
+	    				$rootScope.alert(warn_msg[index],"warn");	
+	    			}
 	    		}
 		    	var runningId=response['addRunningId']
 		    	$rootScope.beginProgress(runningId,$scope.init);
@@ -477,7 +479,9 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 //	    		console.log(warn_msg)
 	    		warn_msg  = warn_msg.split("\n")
 	    		for( index in warn_msg ){
-	    			$rootScope.alert(warn_msg[index],"warn");	
+	    			if( warn_msg[index] !=null && warn_msg[index] !=""){
+	    				$rootScope.alert(warn_msg[index],"warn");	
+	    			}
 	    		}
 	        	window.location.href="#/admin-task"
 	        	//$scope.initInstance();
