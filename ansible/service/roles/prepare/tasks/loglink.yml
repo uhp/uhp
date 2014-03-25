@@ -1,0 +1,30 @@
+
+
+- name: mkdir want log dir
+  sudo: yes
+  file:path={{ services_log_root }}/{{ item }} state=directory mode=777 
+  with_items:
+  - zookeeper
+  - hadoop
+  - hadoop-hdfs
+  - hadoop-mapreduce
+  - hadoop-yarn
+  - hbase
+  - hive
+  - impala
+
+- name: link log if need
+  sudo: yes
+  shell: rm {{ services_log_root }}/{{ item }} -rf ; ln -s /var/log/{{ item }} {{ services_log_root }}/{{ item }}
+  with_items:
+  - zookeeper
+  - hadoop
+  - hadoop-hdfs
+  - hadoop-mapreduce
+  - hadoop-yarn
+  - hbase
+  - hive
+  - impala
+  when: {{ services_log_root }} != "/var/log"
+
+
