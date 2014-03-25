@@ -1,5 +1,5 @@
 //use base.js
-var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngCookies']);
+var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap']);
 //,'ui.bootstrap'
 //'$cookiesProvider',
 uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', function($routeProvider, $interpolateProvider,$rootScopeProvider) {

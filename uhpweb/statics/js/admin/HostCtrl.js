@@ -18,6 +18,11 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    }).success(function(response, status, headers, config){
 	    	$scope.hosts = response['hosts'];
 	    	$scope.initChosenHost()
+	    	$scope.rackList={}
+	    	for(var index in $scope.hosts){
+	    		var temp = $scope.hosts[index];
+	    		$scope.rackList[temp["info"]["rack"]]=1;
+	    	}
 	    }).error(function(data, status) {
 	    	$rootScope.alert("发送hosts请求失败");
 	    });
@@ -164,6 +169,36 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	$rootScope.alert("发送add_host请求失败");
 	    });
 	}
+	//添加机架
+	$scope.readySetRack=function(){
+		$scope.chosenHostStr=$scope.getChosenHostStr();
+		if( $scope.chosenHostStr == "" ){
+			$rootScope.alert("请选择机器","warn")
+			return 
+		}
+		if( $scope.settingRack == null || $scope.settingRack == "" ){
+			$rootScope.alert("请填写机架名称","warn")
+			return 
+		}
+		$("#hostSetRackModal").modal();
+	}
+	$scope.setRack=function(){
+		$http({
+	        method: 'GET',
+	        url: '/adminback/set_rack',
+	        params:{
+	        	"hosts": $scope.chosenHostStr,
+	        	"rack": $scope.settingRack
+	        }
+	    }).success(function(response, status, headers, config){
+	    	if(response["ret"]!="ok"){
+	        	$rootScope.alert("提交失败:"+response["msg"]);
+	        }
+	    	$scope.initHost()
+	    }).error(function(data, status) {
+	    	$rootScope.alert("发送请求失败");
+	    });
+	}
 	//全选chosenAll
 	$scope.$watch("chosenAllHost",function(newValue,oldValue){
 		for(var host in $scope.chosenHost){
@@ -172,6 +207,10 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	})
 	$scope.readyDelHost=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
+		if( $scope.chosenHostStr == "" ){
+			$rootScope.alert("请选择机器","warn")
+			return 
+		}
 		$("#hostDelHostModal").modal();
 	}
 	$scope.getChosenHostStr=function(){
@@ -192,10 +231,10 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	if(response["ret"]!="ok"){
 	        	$rootScope.alert("提交失败:"+response["msg"]);
 	        }
+	    	$scope.initHost()
 	    }).error(function(data, status) {
 	    	$rootScope.alert("发送请求失败");
 	    });
-		$scope.initHost()
 	}
 	$scope.readySendRepo=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
@@ -313,7 +352,9 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    		console.log(warn_msg)
 	    		warn_msg  = warn_msg.split("\n")
 	    		for( index in warn_msg ){
-	    			$rootScope.alert("警告: "+warn_msg[index],"warn");	
+	    			if( warn_msg[index] !=null && warn_msg[index] !=""){
+	    				$rootScope.alert(warn_msg[index],"warn");	
+	    			}
 	    		}
 	    		var runningId=response['addRunningId'].concat(response['delRunningId'])
 		    	$rootScope.beginProgress(runningId,$scope.initRole);

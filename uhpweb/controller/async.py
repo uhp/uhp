@@ -207,7 +207,7 @@ def fade_connect_host(hosts,user,port,passwd,sudopasswd):
     time.sleep(5)
     ret={}
     for host in hosts:
-        ret[host]=(True,"fade finish",{"ip": "0.0.0.0","cpu":"core","mem":"4G","disk":"1T","rack":""})
+        ret[host]=(True,"fade finish",{"ip": "0.0.0.0","cpu":"core","mem":"4G","disk":"1T","rack":"default"})
     return ret
 
 #fade的增删服务,10秒后修改任务未完成状态
