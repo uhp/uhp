@@ -54,7 +54,7 @@ def run():
     session = database.getSession(False)
     logCount = 0 ;
     while True:
-        cbs = session.query(CallBack)
+        cbs = session.query(CallBack).filter( CallBack.status == CallBack.STATUS_CHECK )
         idList = []
         cbcache = {}
         
@@ -89,7 +89,8 @@ def add_callback(session,taskid,fun,params={}):
     session.commit()
     
 def remove_callback(session,taskid):   
-    session.query(CallBack).filter(CallBack.taskid == taskid).delete();
+    session.query(CallBack).filter( CallBack.taskid == taskid ) \
+        .update({CallBack.status:CallBack.STATUS_PASS});
     session.commit()
     
 def deal_callback(session,task,func,params):

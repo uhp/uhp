@@ -21,12 +21,17 @@ class CallBack(BASE, UHPBase):
     func = Column(String(64),nullable=False)
     #参数
     params = Column(String(256), nullable=False)
+    #状态 0需要检查  1不需要检查
+    status = Column(SmallInteger,nullable=False)
     
-    def __init__(self, taskid, func, params):
+    STATUS_CHECK = 0
+    STATUS_PASS = 1
+    
+    def __init__(self, taskid, func, params, status=STATUS_CHECK ):
         self.taskid = taskid
         self.func = func
         self.params = params
-        
+        self.status = status
 
         
  

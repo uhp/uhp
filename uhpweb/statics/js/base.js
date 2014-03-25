@@ -1,4 +1,4 @@
-// setup the angularjs
+
 function inArray(array,str){
 	for(var i in array){
 		if(array[i]==str) return true;
@@ -41,6 +41,7 @@ function unix_to_datetime(unix) {
     return now.getFullYear()+"-"+padZero(now.getMonth()+1,2)+"-"+padZero(now.getDate(),2)+" "
     	+padZero(now.getHours(),2)+":"+padZero(now.getMinutes(),2)+":"+padZero(now.getSeconds());
 }
+
 function unix_to_datetimeNoSecond(unix) {
     var now = new Date(parseInt(unix));
     return now.getFullYear()+"-"+padZero(now.getMonth()+1,2)+"-"+padZero(now.getDate(),2)+" "
@@ -55,6 +56,10 @@ function padZero(inStr, length) {
 	var str = String(inStr)
     var strLen = str.length;
     return length > strLen ? new Array(length - strLen + 1).join("0") + str : str;
+}
+function get_now_hms(){
+	var now = new Date();
+	return padZero(now.getHours(),2)+":"+padZero(now.getMinutes(),2)+":"+padZero(now.getSeconds(),2)
 }
 function get_now_time(){
 	return new Date().valueOf();

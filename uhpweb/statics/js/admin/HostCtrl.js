@@ -222,9 +222,10 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
         		"instances" : instanceList.join(",")
 	        }
 	    }).success(function(response, status, headers, config){
-	    	if(response["ret"]!="ok"){
+	    	if(response["ret"] !="ok" ){
 	        	$rootScope.alert("提交失败:"+response["msg"]);
 	        }
+	    	
 	    }).error(function(data, status) {
 	    	$rootScope.alert("发送请求失败");
 	    });
@@ -307,8 +308,17 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	if(response["ret"]!="ok"){
 	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
 	        }
-	    	var runningId=response['addRunningId'].concat(response['delRunningId'])
-	    	$rootScope.beginProgress(runningId,$scope.initRole);
+	    	else{
+	    		var warn_msg = response["msg"]
+	    		console.log(warn_msg)
+	    		warn_msg  = warn_msg.split("\n")
+	    		for( index in warn_msg ){
+	    			$rootScope.alert("警告: "+warn_msg[index],"warn");	
+	    		}
+	    		var runningId=response['addRunningId'].concat(response['delRunningId'])
+		    	$rootScope.beginProgress(runningId,$scope.initRole);
+	    	}
+	    	
 	    }).error(function(data, status) {
 	    	$rootScope.alert("发送add_del_instance请求失败");
 	    });

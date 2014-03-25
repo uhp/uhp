@@ -34,7 +34,7 @@ def getEngine(echo=True):
         engine = create_engine(config.connection, echo=echo)
     return engine
 
-def getSession(echo=True):
+def getSession(echo=False):
     engine =  getEngine(echo)
     Session = sessionmaker(bind=engine)
     session = Session()

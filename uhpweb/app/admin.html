@@ -16,6 +16,7 @@
 <script type="text/javascript" src="/statics/jslib/vendor/angular-route.js"></script>
 <script type="text/javascript" src="/statics/jslib/vendor/angular-locale_zh-cn.js"></script>
 <script type="text/javascript" src="/statics/jslib/vendor/angular-resource.js"></script>
+<script type="text/javascript" src="/statics/jslib/vendor/angular-cookies.min.js"></script>
 <script type="text/javascript" src="/statics/jslib/vendor/bootstrap.js"></script>
 <script type="text/javascript" src="/statics/jslib/vendor/ui-bootstrap-tpls-0.10.0.min.js"></script>
 <link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings.png" />
@@ -53,7 +54,7 @@
 						<a href="[[submenu.href]]">[[submenu.display]]</a>					
 						</button>
 					</div>
-					<div style="display:inline-block;width:500px;height:90px;border:1px solid rgb(221, 221, 221);" class="pull-right">
+					<div style="display:inline-block;width:500px;height:90px;border:1px solid rgb(221, 221, 221);overflow-y: scroll;" class="pull-right">
 						<alert  ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">[[alert.msg]]</alert>
 					</div>
 				</div>

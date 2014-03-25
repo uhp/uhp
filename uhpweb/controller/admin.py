@@ -8,6 +8,7 @@ import copy
 import tornado
 from sqlalchemy.orm import query,aliased
 from sqlalchemy import and_,or_,desc,asc
+from sqlalchemy import func
 
 import async
 import static_config
@@ -102,7 +103,7 @@ class AdminBackHandler(BaseHandler):
                         del temp['actions'][wi]
                     
 
-        ret = { "services" : services_copy }
+        ret = { "services" : services_copy , "role_check_map" : static_config.role_check_map }
         session.close()
         self.ret("ok", "", ret);
         
@@ -220,8 +221,18 @@ class AdminBackHandler(BaseHandler):
         actionType = self.get_argument("actionType")
         instances = self.get_argument("instances","")
         taskName = self.get_argument("taskName")
-        runningId = []
+        running_id = []
         session = database.getSession()
+        
+        #在执行action之前,检查角色的数量是不是符合要求
+        #如果不符合,给出提示
+        ret_msg = []
+        #角色数量检查
+        (check,warn_msg) = self.check_role_num_by_service(session, service, "It could make the task fail.")
+        
+        if not check:
+            ret_msg += warn_msg
+        
         if actionType=="service":
             #针对服务的操作
             self.update_with_service_action(session,service,taskName)
@@ -229,7 +240,7 @@ class AdminBackHandler(BaseHandler):
             task = Task(taskType,service,"","",taskName);
             session.add(task)
             session.flush()
-            runningId.append(task.id)
+            running_id.append(task.id)
             
         elif actionType=="instance":
             for instance in instances.split(","):
@@ -244,18 +255,21 @@ class AdminBackHandler(BaseHandler):
                     self.update_with_instance_action(session,service,host,role,taskName)
                     
                     session.flush()
-                    runningId.append(task.id)
+                    running_id.append(task.id)
         else:
             self.ret("error", "unsport actionType")
         session.commit()
         session.close()
         #发送消息到MQ
-        retMsg = ""
-        msg = ','.join([str(id) for id in runningId])
+        msg = ','.join([str(rid) for rid in running_id])
         if not mm.send(msg):
-            retMsg = "send message to worker error"
+            ret_msg.append("send message to worker error")
         
-        self.ret("ok", retMsg, {"runningid": runningId})
+        ret_msg_str = ""
+        if len(ret_msg) != 0:
+            ret_msg_str =  ",".join(ret_msg)
+            
+        self.ret("ok", ret_msg_str, {"runningid": running_id})
     
     #对某个task发送kill命令
     def kill_task(self):
@@ -524,22 +538,19 @@ class AdminBackHandler(BaseHandler):
 
     def inner_add_del_instance(self,add_instance,del_instance):
         session = database.getSession()
-        (check,msg)=self.check_add_instance( session, add_instance)
+        ret_msg = []
+        (check,msg) = self.check_add_del_instance( session, add_instance, del_instance)
         if not check:
             self.ret("error", msg);
             return;
+        else:
+            if msg != ""  and isinstance(msg, list) :
+                ret_msg += msg
+            elif isinstance(msg, str) :
+                ret_msg.append(msg)
         
-        (check,msg)=self.check_del_instance( session, del_instance)
-        if not check:
-            self.ret("error", msg);   
-            return;
-        
-        if len(add_instance) == 0 and len(del_instance) == 0:
-            self.ret("error", "no instance need to add or del");   
-            return;
-        
-        add_running_id = self.add_instance(add_instance)
-        del_running_id = self.del_instance(del_instance)
+        add_running_id = self.add_instance( add_instance )
+        del_running_id = self.del_instance( del_instance )
        
 #         async.async_run(async.add_del_service,(addRunningId,delRunningId))
         for taskid in add_running_id:
@@ -552,12 +563,11 @@ class AdminBackHandler(BaseHandler):
             async.async_run(async.fade_add_del_service,(add_running_id,del_running_id))
         
         #发送消息到MQ
-        ret_msg = ""
         msg = ','.join([str(id) for id in (add_running_id + del_running_id)])
         if not mm.send(msg):
-            ret_msg = "send message to worker error"
+            ret_msg.append("send message to worker error")
         
-        self.ret("ok", ret_msg, {"addRunningId":add_running_id,"delRunningId":del_running_id})
+        self.ret("ok", '\n'.join(ret_msg), {"addRunningId":add_running_id,"delRunningId":del_running_id})
         
         
     def add_instance(self,addInstance):
@@ -603,28 +613,89 @@ class AdminBackHandler(BaseHandler):
         session.close()
         return running_id
     
-    def check_add_instance(self,session,addInstance):   
-        for addInst in addInstance:
-            num = session.query(Instance).filter(and_(Instance.host == addInst["host"], \
-                                                       Instance.role == addInst["role"])).count()
+    def check_add_del_instance(self,session,add_instance,del_instance):   
+        
+        if len(add_instance) == 0 and len(del_instance) == 0:
+            self.ret("error", "no instance need to add or del");   
+            return;
+        
+        #角色数量检查
+        role_num_query = session.query(Instance.role,func.count(Instance.id)).group_by(Instance.role)
+        role_num = {}
+        for record in role_num_query:
+            role_num[record[0]] = record[1] 
+        add_del_num = {}
+        
+        
+        for add_inst in add_instance:
+            num = session.query(Instance).filter(and_(Instance.host == add_inst["host"],  \
+                                                       Instance.role == add_inst["role"])).count()
             if num == 1:
-                return (False,"instance is exist (%s,%s) " % (addInst["host"],addInst["role"]) )
-        return (True,"" )
-    
-    def check_del_instance(self,session,delInstance):   
-        for delInst in delInstance:
-            query = session.query(Instance).filter(and_(Instance.host == delInst["host"], \
-                                                        Instance.role == delInst["role"]))
+                return (False,"instance is exist (%s,%s) " % ( add_inst["host"], add_inst["role"]) )
+            if add_del_num.has_key( add_inst["role"] ) :
+                add_del_num[add_inst["role"]] = add_del_num[add_inst["role"]] + 1
+            else:
+                add_del_num[add_inst["role"]] = 1; 
+            
+        for del_inst in del_instance:
+            query = session.query(Instance).filter(and_(Instance.host == del_inst["host"], \
+                                                        Instance.role == del_inst["role"]))
             num = query.count();
             if num == 0 or num > 1:
-                return (False,"instance is not exist ( %s,%s) " % (delInst["host"],delInst["role"]))
+                return (False,"instance is not exist ( %s,%s) " % ( del_inst["host"] ,del_inst["role"] ))
             else:
                 for instance in query:
                     if instance.status != "stop":
-                        return (False,"instance's status is not stop (%s,%s) " % (delInst["host"],delInst["role"]) )
+                        return (False,"instance's status is not stop (%s,%s) " % ( del_inst["host"], del_inst["role"]) )
+            
+            if add_del_num.has_key( del_inst["role"] ) :
+                add_del_num[del_inst["role"]] = add_del_num[del_inst["role"]] - 1
+            else:
+                add_del_num[del_inst["role"]] = -1; 
+                
+        #合并role_num和add_del_num,然后计算角色数量是否符合
+        warn_msg = []
+        for (role,new_num) in add_del_num.items():
+            old_num = 0;
+            if role_num.has_key(role) :
+                old_num = role_num[role]
+            (check,msg) = self.check_role_num( role, old_num+new_num )
+            if not check :
+                warn_msg.append(msg)
+
+        return (True, warn_msg)
+    
+    def check_role_num_by_service(self, session, service, add_more_msg=""):
+        #角色数量检查
+        role_num_query = session.query(Instance.role,func.count(Instance.id)).group_by(Instance.role)
+        checkResult = True
+        warnMsg = []
+        for record in role_num_query:
+            (check,msg) = self.check_role_num( record[0], record[1], add_more_msg )
+            if not check:
+                checkResult = False
+                warnMsg.append(msg)
+        return ( checkResult, warnMsg )
+    
+    def check_role_num(self, role, new_num, add_more_msg=""):
+        """
+                   检查这个角色的数量是不是符合要求
+        """
+        if static_config.role_check_map.has_key( role ) :
+            temp = static_config.role_check_map[role]
+            if temp.has_key("min") and new_num < temp["min"] :
+                return (False, "role %s 's number %d shoule more than or equal %d.%s"
+                        % ( role, new_num, temp["min"], add_more_msg) )
+            if temp.has_key("max") and new_num > temp["max"] :
+                return (False, "role %s 's number %d shoule less than or equal %d.%s" 
+                        % ( role, new_num, temp["max"], add_more_msg) )
+            if temp.has_key("equal") and new_num != temp["equal"] :
+                return (False, "role %s 's number %d shoule equal to  %d.%s" 
+                        % ( role, new_num, temp["equal"], add_more_msg) )
+        
         return (True,"")
-    
-    
+        
+        
     #查询任务
     #dir=desc&limit=50&offset=0&orderby=id&search=aaa
     def tasks(self):
