@@ -42,6 +42,7 @@ CentOS 6+
 			symbolic-links=0
             # for ha
 			log-bin=/var/log/mysql/bin.log
+            binlog_format=mixed
 			server-id=1
 			binlog-ignore-db=mysql
 			# 用于自增长的id字段，防止同时增加记录的冲突
@@ -82,6 +83,7 @@ CentOS 6+
 			symbolic-links=0
             # for ha
 			log-bin=/var/log/mysql/bin.log
+            binlog_format=mixed
 			server-id=2
 			binlog-ignore-db=mysql
 			# 用于自增长的id字段，防止同时增加记录的冲突
