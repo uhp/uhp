@@ -76,7 +76,7 @@ def get_info_from_result(facts):
             else:
                 disks[type]=1
     diskstr=",".join( [ k+"*"+str(v) for (k,v) in disks.items() ] )
-    return {"ip": ",".join(ips),"cpu":cpu,"mem":mem,"disk":diskstr,"rack":""}
+    return {"ip": ",".join(ips),"cpu":cpu,"mem":mem,"disk":diskstr,"rack":"default"}
 
 
 def size_to_type(size):

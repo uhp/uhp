@@ -9,6 +9,7 @@ import tornado
 from sqlalchemy.orm import query,aliased
 from sqlalchemy import and_,or_,desc,asc
 from sqlalchemy import func
+from sqlalchemy.orm.exc import NoResultFound
 
 import async
 import static_config
@@ -23,6 +24,7 @@ from model.instance import Instance
 from model.host_group_var import Host,Group,GroupHost,HostVar,GroupVar
 from model.task import Task
 from model.services import Service
+from model.callback import CallBack
 
 app_log = logging.getLogger("tornado.application")
 
@@ -285,9 +287,15 @@ class AdminBackHandler(BaseHandler):
     def rerun_task(self):
         taskid = self.get_argument("taskid")
         session = database.getSession()
-        for task in session.query(Task).filter(Task.id==taskid):
-            newTaskid = database.build_task(session,task.taskType,task.service,task.host,task.role,task.task)
-            
+        try:
+            task = session.query(Task).filter(Task.id == taskid).one()
+        except NoResultFound:
+            return self.ret("error", "Cant't find the task with id: %s" % taskid)
+        
+        newTaskid = database.build_task(session,task.taskType,task.service,task.host,task.role,task.task)
+        for cb in session.query(CallBack).filter(CallBack.taskid == taskid):
+                callback_lib.add_callback(session,newTaskid,cb.func,json.loads(cb.params) )
+        
         #发送消息到MQ
         retMsg = ""
         msg = str(newTaskid)
@@ -397,6 +405,17 @@ class AdminBackHandler(BaseHandler):
         session.close()
         self.ret("ok", "", {"hosts":ret})
          
+    def set_rack(self):
+        hosts = self.get_argument("hosts")
+        rack = self.get_argument("rack")
+        
+        session = database.getSession()
+        session.query(Host).filter(Host.hostname.in_(hosts.split(","))).update( { Host.rack:rack },synchronize_session="fetch" )
+        session.commit()
+        session.close()
+        
+        self.ret("ok","")
+        
     def del_host(self):
         hosts = self.get_argument("hosts")
         session = database.getSession()

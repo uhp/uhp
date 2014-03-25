@@ -98,7 +98,7 @@ def deal_callback(session,task,func,params):
     callback_log.info(dir(cbm))
     if hasattr(cbm, func) :
         fun = getattr(cbm, func);
-        if callable(fun):
+        if callable(fun) :
             apply(fun,(session,task,params))
         else:
             callback_log.error(func+" is not callable")

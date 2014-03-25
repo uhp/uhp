@@ -1,5 +1,5 @@
 
-uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$cookieStore',function($scope,$rootScope,$interval,$http,$cookieStore){
+uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function($scope,$rootScope,$interval,$http){
 	$scope.user={}
 	$scope.menus={}
 	$scope.submenus={}
@@ -72,13 +72,24 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$cookieS
 			$rootScope.progressCallback();
 		}
 	}
-	$rootScope.alert=function(msg,type){
-		var temp = $cookieStore.get("alerts")
-		if( temp != null ){
-			$rootScope.alerts = temp
+	$rootScope.initAlerts=function(){
+		var temp = getCookie("alerts")
+		if( temp != null && temp != "" ){
+			$rootScope.alerts = angular.fromJson(temp)
 		}
 		else{
-			$rootScope.alerts=[]
+			$rootScope.alerts = []
+		}
+		if( $rootScope.alerts.length == 0 ){
+			$rootScope.alerts.push({"msg": "welcome to uhp !!","type":"info"})
+		} 
+		setCookie("alerts",angular.toJson($rootScope.alerts),{"expireSeconds":300});
+	}
+	$rootScope.initAlerts()
+	$rootScope.alert=function(msg,type){
+		var temp = getCookie("alerts")
+		if( temp != null && temp != "" ){
+			$rootScope.alerts = angular.fromJson(temp)
 		}
 		if( type == null || type==""){
 			type="danger"
@@ -97,15 +108,19 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$cookieS
 		else if( type == "warn" ){
 			msgHead +=" WARN ";
 		}
+		else if( type == "welcome" ){
+			return
+		}
 		$rootScope.alerts.unshift({"msg": msgHead+msg,"type":type});
 		if($rootScope.alerts.length>10){
 			$rootScope.alerts.splice(0, 1);
 		}
-		$cookieStore.put("alerts",$rootScope.alerts);
+		setCookie("alerts",angular.toJson($rootScope.alerts),{"expireSeconds":300});
 	}
 	$rootScope.closeAlert = function(index) {
 		$rootScope.alerts.splice(index, 1);
-		$cookieStore.put("alerts",$rootScope.alerts);
+		//$cookieStore.put("alerts",$rootScope.alerts);
+		setCookie("alerts",angular.toJson($rootScope.alerts),{"expireSeconds":300});
 	};
 	
 	$rootScope.showFirst = function(){
@@ -113,7 +128,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$cookieS
 		$rootScope.alert("初次安装请到设置进行必要的配置,星号的配置请留意","warn")
 		$rootScope.first = false;
 	}
-	$rootScope.alert("welcome to uhp !!","info"); 
+
 	//自动刷新,各个ctrl通过registerAutoFlush注册要自动刷新的函数
 	//autoFlush会自动根据submenus名字选择自动刷新的函数并调用
 	$rootScope.autoFlushMap = {}
