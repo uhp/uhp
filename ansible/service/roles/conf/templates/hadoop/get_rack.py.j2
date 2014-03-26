@@ -1,0 +1,19 @@
+#!/usr/bin/python
+#-*- coding:UTF-8 -*-
+import sys  
+from string import split
+
+rack_map="""
+{{ hdfs__net_topology_map | join('\n') }}
+"""
+
+racks = {}  
+for line in split(rack_map, '\n'):
+  if line:
+    ip, host, rack = split(line, maxsplit=2)
+    racks[ip] = rack
+    racks[host] = rack
+
+if __name__=="__main__":
+  for host in sys.argv[1:]:
+    print "/" + racks.get(host, "default_rack"),
