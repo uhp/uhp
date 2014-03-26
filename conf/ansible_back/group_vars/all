@@ -7,8 +7,13 @@
 #java_tar: /home/qiujw/java/jdk1.6.0_45.tar.gz
 #java_untar_floder: jdk1.6.0_45
 
-#以下是hadoop相关配置
+#以下是服务的配置目录
+
+zookeeper_conf_dir: /etc/zookeeper/conf
 hadoop_conf_dir: /etc/hadoop/conf
+hbase_conf_dir: /etc/hbase/conf
+hive_conf_dir: /etc/hive/conf
+
 #hdfs的用户目录,NM的HDFS用户的相互信任，需要加入SHH互信
 hdfs_user_home: /var/lib/hadoop-hdfs
 
@@ -39,7 +44,7 @@ hdfs__HADOOP_CLIENT_OPTS: " -Xmx256m "
 
 #Variables for <core-site_xml>
 
-hdfs__net_topology_script_file_name: ""
+hdfs__net_topology_script_file_name: "/etc/hadoop/conf/get_rack.py"
 hdfs__nameservice_id: "mycluster"
 hdfs__namenode1: "nn1"
 hdfs__namenode2: "nn2"
@@ -68,6 +73,7 @@ hdfs__dfs_datanode_http_address_port: 50075
 hdfs__dfs_datanode_ipc_address_port:  50020
 hdfs__dfs_datanode_failed_volumes_tolerated: 0
 hdfs__dfs_datanode_du_reserved: "5368709120"
+hdfs__dfs_domain_socket_path: "/var/run/hdfs-sockets/dn"
 hdfs__fs_permissions_umask_mode: "022"
 
 hdfs__dfs_ha_zkfc_port: 8019
