@@ -99,6 +99,14 @@ class MysqlInventory(object):
                 group_vars[name] = value
             else: # 数组
                 group_vars[name] = value.split(",")
+
+        #特别添加的特殊变量 hdfs__net_topology_map
+        net_topology_map = []
+        for host in session.query(Host):
+            net_topology_map.append( "%s %s %s" % (host.ip,host.hostname,host.rack) )
+        groups['all']['vars']['hdfs__net_topology_map'] = net_topology_map
+
+
         
         #写机器变量
         # _meta:hostvars
