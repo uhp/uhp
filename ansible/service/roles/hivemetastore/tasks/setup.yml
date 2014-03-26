@@ -4,7 +4,8 @@
   sudo: yes
   yum: name={{item}} state=installed
   with_items:
-   - hive-metastore
+  - hive-metastore
+  - mysql
 
 
 - include: ../../jar/tasks/hive.yml
