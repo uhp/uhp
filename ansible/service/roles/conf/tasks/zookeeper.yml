@@ -6,4 +6,4 @@
     - zoo.cfg
     - configuration.xsl
     - log4j.properties
-    
+    - zookeeper-env.sh

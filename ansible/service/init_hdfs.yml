@@ -1,19 +1,13 @@
 ---
 
-- hosts:
-  - NAMENODE[0]
-  sudo: yes
-  sudo_user: hdfs
+- hosts: QJM
   tasks:
-  - name: init tmp dir
-    shell: hdfs dfs -mkdir -p {{item}} ;  hdfs dfs -chmod 1777 {{item}} 
-    with_items: 
-     - /tmp
+  - include: roles/namenode/tasks/init.yml
 
-- hosts:
-  - NAMENODE[0]
-  sudo: yes
-  sudo_user: hdfs
+- hosts: NAMENODE
   tasks:
-  - name: init user dir
-    shell: hdfs dfs -mkdir -p /user ; hdfs dfs -chmod 711 /user
+  - include: roles/namenode/tasks/init.yml
+
+- hosts: DATANODE
+  tasks:
+  - include: roles/namenode/tasks/init.yml

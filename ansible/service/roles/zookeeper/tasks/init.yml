@@ -1,9 +1,13 @@
 ---
 # The plays for zookeper daemons
 
+- name: rm conf dir file
+  sudo: yes
+  shell: rm /etc/zookeeper/conf/* -rf
+
 - include: ../../conf/tasks/zookeeper.yml
 
-- name: initialize the zookeper
+- name: init zookeeper
   sudo: yes
-  shell: creates=/var/lib/zookeeper/myid /sbin/service zookeeper-server init --myid={{zookeeper__zoo_id}}
- 
+  shell:  /sbin/service zookeeper-server init --myid={{zookeeper__zoo_id}} --force
+

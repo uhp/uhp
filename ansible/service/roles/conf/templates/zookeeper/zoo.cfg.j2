@@ -1,8 +1,8 @@
 tickTime=2000
 initLimit=10
 syncLimit=2
-dataDir=/var/lib/zookeeper
-dataLogDir=/var/lib/zookeeper
+dataDir={{zookeeper__data_dir}}
+dataLogDir={{zookeeper__data_log_dir}}
 clientPort={{zookeeper__zookeeper_client_port}}
 maxClientCnxns=60
 minSessionTimeout=4000

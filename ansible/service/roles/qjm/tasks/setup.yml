@@ -5,7 +5,4 @@
   sudo: yes
   yum: name=hadoop-hdfs-journalnode state=installed
   
-- name: Create folder for Journaling
-  sudo: yes
-  file: path={{hdfs__dfs_journalnode_edits_dir}} state=directory owner=hdfs group=hdfs
 

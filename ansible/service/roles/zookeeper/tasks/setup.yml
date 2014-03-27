@@ -9,13 +9,4 @@
    - zookeeper-server
    - bigtop-utils
 
-- name: rm conf dir file
-  sudo: yes
-  shell: rm /etc/zookeeper/conf/* -rf
-
-- include: ../../conf/tasks/zookeeper.yml
-
-- name: init zookeeper
-  sudo: yes
-  shell:  /sbin/service zookeeper-server init --myid={{zookeeper__zoo_id}} --force
 
