@@ -145,4 +145,9 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 		stop = $interval($rootScope.autoFlush, 5000);
 	}
 	$rootScope.beginAutoFlush()
+	
+	//href
+	$rootScope.href=function(url){
+		window.location.href=url
+	}
 }])

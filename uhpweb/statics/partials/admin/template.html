@@ -13,7 +13,8 @@
         <div class="input-prepend">
            <span class="add-on">针对指定机器查看生成的配置文件</span>
            <select ng-model="nowhost" ng-options="host for host in hosts"></select>
-           <button class="btn" ng-click="build()" >查看</button>
+           <button class="btn" ng-click="build()" >在线查看</button>
+           <button class="btn" ng-click="download()" >全部下载</button>
         </div>
         
         <div>
