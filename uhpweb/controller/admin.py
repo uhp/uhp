@@ -842,8 +842,11 @@ class AdminBackHandler(BaseHandler):
             self.ret("error","file not exist")     
             
             
-    #获取生成的配置文件
+    
     def template_build_file(self):
+        '''
+                   获取生成的配置文件
+        '''
         dir = self.get_argument("dir")
         file = self.get_argument("file")
         file = file+".j2"
@@ -853,6 +856,19 @@ class AdminBackHandler(BaseHandler):
             self.ret("ok","",{"content":content,"row":self.get_content_row(content) })
         else:
             self.ret("error",output)
+    
+    def template_download_file(self):
+        '''
+                   生成整个服务的配置文件
+        '''    
+        dir = self.get_argument("dir")
+        host = self.get_argument("host")
+        (url,output) = shell_lib.download_template_file(host,dir);
+        if url != None and url != "":
+            self.ret("ok","",{"url" : url })
+        else:
+            self.ret("error",output)
+            
             
     def get_content_row(self,content):
         count = 0 ;

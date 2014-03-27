@@ -50,7 +50,7 @@
 				
 				<div>
 					<div class="btn-group" style="display:inline-block">
-						<button class="btn btn-large [[isActiveSubmenu(submenu.name)]]" ng-repeat="submenu in submenus">
+						<button class="btn btn-large [[isActiveSubmenu(submenu.name)]]" ng-repeat="submenu in submenus"  ng-click="href(submenu.href)">
 						<a href="[[submenu.href]]">[[submenu.display]]</a>					
 						</button>
 					</div>

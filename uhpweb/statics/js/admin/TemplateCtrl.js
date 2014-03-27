@@ -114,12 +114,35 @@ uhpApp.controller('TemplateCtrl',['$scope','$rootScope','$http',function($scope,
 	    		$scope.buildContentMaxRow = response["row"]+20;
 	        }
 	        else{
-	        	$scope.buildContent = "获取"+$scope.nowhost+"的"+$scope.nowdir+"/"+$scope.nowfile+"文件失败:"+response["msg"];
-	        	$rootScope.alert("获取"+$scope.nowhost+"的"+$scope.nowdir+"/"+$scope.nowfile+"文件失败");
+	        	$scope.buildContent = "获取"+$scope.nowhost+"的"+$scope.nowdir+"/"+$scope.nowfile+"配置文件失败:"+response["msg"];
+	        	$rootScope.alert("获取"+$scope.nowhost+"的"+$scope.nowdir+"/"+$scope.nowfile+"配置文件失败");
 	        }   
 	    }).error(function(data, status) {
 	    	$rootScope.alert("发送template_build_file请求失败");
 	    });
 	}
-	 
+	$scope.download=function(){
+		$("#templateDownloadModal").modal();
+		
+		//加载对应的生成的配置文件
+		$scope.downloadContent="生成中 ...."
+		$http({
+	        method: 'GET',
+	        url: '/adminback/template_download_file',
+	        params:{
+	        	"dir" : $scope.nowdir,
+        		"host" : $scope.nowhost
+	        }
+	    }).success(function(response, status, headers, config){
+	    	if(response["ret"]=="ok"){
+	    		
+	        }
+	        else{
+	        	$scope.downloadContent = "下载"+$scope.nowhost+"的"+$scope.nowdir+"配置文件失败:"+response["msg"];
+	        	$rootScope.alert("下载"+$scope.nowhost+"的"+$scope.nowdir+"配置文件失败");
+	        }   
+	    }).error(function(data, status) {
+	    	$rootScope.alert("发送template_download_file请求失败");
+	    });
+	} 
 }]);
