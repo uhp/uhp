@@ -8,6 +8,7 @@
     - cloudera-cdh4.repo
     - cloudera-gplextras4.repo  
     - cloudera-impala.repo
+    - epel.repo
 
 - name: depoly the orignal repo
   sudo: yes
@@ -17,6 +18,7 @@
     - cloudera-cdh4.repo
     - cloudera-gplextras4.repo  
     - cloudera-impala.repo
+    - epel.repo
 
 - name: clear yum
   sudo: yes

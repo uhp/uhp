@@ -18,10 +18,8 @@ app=${app#*-}
 
 mkdir -p logs/$app pids/$app
 
-chmod a+x ./uhp$app/uhp$app.py
-
 cd uhp$app
-nohup python uhp${app}.py >/dev/null 2>&1 &
+nohup python uhp${app}.py >$UHP_HOME/logs/web/stdout 2>&1 &
 
 sleep 1
 pid=`ps -ef|grep uhp$app.py|grep -v grep|awk '{print \$2;}'`

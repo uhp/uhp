@@ -8,8 +8,6 @@
    - hadoop-client
    - hadoop-lzo-cdh4
    - bigtop-utils
-   - hbase
-   - hive
 
 
 - include: config.yml
