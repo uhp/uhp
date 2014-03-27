@@ -25,7 +25,7 @@
 					<th ng-click="changeOrderBy('status')"><i class="[[getIconClass('status')]]"></i> 状态</th>
 					<th ng-click="changeOrderBy('result')"><i class="[[getIconClass('result')]]"></i> 结果</th>
 					<th>消息</th>
-					<th>操作 </th>
+					<th style="width: 76px;">操作 </th>
 		        </tr>
 		    </thead>
 		    <tbody>
@@ -41,14 +41,16 @@
 		            <td><i class="[[ resultIconMap[task.result]['class'] ]]" style="[[ resultIconMap[task.result]['style'] ]]" ></i> [[task.result]]</td>
 		            <td><button class="btn" ng-click="showTaskDetail(task.id)">msg</button></td>
 		            <td>
-		            	<div class="btn-group" >
+		            	<button class="btn" ng-click="killTask(task.id)" ng-show="task.status=='running'" >终止</button>
+		            	<button class="btn" ng-click="rerunTask(task.id)" ng-show="canRerun(task)" >重跑</button>
+		            	<!-- <div class="btn-group" >
 							<button class="btn drop-down-toggle" data-toggle="dropdown" ng-disabled="task.status=='init'">操作<span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu" style="min-width:0px">
 								<li ng-click="killTask(task.id)" ng-show="task.status=='running'"><a>终止</a></li>
 								<li ng-click="rerunTask(task.id)" ng-show="task.status=='finish'"><a>重跑</a></li>
 							</ul>
-						</div>
+						</div> -->
 		            </td>
 		        </tr>
 		    </tbody>	
@@ -58,9 +60,6 @@
 		<!-- 查看任务详细信息的模式对话框 -->
         <div id="taskDetailModal" class="modal hide fade" data-backdrop="static" aria-hidden="true" style="width:950px;left:auto;margin-left:0px;">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
                 <h3>任务[[nowTask.id]]</h3>
             </div>
             <div class="modal-body">

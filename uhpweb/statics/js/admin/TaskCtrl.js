@@ -111,6 +111,14 @@ uhpApp.controller('TaskCtrl',['$scope','$rootScope','$interval','$http',function
 	    	$rootScope.alert("发送kill_task请求失败");
 	    });
 	}
+	$scope.canRerun=function(task){
+		if( task.service == "prepare" ){
+			return true
+		}
+		else{
+			return false;
+		}
+	}
 	$scope.rerunTask=function(taskid){
 		$http({
 	        method: 'GET',
