@@ -1,0 +1,19 @@
+---
+
+- hosts:
+  - NAMENODE[0]
+  sudo: yes
+  sudo_user: hdfs
+  tasks:
+  - name: init tmp dir
+    shell: hdfs dfs -mkdir -p {{item}} ;  hdfs dfs -chmod 1777 {{item}} 
+    with_items: 
+     - /tmp
+
+- hosts:
+  - NAMENODE[0]
+  sudo: yes
+  sudo_user: hdfs
+  tasks:
+  - name: init user dir
+    shell: hdfs dfs -mkdir -p /user ; hdfs dfs -chmod 711 /user

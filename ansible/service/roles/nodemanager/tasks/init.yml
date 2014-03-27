@@ -1,0 +1,13 @@
+---
+
+- name: Create the local directory for the node manager
+  sudo: yes
+  file: path={{item}} owner=yarn group=yarn state=directory
+  with_items: yarn__yarn_nm_local_dirs
+
+- name: Create the log directory for the node manager
+  sudo: yes
+  file: path={{item}} owner=yarn group=yarn state=directory
+  with_items: yarn__yarn_nm_log_dirs
+
+

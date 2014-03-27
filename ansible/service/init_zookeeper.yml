@@ -1,0 +1,6 @@
+---
+
+- hosts:
+  - ZOOKEEPER
+  tasks:
+  - include: roles/zookeeper/tasks/init.yml
