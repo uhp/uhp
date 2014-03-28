@@ -8,36 +8,36 @@
 
     <property>
         <name>yarn.scheduler.fair.user-as-default-queue</name>
-        <value>true</value>
+        <value>{{ yarn__fair_scheduler_user_as_default  }}</value>
     </property>
 
     <property>
         <name>yarn.scheduler.fair.preemption</name>
-        <value>false</value>
+        <value>{{ yarn__fair_scheduler_preemption }}</value>
     </property>
 
     <property>
         <name>yarn.scheduler.fair.sizebasedweight</name>
-        <value>false</value>
+        <value>{{ yarn__fair_scheduler_sizebasedweight }}</value>
     </property>
 
     <property>
         <name>yarn.scheduler.fair.assignmultiple</name>
-        <value>true</value>
+        <value>{{ yarn__fair_scheduler_assignmultiple }}</value>
     </property>
 
     <property>
         <name>yarn.scheduler.fair.max.assign</name>
-        <value>3</value>
+        <value>{{ yarn__fair_scheduler_max_assign }}</value>
     </property>
 
     <property>
         <name>locality.threshold.node</name>
-        <value>0.5</value>
+        <value>{{ yarn__fair_scheduler_locality_threshold_node }}</value>
     </property>
 
     <property>
         <name>locality.threshold.rack</name>
-        <value>0.0</value>
+        <value>{{ yarn__fair_scheduler_locality_threshold_rack }}</value>
     </property>
 </configuration>
