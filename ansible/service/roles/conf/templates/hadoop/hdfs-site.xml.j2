@@ -32,6 +32,10 @@
     <value>{{groups['NAMENODE'][0]}}:{{hdfs__dfs_namenode_rpc_address_port}}</value>
   </property>
   <property>
+    <name>dfs.namenode.servicerpc-address.{{hdfs__nameservice_id}}.{{hdfs__namenode1}}</name>
+    <value>{{groups['NAMENODE'][0]}}:{{hdfs__dfs_namenode_servicerpc_address_port}}</value>
+  </property>
+  <property>
     <name>dfs.namenode.http-address.{{hdfs__nameservice_id}}.{{hdfs__namenode1}}</name>
     <value>{{groups['NAMENODE'][0]}}:{{hdfs__dfs_namenode_http_address_port}}</value>
   </property>
@@ -43,6 +47,10 @@
   <property>
     <name>dfs.namenode.rpc-address.{{hdfs__nameservice_id}}.{{hdfs__namenode2}}</name>
     <value>{{groups['NAMENODE'][1]}}:{{hdfs__dfs_namenode_rpc_address_port}}</value>
+  </property>
+  <property>
+    <name>dfs.namenode.servicerpc-address.{{hdfs__nameservice_id}}.{{hdfs__namenode2}}</name>
+    <value>{{groups['NAMENODE'][1]}}:{{hdfs__dfs_namenode_servicerpc_address_port}}</value>
   </property>
   <property>
     <name>dfs.namenode.http-address.{{hdfs__nameservice_id}}.{{hdfs__namenode2}}</name>

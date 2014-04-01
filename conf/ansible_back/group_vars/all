@@ -58,6 +58,7 @@ hdfs__namenode2: "nn2"
     
 hdfs__dfs_namenode_support_allow_format: "true"
 hdfs__dfs_namenode_rpc_address_port: 50900
+hdfs__dfs_namenode_servicerpc_address_port: 50900
 hdfs__dfs_namenode_http_address_port: 50070
 hdfs__dfs_namenode_https_address_port: 50470
 hdfs__dfs_include_hosts: []
