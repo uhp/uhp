@@ -1,5 +1,9 @@
 ---
 
+- hosts: NODEMANAGER
+  tasks:
+  - include: roles/nodemanager/tasks/init.yml
+
 - hosts:
   - NAMENODE[0]
   sudo: yes
@@ -23,4 +27,4 @@
   - name: mkdir log dir
     shell: hdfs dfs -mkdir -p {{item}} ; hdfs dfs -chown yarn:mapred {{item}} ; hdfs dfs -chmod 1777 {{item}}
     with_items:
-     _ "{{yarn__yarn_nm_remote_app_log_dir}}"
+    - "{{yarn__yarn_nm_remote_app_log_dir}}"

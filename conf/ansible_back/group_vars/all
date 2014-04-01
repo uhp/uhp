@@ -29,9 +29,12 @@ SERVER_OPTS: " -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -X
 #以下是各个服务的配置
 #格式服务__变量名字 : 值
 
+zookeeper__ZOOKEEPER_OPTS: "-Xmx1024m"
 zookeeper__zookeeper_client_port: "2181"
 zookeeper__zookeeper_leader_port: "2888"
 zookeeper__zookeeper_election_port: "3888"
+zookeeper__data_dir: /var/lib/zookeeper
+zookeeper__data_log_dir: /var/lib/zookeeper
 zookeeper__zoo_id: "0"
 
 #Variables for java opts

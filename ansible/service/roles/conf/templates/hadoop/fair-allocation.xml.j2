@@ -1,26 +1,17 @@
 <?xml version="1.0"?>
 <allocations>
-  <queue name="pool_high">
-    <minResources>50000</minResources>
-    <weight>6.0</weight>
-    <maxRunningApps>8</maxRunningApps>
+  {% for queuestr in yarn__fair_scheduler_queues -%}
+  {% set queue = queuestr.split('/') -%}
+  <queue name="{{ queue[0] }}">
+    <aclSubmitApps>{{ queue[1] }}</aclSubmitApps>
+    <weight>{{ queue[2] }}</weight>
+    <minResources>{{ queue[3] }}</minResources>
+    <maxRunningApps>{{ queue[4] }}</maxRunningApps>
   </queue>
-  <queue name="default">
-    <minResources>50000</minResources>
-    <weight>3.0</weight>
-    <maxRunningApps>35</maxRunningApps>
-  </queue>
-  <queue name="pool_low">
-    <weight>1.0</weight>
-    <maxRunningApps>20</maxRunningApps>
-  </queue>
-  <user name="kpi">
-    <maxRunningApps>50</maxRunningApps>
-    <weight>3.0</weight>
-  </user>
-  <userMaxAppsDefault>50</userMaxAppsDefault>
+  {% endfor -%}
+  <userMaxAppsDefault>{{ yarn__fair_scheduler_userMaxAppsDefault }}</userMaxAppsDefault>
   <defaultMinSharePreemptionTimeout>600</defaultMinSharePreemptionTimeout>
   <fairSharePreemptionTimeout>600</fairSharePreemptionTimeout>
-  <queueMaxAppsDefault>30</queueMaxAppsDefault>
+  <queueMaxAppsDefault>{{ yarn__fair_scheduler_queueMaxAppsDefault }}</queueMaxAppsDefault>
   <defaultQueueSchedulingMode>fair</defaultQueueSchedulingMode>
 </allocations>

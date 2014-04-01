@@ -1,0 +1,18 @@
+#用于web生成配置文件查看不能直接执行，请执行script/get_template_file.sh
+---
+- hosts: WANT_HOST
+  tasks:
+
+  - name: mkdir tmp dir
+    shell: mkdir -p /tmp/TMP_DIR/ ; chmod 777 /tmp/TMP_DIR/
+    sudo: yes
+
+  - name: build template remote file
+    task:
+    - include: roles/conf/tasks/WANT_DIR.yml SET_VAR=/tmp/TMP_DIR/ 
+
+  - name: copy back
+    fetch: src=/tmp/TMP_FILE dest=/tmp
+    sudo: yes
+
+
