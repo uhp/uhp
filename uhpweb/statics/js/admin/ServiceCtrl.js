@@ -267,6 +267,158 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	    	$rootScope.alert("提交can_del_service请求失败");
 	    });
 	}
+	$scope.configFairScheduler=function(){
+		$http({
+	        method: 'GET',
+	        url: 'adminback/fair_scheduler_config'
+	        	//'/statics/static_data/admin/fair_scheduler_config.json'
+	    }).success(function(response, status, headers, config){
+	    	if(response["ret"]!="ok"){
+	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
+	        }
+	    	else{
+	    		$scope.fairqueues = []
+	    		var fairqueues = response['fair_scheduler_queues'].split(",")
+				for(var i in fairqueues){
+					var queue = fairqueues[i].split("/")
+					var temp = {}
+					if( queue.length == 5){
+						temp['name'] = queue[0]
+						temp['user'] = queue[1]
+						temp['weight'] = queue[2]
+						temp['minResource'] = queue[3]
+						temp['maxApps'] = queue[4]
+						$scope.fairqueues.push(temp)
+					}
+				}
+	    		$scope.fair={}
+	    		
+	    		$scope.fair['totalMemory'] = response['total_memory']
+	    		$scope.fair['nodes'] = response['nodes']
+	    		if( response['nodes'] != null && response['nodes'] != 0 ){
+	    			$scope.fair['nodememory'] =  Math.floor( response['total_memory'] / response['nodes'] )
+	    		}
+	    		else{
+	    			$scope.fair['nodememory'] = 0
+	    		}
+	    		$scope.fair['am'] = response['yarn_app_mapreduce_am_resource_mb']
+	    		$scope.fair['map'] = response['mapreduce_map_memory_mb']
+	    		$scope.fair['reduce'] = response['mapreduce_reduce_memory_mb']
+	    		if( response['nodes'] != null && response['nodes'] != 0 ){
+	    			$scope.fair['container'] =  Math.floor( 
+	    					( parseInt($scope.fair['am']) + parseInt($scope.fair['map']) + parseInt($scope.fair['reduce']) ) / 3 ) 
+	    		}
+	    		else{
+	    			$scope.fair['container'] = 0
+	    		}
+	    		$scope.recal()
+	    		$("#configFairScheduler").modal()
+			}
+	    }).error(function(data, status) {
+	    	$rootScope.alert("提交 del_service 请求失败");
+	    });
+		
+	}
+	$scope.recal=function(){
+		$scope.fair['weightSum'] = 0 ;
+		$scope.fair['appSum'] = 0 ;
+		for(var i in $scope.fairqueues){
+			var queue = $scope.fairqueues[i]
+			$scope.fair['weightSum'] += parseFloat(queue.weight);
+			$scope.fair['appSum'] += parseFloat(queue.maxApps);
+		}
+		for(var i in $scope.fairqueues){
+			var queue = $scope.fairqueues[i]
+			queue['fairResource'] = Math.floor( 
+				$scope.fair['totalMemory']  * parseFloat(queue.weight) /$scope.fair['weightSum'] )
+			if( queue['fairResource'] !=null && queue['fairResource'] != 0 ){
+				queue['appRate'] = Math.floor(  ( parseFloat(queue.maxApps) * $scope.fair['am'] ) / queue['fairResource'] * 100)
+			}
+			else{
+				queue['appRate'] = 0
+			}
+		}
+		$scope.fair['appRate']  =   Math.floor( 
+				( $scope.fair['appSum'] * $scope.fair['am'] ) /$scope.fair['totalMemory'] *100)
+		var temp = {}
+		for(var i in $scope.fairqueues){
+			var queue = $scope.fairqueues[i]
+			if( queue['user'] in temp){
+				temp[queue['user']] +=  parseFloat(queue.weight);
+			}
+			else{
+				temp[queue['user']] = parseFloat(queue.weight);
+			}
+		}
+		console.log(temp)
+		$scope.userResource = []
+		var types = ['success', 'info', 'warning', 'danger'];
+		var i = 0 ;
+		var left = 100;
+		for(var user in temp){
+			var t = {}
+			t['name'] = user;
+			t['value'] = Math.floor( temp[user]*100 /$scope.fair['weightSum'] );
+			left -= t['value'];
+			t['type'] = types[i];
+			i++;
+			if(i>=4) i-=4;
+			$scope.userResource.push(t)
+		}
+		$scope.userResource[0]['value']+=left;
+		
+		console.log($scope.userResource)
+	}
+	$scope.rateWarn=function(rate){
+		if( rate > 100 ){
+			return "color:red;";
+		}
+		else{
+			return "";
+		}
+	}
+	$scope.addQueue=function(){
+		console.log($scope.fairqueues)
+		$scope.fairqueues.push({"name":"queue","user":"hdfs","weight":"0","minResource":"0","maxApps":0})
+		$scope.recal()
+	}
+	$scope.delQueue=function(index){
+		$scope.fairqueues.splice(index,1)
+		$scope.recal()
+		console.log($scope.fairqueues)
+	}
+	$scope.saveFairScheduler=function(){
+		$scope.fairqueues
+		var queues_value = []
+		for(var index in $scope.fairqueues){
+			var queue = $scope.fairqueues[index];
+			var value = queue['name']+"/"+queue['user']+"/"+queue['weight']+"/"+queue['minResource']+"/"+queue['maxApps'];
+			queues_value.push(value)
+		}
+		$http({
+	        method: 'GET',
+	        url: '/adminback/save_conf_var',
+	        params:  
+	        	{
+	        		"service" : "yarn",
+	        		"showType" : "group",
+	        		"group" : "all",
+	        		"name" : "fair_scheduler_queues",
+	        		"value" : queues_value.join(","),
+	        		"type" : "list"
+	        	}
+	    }).success(function(response, status, headers, config){
+	        if(response["ret"]=="ok"){
+	        	$scope.initConf();
+	        }
+	        else{
+	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
+	        }
+	    }).error(function(data, status) {
+	    	$rootScope.alert("发送save_conf_var请求失败");
+	    });
+		
+	}
 	$scope.sendDelService=function(){
 		$http({
 	        method: 'GET',

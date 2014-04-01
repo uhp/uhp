@@ -103,6 +103,35 @@ def get_service_conf(session,service,name):
                    GroupVar.service==service,GroupVar.name==name)).one().value)
     except NoResultFound:
         return None
+    
+#获取一批机器的配置
+def get_conf_from_host(session,host_list,service,name):
+    try:
+        #默认
+        default_value =get_service_conf(session,service,name)
+        ret = {}
+        for host in host_list:
+            ret[host] = default_value
+        
+        #组变量
+        gv_list = {}
+        for gv in session.query(GroupVar).filter(
+                            and_(GroupVar.service==service,GroupVar.name==name)):
+            gv_list[gv.group] = str(gv.value)
+        if len(gv_list) > 0:
+            #组关系
+            for (group,value) in gv_list.items():
+                for gh in session.query(GroupHost).filter(GroupHost.group==group):
+                    if ret.has_key(gh.hostname):
+                        ret[gh.hostname] = value
+        
+        #机器变量
+        for var in session.query(HostVar).filter(and_(HostVar.service==service,HostVar.name==name)):
+            ret[var.host] = str(var.value) 
+            
+        return ret;
+    except NoResultFound:
+        return None 
 
 #一些有用的数据库操作封装
 #增加活动记录

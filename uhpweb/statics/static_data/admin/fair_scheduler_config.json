@@ -1,0 +1,10 @@
+{
+"ret":"ok",
+"fair_scheduler_queues":"high/kpi/6.0/50000/8,low/haha/1.0/10000/8",
+
+"yarn_app_mapreduce_am_resource_mb":"640",
+"mapreduce_map_memory_mb":"640",
+"mapreduce_reduce_memory_mb":"640",
+"total_memory":"4000",
+"nodes":"6"
+}

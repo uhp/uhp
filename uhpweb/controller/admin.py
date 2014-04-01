@@ -172,6 +172,34 @@ class AdminBackHandler(BaseHandler):
         session.close()       
         self.ret("ok", "", {"conf":temp})
         
+    #获取fair scheduler的信息
+    def fair_scheduler_config(self):
+        session = database.getSession()
+        #获取队列
+        queues = database.get_service_conf(session,"yarn","fair_scheduler_queues")
+        yarn_app_mapreduce_am_resource_mb = database.get_service_conf(session,"yarn","yarn_app_mapreduce_am_resource_mb")
+        mapreduce_map_memory_mb = database.get_service_conf(session,"yarn","mapreduce_map_memory_mb")
+        mapreduce_reduce_memory_mb = database.get_service_conf(session,"yarn","yarn_app_mapreduce_am_resource_mb")
+        
+        #计算node
+        nodes = 0;
+        node = []
+        for instance in session.query(Instance).filter(Instance.role == "nodemanager"):
+            nodes = nodes + 1
+            node.append(instance.host)
+
+        session.query()
+        node_memory = database.get_conf_from_host(session,node,"yarn","yarn_nm_resource_memory_mb")
+        #计算host
+        total_memory = 0;
+        for (node,memory) in node_memory.items():
+            total_memory = total_memory + int(memory)
+            
+        self.ret("ok","",{"fair_scheduler_queues":queues,"yarn_app_mapreduce_am_resource_mb":yarn_app_mapreduce_am_resource_mb,
+                          "mapreduce_map_memory_mb":mapreduce_map_memory_mb,"mapreduce_reduce_memory_mb":mapreduce_reduce_memory_mb,
+                          "total_memory":total_memory,"nodes":nodes,"node_memory":node_memory
+                          })
+        
     #保存 修改 删除  分组变量或者机器变量
     #TODO增加区分是否第一次插入
     def save_conf_var(self):

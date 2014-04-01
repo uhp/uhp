@@ -113,7 +113,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 		}
 		$rootScope.alerts.unshift({"msg": msgHead+msg,"type":type});
 		if($rootScope.alerts.length>10){
-			$rootScope.alerts.splice(0, 1);
+			$rootScope.alerts.pop();
 		}
 		setCookie("alerts",angular.toJson($rootScope.alerts),{"expireSeconds":300});
 	}

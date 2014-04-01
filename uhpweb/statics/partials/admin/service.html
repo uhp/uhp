@@ -49,6 +49,8 @@
 								href="http://[[url.host]]:[[url.port]]" target="_blank">[[url.host]]-[[url.role]]</a></li>
 						</ul>
 					</div>
+					<button style="margin-bottom: 20px; margin-left: 10px;"
+						class="btn" ng-click="configFairScheduler()" ng-show="nowService=='yarn'">配置调度器</button>
 					<h5>概况</h5>
 					<table style="width: 550px;" cellpadding="0" cellspacing="0"
 						border="0" class="table table-striped table-bordered">
@@ -150,7 +152,6 @@
 							</tr>
 						</tbody>
 					</table>
-
 				</div>
 
 				<!-- <div class="tab-pane fade [[tabClass('conftem','in')]] " >d</div>  -->
@@ -319,6 +320,122 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-primary" data-dismiss="modal" >确定</button>
+		</div>
+	</div>
+	<!-- 配置公平调度器的模式对话框 -->
+	<div id="configFairScheduler" class="modal hide fade" data-backdrop="static" aria-hidden="true"
+		style="width:950px;left:auto;margin-left:0px;">
+		<div class="modal-header">
+			<h3>配置公平调度器</h3>
+		</div>
+		<div class="modal-body">
+			
+			<!--  "fair_scheduler_user_as_default",
+							"fair_scheduler_preemption",
+							"fair_scheduler_sizebasedweight",
+							"fair_scheduler_assignmultiple",
+							"fair_scheduler_max_assign",
+							"fair_scheduler_locality_threshold_node",
+							"fair_scheduler_locality_threshold_rack" 
+			<div class="input-prepend" style="display: block;" ng-repeat="fairBooleanVar in fairBooleanVarNameList ">
+				<span class="add-on">[[ fairBooleanVar ]]</span>
+				<button type="button" class="btn btn-primary" ng-model="fair[fairBooleanVar]" 
+					btn-checkbox>[[ fair[fairBooleanVar] ]]</button>
+			</div>
+			<div class="input-prepend" style="display: block;" ng-repeat="fairVar in fairVarNameList ">
+				<span class="add-on">[[ fairVar ]]</span>
+				<input type="text" ng-model="fair[fairVar]" >
+			</div>-->
+			<div>
+				<div class="input-prepend" >
+					<span class="add-on">总内存数(MB)</span>
+					<input style="width:50px"  type="text" ng-model="fair.totalMemory" disabled > 
+				</div>
+				<div class="input-prepend"  >
+					<span class="add-on">节点数</span>
+					<input style="width:50px"  type="text" ng-model="fair.nodes" disabled>
+				</div>
+				<div class="input-prepend" >
+					<span class="add-on">节点平均内存(MB)</span>
+					<input style="width:50px"  type="text" ng-model="fair.nodememory" disabled>
+				</div>
+			</div>
+			<div>
+				<div class="input-prepend"  >
+					<span class="add-on">AM内存(MB)</span>
+					<input style="width:50px" type="text" ng-model="fair.am" disabled>
+				</div>
+				<div class="input-prepend"  >
+					<span class="add-on">MAP内存(MB)</span>
+					<input style="width:50px" type="text" ng-model="fair.map" disabled >
+				</div>
+				<div class="input-prepend" >
+					<span class="add-on">REDUCE内存(MB)</span>
+					<input style="width:50px" type="text" ng-model="fair.reduce" disabled>
+				</div>
+				<div class="input-prepend" >
+					<span class="add-on">Container平均内存(MB)</span>
+					<input style="width:50px" type="text" ng-model="fair.container" disabled>
+				</div>
+			</div>
+			<div>
+				<div class="input-prepend" >
+					<span class="add-on">权值总和</span>
+					<input style="width:50px" type="text" ng-model="fair.weightSum" disabled>
+				</div>
+				<div class="input-prepend" >
+					<span class="add-on">并发应用总和</span>
+					<input style="width:50px" type="text" ng-model="fair.appSum" disabled>
+				</div>
+				<div class="input-prepend" >
+					<span class="add-on">AM占用资源比</span>
+					<input style="width:50px;[[rateWarn(fair.appRate)]]" type="text" value="[[fair.appRate]]%" disabled>
+				</div>
+			</div>
+			<div>
+				用户资源期望占比:
+				<div class="progress">
+				  <div class="bar bar-[[user.type]]" ng-repeat="user in userResource" style="width:[[user.value]]%;">
+				  	<span>[[user.name]]:[[user.value]]%</span>		
+				  </div>
+				</div>
+				
+			</div>
+			<div>
+				<button class="btn" ng-click="addQueue()">添加队列</button>
+			</div>
+			<table id="table_id" cellpadding="0" cellspacing="0" border="0"
+				class="table table-striped table-bordered" >
+				<thead>
+					<tr>
+						<th>队列名称</th>
+						<th>所属用户</th>
+						<th>权值</th>
+						<th>最小共享量(MB)</th>
+						<th>并发应用数</th>
+						<th>期望资源</th>
+						<th>AM资源占比</th>
+						<th>删除</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="queue in fairqueues">
+						<td style="width:100px"><input type="text" ng-model="queue.name" style="width:70px" ng-change="recal()" ></td>
+						<td style="width:100px"><input type="text" ng-model="queue.user" style="width:70px" ng-change="recal()" ></td>
+						<td><input type="text" ng-model="queue.weight" style="width:50px" ng-change="recal()" > </td>
+						<td><input type="text" ng-model="queue.minResource" style="width:100px" ng-change="recal()" > </td>
+						<td><input type="text" ng-model="queue.maxApps" style="width:50px" ng-change="recal()" > </td>
+						<td>[[ queue.fairResource ]] MB</td>
+						<td style="[[rateWarn(queue.appRate)]]"> [[ queue.appRate ]]%</td>
+						<td><button class="btn btn-danger" ng-click="delQueue($index)" >删除</button></td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn " data-dismiss="modal" >取消</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveFairScheduler()">保存</button>
 		</div>
 	</div>
 	<!-- 迁移RM的模式对话框 -->
