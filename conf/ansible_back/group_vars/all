@@ -24,7 +24,7 @@ HIVE_HOME: /usr/lib/hive
 
 #以下是启动的java参数
 #自动添加到所有服务启动的参数
-SERVER_OPTS: " -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:+UseCMSCompactAtFullCollection -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN" 
+SERVER_OPTS: "-Xmx1024m -XX:OnOutOfMemoryError='kill;-9;%p' -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:+UseCMSCompactAtFullCollection -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN" 
 
 #以下是各个服务的配置
 #格式服务__变量名字 : 值
@@ -40,6 +40,7 @@ zookeeper__zoo_id: "0"
 #Variables for java opts
 
 hdfs__HADOOP_NAMENODE_OPTS: " -Xmx1024m -Dhdfs.audit.logger=INFO,RFAAUDIT -Dsecurity.audit.logger=INFO,RFAS "
+hdfs__HADOOP_JOURNALNODE_OPTS: " -Xmx1024m "
 hdfs__HADOOP_SECONDARYNAMENODE_OPTS: " "
 hdfs__HADOOP_DATANODE_OPTS: " -Xmx1024m "
 hdfs__HADOOP_BALANCER_OPTS: " -Xmx1024m"
@@ -140,6 +141,19 @@ yarn__yarn_nm_local_dirs:
 yarn__yarn_nm_log_dirs: 
     - /uhp/all_log_dir
 
+yarn__fair_scheduler_user_as_default: "true"
+yarn__fair_scheduler_preemption: "false"
+yarn__fair_scheduler_sizebasedweight: "false"
+yarn__fair_scheduler_assignmultiple: "true"
+yarn__fair_scheduler_max_assign: "2"
+yarn__fair_scheduler_locality_threshold_node: "0.5"
+yarn__fair_scheduler_locality_threshold_rack: "0.0"
+
+yarn__fair_scheduler_userMaxAppsDefault: 50
+yarn__fair_scheduler_queueMaxAppsDefault: 30
+yarn__fair_scheduler_queues:
+   - high/kpi/6.0/50000/8
+   - low/kpi/1.0/10000/8
 
 hbase__HBASE_MASTER_OPTS: " -Xmx256m "
 hbase__HBASE_REGIONSERVER_OPTS: " -Xmx1024m "

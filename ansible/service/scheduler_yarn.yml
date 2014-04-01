@@ -1,0 +1,10 @@
+---
+
+- hosts: RESOURCEMANAGER
+  tasks:
+  - include: roles/conf/tasks/scheduler.yml
+  - name: refresh resource manager
+    sudo: yes
+    sudo_user: yarn
+    shell: yarn rmadmin -refreshQueues
+
