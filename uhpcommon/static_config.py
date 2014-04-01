@@ -67,7 +67,7 @@ services = [
                         {"name":"stop","display":"停止","tooptip":""},
                         {"name":"restart","display":"重启","tooptip":""}],
      "dependence" : ["zookeeper","hdfs"],
-     "web" : [{"role":"resourcemanager","port":"yarn_nm_webapp_port"},
+     "web" : [{"role":"resourcemanager","port":"yarn_rm_webapp_port"},
               {"role":"historyserver","port":"mapreduce_jobhistory_webapp_port"}]
      },
     {"name":"hbase",
