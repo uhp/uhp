@@ -8,4 +8,5 @@
     - hdfs-site.private.xml
     - log4j.properties
     - hadoop-env.sh
+    - hadoop-metrics2.properties
     

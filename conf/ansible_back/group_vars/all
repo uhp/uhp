@@ -22,6 +22,8 @@ YARN_HOME: /usr/lib/hadoop-yarn
 HBASE_HOME: /usr/lib/hbase
 HIVE_HOME: /usr/lib/hive
 
+ganglia_gmond: "hadoop1:8649"
+
 #以下是启动的java参数
 #自动添加到所有服务启动的参数
 SERVER_OPTS: "-Xmx1024m -XX:OnOutOfMemoryError='kill;-9;%p' -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:+UseCMSCompactAtFullCollection -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN" 
@@ -86,6 +88,7 @@ hdfs__qjournal_port: 8485
 hdfs__qjournal_http_port: 8480 
 hdfs__dfs_journalnode_edits_dir: /uhp/journaldir/
 hdfs__dfs_namenode_shared_edits_dir: "journalhdfs1"
+hdfs__fs_trash_checkpoint_interval: 60
 
 hdfs__dfs_datanode_data_dir:
     - /uhp/all_data_dir
@@ -168,6 +171,7 @@ hbase__hbase_master_handler_count: 25
 hbase__hbase_resigionserver_port: 50620
 hbase__hbase_resigionserver_info_port: 50630
 hbase__hbase_regionserver_handler_count: 10
+hbase__hbase_regionserver_codecs: snappy
 
 
     
