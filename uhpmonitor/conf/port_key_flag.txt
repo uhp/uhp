@@ -9,6 +9,7 @@
     "hdfs": {
         "namenode": {
             "dfs_namenode_rpc_address_port": true,
+            "dfs_namenode_servicerpc_address_port": true,
             "dfs_namenode_http_address_port": true,
             "dfs_namenode_https_address_port": false
         },
