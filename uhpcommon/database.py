@@ -21,6 +21,8 @@ from model.instance import Instance
 from model.host_group_var import Host,Group,GroupHost,HostVar,GroupVar
 from model.services import Service
 from model.callback import CallBack
+from model.alarm import *
+from model.monitor import *
 
 engine = None
 
@@ -59,6 +61,15 @@ def get_all_models():
     models.append(HostVar)
     
     models.append(CallBack)
+    
+    models.append(Alarm)
+    models.append(AlarmAssist)
+    
+    models.append(MonitorAssist)
+    models.append(MonitorMetric)
+    models.append(MonitorGroup)
+    models.append(MonitorHost)
+    
     return models
 
 def get_model_from_name(name):
