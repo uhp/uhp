@@ -1,0 +1,12 @@
+---
+
+- name: setup the web
+  sudo: yes
+  yum: name={{ item }} state=installed
+  with_items:
+  - ganglia-web
+  - httpd
+
+- name: copy the ganglia conf to httpd
+  sudo: yes
+  copy: src=ganglia.conf dest=/etc/httpd/conf.d/ganglia.conf

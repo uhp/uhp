@@ -9,6 +9,7 @@ fi
 sudo yum install -y python-pip rpm-build make python2-devel mysql-devel
 sudo pip-python install -U pip
 sudo yum install -y ansible
+sudo yum install -y rrdtool rrdtool-python
 #check ansible 
 #检查ansible安装成功
 #RE=`ansible  --version|grep ansible|wc -l`

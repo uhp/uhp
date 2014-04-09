@@ -1,0 +1,4 @@
+---
+
+- name: stop the httpd
+  service: name=httpd state=stopped
