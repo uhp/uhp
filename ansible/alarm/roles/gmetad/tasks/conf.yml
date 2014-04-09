@@ -1,0 +1,6 @@
+---
+
+- name: template the gmetad conf
+  sudo: yes
+  template: src=gmetad.conf.j2 dest=/etc/ganglia/gmetad.conf
+

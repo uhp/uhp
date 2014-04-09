@@ -1,0 +1,6 @@
+---
+
+- name: stop the gmetad
+  sudo: yes
+  service: name=gmetad state=stopped
+

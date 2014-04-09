@@ -41,6 +41,11 @@ port_key_flag = "file://%s/uhpmonitor/conf/port_key_flag.txt" % uhphome
 monitor_process_timeout = 10
 
 
+# for alarm
+ganglia_rrd_dir = "/var/lib/ganglia/rrds"
+rrd_image_dir = os.path.join(uhphome, "uhpalarm","imgs")
+
+
 #USE FOR DEBUG
 
 #fade_add_del=True

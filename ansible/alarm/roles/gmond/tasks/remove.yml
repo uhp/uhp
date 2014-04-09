@@ -1,0 +1,8 @@
+
+- name: remove the gmond
+  sudo: yes
+  yum: name={{ item }} state=removed
+  with_items:
+   - ganglia-gmond
+   - ganglia-gmond-python
+
