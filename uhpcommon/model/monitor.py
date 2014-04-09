@@ -52,7 +52,7 @@ class MonitorHost(BASE, UHPBase):
     """
     __tablename__ = 'monitor_host'
     #__table_args__ = ( Index('uniqe_idx_%s' % __tablename__, 'service', 'host','role'), )
-    __table_args__ = (UniqueConstraint('host', 'gid', name='_host_gid_ui'), )
+    __table_args__ =  (UniqueConstraint('host', 'gid', name='_host_gid_ui'), UHPBase.__table_args__)
     
     id= Column(Integer, primary_key=True)
     host= Column(String(30), nullable=False)

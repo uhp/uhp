@@ -8,7 +8,9 @@ __pycache__/
 # Distribution / packaging
 .Python
 uhpcommon/config.py
-myvirtualenv/
+vpy/
+logs/
+pids/
 build/
 develop-eggs/
 dist/
