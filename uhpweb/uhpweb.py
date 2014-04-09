@@ -15,6 +15,7 @@ sys.path.append(commondir)
 import config
 import database
 from controller import *
+from controller.monitor import *
 from controller.admin import AdminHandler,AdminBackHandler
 from controller.user import UserHandler,UserBackHandler
 from controller.debug import DebugHandler
@@ -54,6 +55,7 @@ class Application(tornado.web.Application):
             (r"/login", LoginHandler),
             (r"/admin", AdminHandler),
             (r"/user", UserHandler),
+            (r"/monitor", MonitorHandler),
             (r"/adminback/(.*)", AdminBackHandler),
             (r"/userback/(.*)", UserBackHandler),
             (r"/debug", DebugHandler),
