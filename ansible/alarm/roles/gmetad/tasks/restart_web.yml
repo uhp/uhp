@@ -1,0 +1,3 @@
+---
+- include: stop_web.yml
+- include: start_web.yml

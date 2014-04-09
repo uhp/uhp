@@ -1,0 +1,8 @@
+---
+
+- include: conf.yml
+
+- name: start the gmond
+  sudo: yes
+  service: name=gmond state=started
+
