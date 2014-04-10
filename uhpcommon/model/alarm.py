@@ -22,7 +22,7 @@ class Alarm(BASE, UHPBase):
     expression= Column(String(250), nullable=False)
     #回调函数  sendmail 调用参数是 expression的返回的二元组
     callback= Column(String(250), nullable=False)
-    #为* 或者为 机器名
+    #为* 或者为 机器名 或者为 cluster
     host = Column(String(30),nullable=False)
 
     HOST_ALL = "*"
