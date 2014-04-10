@@ -45,6 +45,8 @@ monitor_process_timeout = 10
 ganglia_rrd_dir = "/var/lib/ganglia/rrds"
 rrd_image_dir = os.path.join(uhphome, "uhpalarm","imgs")
 
+alarm_interval = 60
+
 
 #USE FOR DEBUG
 
