@@ -136,10 +136,11 @@ def add_host(asyncId,hosts,login):
             host.rack=info['rack']
             session.add(host)
             session.commit()
-            #提交一个prepare任务,假如运行成功将修改状态到ready
-            prepareTaskid = database.build_task(session,"ansible","prepare",hostName,"prepare","prepare")
-            prepareTaskids.append(prepareTaskid)
-            callback_lib.add_callback(session,prepareTaskid,"changeHostToReady")
+            if config.install_manager:
+                #提交一个prepare任务,假如运行成功将修改状态到ready
+                prepareTaskid = database.build_task(session,"ansible","prepare",hostName,"prepare","prepare")
+                prepareTaskids.append(prepareTaskid)
+                callback_lib.add_callback(session,prepareTaskid,"changeHostToReady")
             #假如登录信息跟默认的不一致，保存这些登录信息到数据库
             save_login(session, hostName, login)
             

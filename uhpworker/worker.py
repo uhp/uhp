@@ -183,13 +183,21 @@ class AnsibleExecutor(Executor):
         myout      = MyOut(task)
         #tmp_out    = sys.stdout
         #sys.stdout = myout
-        
-        cmd = ["/usr/bin/ansible-playbook", "-i", config.ansible_host_list, pb]
+        uh = os.getenv('UHP_HOME')
+        myout.write('UHP_HOME:' + uh)
+        myout.write("\n")
+        myout.write('PATH:' + os.getenv('PATH'))
+        myout.write("\n")
+        cmd = ["/usr/bin/env", "ansible-playbook", "-i", config.ansible_host_list, pb]
         cmd_str = "cmd="+" ".join(cmd)
         myout.write(cmd_str)
         myout.write("\n")
         log.debug(cmd_str)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=config.uhphome, env={'UHP_HOME':config.uhphome})
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=config.uhphome, 
+            env={'UHP_HOME':config.uhphome,
+                 'PATH':os.getenv('PATH')
+              }
+            )
         task_process_map[task.id] = p
         while p.poll() == None:
             line = p.stdout.readline() 

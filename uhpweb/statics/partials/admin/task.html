@@ -5,8 +5,8 @@
 			<label style="margin-bottom:20px;display:inline-block">一共[[totalTask]]个任务([[totalPage]]页),当前第[[nowPage]]页</label>
 			<div class="btn-group" style="margin-bottom:20px;">
 			  <button class="btn" ng-click="nowPage=1">First</button>
-			  <button class="btn [[isDisable('pre')]] " ng-click="nowPage=nowPage-1">Pre</button>
-			  <button class="btn [[isDisable('next')]] " ng-click="nowPage=nowPage+1">Next</button>
+			  <button class="btn [[isDisable('pre')]] " ng-click="prepage()">Pre</button>
+			  <button class="btn [[isDisable('next')]] " ng-click="nextpage()">Next</button>
 			  <button class="btn" ng-click="nowPage=totalPage">Last</button>
 			</div>
 			<input type="text" style="width:50px;margin-bottom:20px;" ng-model="wantPage">

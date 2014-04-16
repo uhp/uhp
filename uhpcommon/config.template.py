@@ -4,6 +4,10 @@ import os
 
 uhphome = os.getenv('UHP_HOME')
 
+# 是否安装 管理组件 和 监控组件
+install_manager = True
+install_monitor = False
+
 template_dir = os.path.join(uhphome,"ansible","service","roles","conf","templates")
 
 jar_dir = os.path.join(uhphome,"ansible","service","roles","jar","files")

@@ -27,28 +27,35 @@
             <!-- head -->
             <div class="row" ng-controller="NarCtrl">
                 <div class="span12">
-                <div class="navbar" >
-                    <div class="navbar-inner">
-                        <h3 style="float:left;">管理员界面</h3>
-                        <div class="pull-right">
-                            <label class="hor">用户：[[user.name]]</label>
-                            <!-- 下拉高级操作  -->
-                            <div class="btn-group">
-                                <button class="btn drop-down-toggle" data-toggle="dropdown" >
-                                    高级<span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="/admin#/admin-manual">手动修改</a></li>
-                                </ul>
+                    <div class="navbar" >
+                        <div class="navbar-inner">
+                            <h3 style="float:left;">管理员界面</h3>
+                            <div class="pull-right">
+                                <label class="hor">用户：[[user.name]]</label>
+                                <!-- 下拉高级操作  -->
+                                <div class="btn-group">
+                                    <button class="btn drop-down-toggle" data-toggle="dropdown" >
+                                        高级<span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/admin#/admin-manual">手动修改</a></li>
+                                    </ul>
+                                </div>
+                                <!-- <button class="btn" type="button"><a href="/user">切换到开发者界面</a></button>  -->
+                                <!-- <button class="btn" type="button"><a href="/admin#/admin-manual">手动修改</a></button> -->
+                                <button class="btn" type="button"><a href="/logout">登出</a></button>
                             </div>
-                            <!-- <button class="btn" type="button"><a href="/user">切换到开发者界面</a></button>  -->
-                            <!-- <button class="btn" type="button"><a href="/admin#/admin-manual">手动修改</a></button> -->
-                            <button class="btn" type="button"><a href="/logout">登出</a></button>
                         </div>
                     </div>
                 </div>
-                </div>
 
+                <!-- alert -->
+                <div class="span12">
+                    <div style="display:inline-block;width:500px;height:90px;border:1px solid rgb(221, 221, 221);overflow-y: scroll;" class="pull-right">
+                        <alert  ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">[[alert.msg]]</alert>
+                    </div>
+                </div>
+                <!-- ~alert -->
                 <!-- menu -->
                 <div class="col-md-12 span12">
                     <ul id="tabs" class="nav nav-tabs">
@@ -57,20 +64,14 @@
                         </li>
                     </ul>
                 </div>
-                
-                <!--
-                <div>
-                    <div style="display:inline-block;width:500px;height:90px;border:1px solid rgb(221, 221, 221);overflow-y: scroll;" class="pull-right">
-                        <alert  ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">[[alert.msg]]</alert>
-                    </div>
-                </div>
-                -->
             </div>
             <!-- ~head -->
 
+            <!--
             <div class="row" >
-                <div ng-view class="reveal-animation"></div>
             </div>
+            -->
+            <div ng-view class="reveal-animation"></div>
 
             <!-- 全局共用HTML -->
             <!-- 模式对话框的进度条  -->
@@ -94,14 +95,5 @@
         </div>
         <script type="text/javascript" src="/statics/js/base.js"></script>
         <script type="text/javascript" src="/statics/js/monitor.js"></script>
-        <!--
-        <script type="text/javascript" src="/statics/js/admin/NarCtrl.js"></script>
-        <script type="text/javascript" src="/statics/js/admin/ServiceCtrl.js"></script>
-        <script type="text/javascript" src="/statics/js/admin/HostCtrl.js"></script>
-        <script type="text/javascript" src="/statics/js/admin/TaskCtrl.js"></script>
-        <script type="text/javascript" src="/statics/js/admin/SettingCtrl.js"></script>
-        <script type="text/javascript" src="/statics/js/admin/TemplateCtrl.js"></script>
-        <script type="text/javascript" src="/statics/js/admin/ManualCtrl.js"></script>
-        -->
     </body>
 </html>

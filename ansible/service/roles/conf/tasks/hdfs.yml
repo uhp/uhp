@@ -9,4 +9,11 @@
     - log4j.properties
     - hadoop-env.sh
     - hadoop-metrics2.properties
+
+- name: copy the get_rack
+  sudo: yes
+  template: src=hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}} mode=0755
+  with_items:
+    - get_rack.py
+ 
     
