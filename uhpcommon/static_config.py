@@ -1,8 +1,13 @@
 #!python
 # coding=utf8
 
+import config
+
 adminmenus = {
         "name":"admin", "display":"管理员", "href":"/admin",
+        "menus":[
+            {"name":"admin", "display":"管理", "href":"/admin", "active":"active" }
+            ],
         "submenus":[
             {"name":"service", "display":"服务", "href":"#admin-service"},
             {"name":"host", "display":"机器", "href":"#admin-host"},
@@ -11,6 +16,10 @@ adminmenus = {
             {"name":"template", "display":"模板", "href":"#admin-template"}
             ]    
          }
+
+if config.install_monitor:
+   adminmenus['menus'].insert(0,{"name":"hosts", "display":"机器", "href":"/monitor#/hosts"})
+   adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"/monitor#/monitor"})  
 
 usermenus = {"name":"user", "display":"用户", "href":"/user",
         "submenus":[

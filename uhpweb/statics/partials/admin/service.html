@@ -1,24 +1,29 @@
-<div ng-controller="ServiceCtrl">
+<div class="container" style="margin-top:20px" ng-controller="ServiceCtrl">
+  
+  <div class="row">
+    <div class="col-md-12">
+      <div style="margin-bottom: 20px">
+        <button class="btn" ng-click="showSetupService()" ng-show="unactiveServices.length!=0" >添加服务</button>
+      </div>
+    </div>
+  </div>
+	
+  <div class="row">
 
-	<div style="margin-bottom: 10px">
-		<button class="btn" ng-click="showSetupService()" ng-show="unactiveServices.length!=0" >添加服务</button>
-	</div>
-	<div class="row">
-		<div class="span2">
+		<div class="col-md-2 span2">
 			<ul class="nav nav-tabs nav-stacked">
-				<li ng-click="changeService(service)"
-					ng-repeat="service in activeServices"><a
-					class="[[serviceClass(service)]]">[[service]]</a></li>
+				<li ng-click="changeService(service)" ng-repeat="service in activeServices">
+        <a class="[[serviceClass(service)]]">[[service]]</a>
+        </li>
 			</ul>
 		</div>
-		<div ng-show="hasService" class="span8">
+
+		<div ng-show="hasService" class="col-md-10 span10">
 			<!-- 标签页切换 -->
 			<ul class="nav nav-tabs" id="serviceTab">
 				<li class="[[tabClass('info')]]"><a ng-click="tab='info'">服务概况</a></li>
-				<li class="[[tabClass('instance')]]"><a
-					ng-click="tab='instance'">运行实例</a></li>
+				<li class="[[tabClass('instance')]]"><a ng-click="tab='instance'">运行实例</a></li>
 				<li class="[[tabClass('confvar')]]"><a ng-click="tab='confvar'">配置变量</a></li>
-				<!-- <li class="[[tabClass('conftem')]]"><a  ng-click="tab='conftem'">配置模板</a></li>  -->
 			</ul>
 
 			<div class="tab-content">
@@ -485,8 +490,6 @@
 	</div> -->
 
 </div>
-
-
 
 <script>
 	$('.dropdown-toggle').dropdown();

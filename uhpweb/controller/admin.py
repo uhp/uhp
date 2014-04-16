@@ -12,9 +12,9 @@ from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 import async
+import config
 import static_config
 import database
-import config
 import util
 import callback_lib
 import mm

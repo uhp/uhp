@@ -1,42 +1,63 @@
 <!DOCTYPE html>
-<html data-ng-app="uhpApp">
-<head>
-<meta charset="UTF-8" />
-<title>{{title}}</title>
-<link rel="stylesheet" href="/statics/css/bootstrap.css" />
-<link rel="stylesheet" href="/statics/css/uhplogin.css" />
-</head>
-<body>
-	<div id="loginbox" class="container">
-		<form id="loginform" class="form-vertical" action="/login"
-			method="post">
-			<div class="control-group normal_text">
-				<h2>UHP管理平台</h2>
-			</div>
-			<div class="control-group">
-				<div class="controls">
-					<div class="main_input_box">
-						<span class="add-on bg_lg"><i class="icon-user"></i></span> <input
-							type="text" placeholder="用户名" name="useranme" />
-					</div>
-				</div>
-			</div>
-			<div class="control-group">
-				<div class="controls">
-					<div class="main_input_box">
-						<span class="add-on bg_ly"><i class="icon-lock"></i></span> <input
-							type="password" placeholder="密码" name="password" />
-					</div>
-				</div>
-			</div>
-			<div class="form-actions">
-				<span><button type="submit" href="index.html"
-						class="btn btn-success" /> 登录
-					</button></span>
-			</div>
-		</form>
-	</div>
+<html lang="en" data-ng-app="uhpApp">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+    <title>{{title}}</title>
+    <!-- <link href="/statics/css/flatui/2.1.3/bootstrap/css/bootstrap.css" rel="stylesheet"> -->
+    <link href="http://cdn.bootcss.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/statics/css/flatui/2.1.3/css/flat-ui.css" rel="stylesheet">
+    <link rel="shortcut icon" href="/statics/favicon.ico">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      .container { width: 970px !important; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="login">
+        <div class="login-screen">
+          <div class="login-icon">
+            <img src="/statics/css/flatui/2.1.3/images/login/elephant_rgb_sq.png">
+            <h4>Welcome to <small>UHP</small></h4>
+          </div>
 
+          <div class="login-form">
+		      <form action="/login" method="post">
+            <div class="form-group">
+              <input type="text" class="form-control login-field" name="useranme" value="" placeholder="Enter your name" id="login-name" />
+              <label class="login-field-icon fui-user" for="login-name"></label>
+            </div>
 
-</body>
+            <div class="form-group">
+              <input type="password" class="form-control login-field" name="password" value="" placeholder="Password" id="login-pass" />
+              <label class="login-field-icon fui-lock" for="login-pass"></label>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Log in</button>
+            <!-- <a class="login-link" href="#">Lost your password?</a> -->
+          </form>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /container -->
+    
+    <!-- Load JS here for greater good =============================-->
+    <script src="/statics/css/flatui/2.1.3/js/jquery-1.8.3.min.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/bootstrap.min.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/bootstrap-select.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/bootstrap-switch.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/flatui-checkbox.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/flatui-radio.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/jquery.tagsinput.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/jquery.placeholder.js"></script>
+    <script src="/statics/css/flatui/2.1.3/js/application.js"></script>
+  </body>
 </html>
+
