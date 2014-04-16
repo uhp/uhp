@@ -47,6 +47,12 @@ rrd_image_dir = os.path.join(uhphome, "uhpalarm","imgs")
 
 alarm_interval = 60
 
+#for mail
+mail_host = None
+mail_from = None
+mail_user = None
+mail_passwd = None
+
 
 #USE FOR DEBUG
 
