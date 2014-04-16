@@ -22,6 +22,12 @@ uhpApp.controller('TaskCtrl',['$scope','$rootScope','$interval','$http',function
 		if( button=="next" && $scope.nowPage == $scope.totalPage) return "disabled";
 		return " ";
 	}
+    $scope.prepage=function(){
+        if( $scope.nowPage > 1)  $scope.nowPage = $scope.nowPage - 1;
+    }
+    $scope.nextpage=function(){
+        if( $scope.nowPage < $scope.totalPage)  $scope.nowPage = $scope.nowPage + 1;
+    }
 	$scope.getIconClass=function(name){
 		if( $scope.orderbyField == name){
 			if( $scope.orderDir=="asc" ){
