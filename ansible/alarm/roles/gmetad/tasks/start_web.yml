@@ -1,0 +1,5 @@
+---
+
+- name: start the httpd
+  sudo: yes
+  service: name=httpd state=started

@@ -21,6 +21,8 @@ from model.instance import Instance
 from model.host_group_var import Host,Group,GroupHost,HostVar,GroupVar
 from model.services import Service
 from model.callback import CallBack
+from model.alarm import *
+from model.monitor import *
 
 engine = None
 
@@ -59,6 +61,15 @@ def get_all_models():
     models.append(HostVar)
     
     models.append(CallBack)
+    
+    models.append(Alarm)
+    models.append(AlarmAssist)
+    
+    models.append(MonitorAssist)
+    models.append(MonitorMetric)
+    models.append(MonitorGroup)
+    models.append(MonitorHost)
+    
     return models
 
 def get_model_from_name(name):
@@ -167,17 +178,17 @@ if __name__ == "__main__":
     #默认分组
     insert(Group("all","no chinise"))
     #关键分组变量
-    insert(GroupVar("all","","ansible_ssh_user","qiujw",0,"*用于登录到其它机器的用户名称"))
-    insert(GroupVar("all","","ansible_ssh_port","9922",0,"*ssh的登录端口"))
-    insert(GroupVar("all","","ansible_ssh_pass","just4test",0,"*ssh的登录密码"))
-    insert(GroupVar("all","","ansible_sudo_pass","just4test",0,"*ssh登录后的sudo密码"))
-    insert(GroupVar("all","","local_repo_enabled","true",0,"*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url"))
-    insert(GroupVar("all","","local_http_url","http://localhost:8080/uhp",0,"*本地仓库的HTTP服务local_http_url"))
+    insert(GroupVar("all","","ansible_ssh_user","qiujw",0,u"*用于登录到其它机器的用户名称"))
+    insert(GroupVar("all","","ansible_ssh_port","9922",0,u"*ssh的登录端口"))
+    insert(GroupVar("all","","ansible_ssh_pass","just4test",0,u"*ssh的登录密码"))
+    insert(GroupVar("all","","ansible_sudo_pass","just4test",0,u"*ssh登录后的sudo密码"))
+    insert(GroupVar("all","","local_repo_enabled","true",0,u"*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url"))
+    insert(GroupVar("all","","local_http_url","http://localhost:8080/uhp",0,u"*本地仓库的HTTP服务local_http_url"))
     
-    insert(GroupVar("all","","java_tar","jdk1.6.0_45.tar.gz",0,"*添加机器的时候.检查到没有java的话会安装的java的tar包。请填写绝对路径。"))
-    insert(GroupVar("all","","java_untar_floder","jdk1.6.0_45",0,"*安装java的时候tar包解压的名称。推荐安装示例形式填写"))
+    insert(GroupVar("all","","java_tar","jdk1.6.0_45.tar.gz",0,u"*添加机器的时候.检查到没有java的话会安装的java的tar包。请填写绝对路径。"))
+    insert(GroupVar("all","","java_untar_floder","jdk1.6.0_45",0,u"*安装java的时候tar包解压的名称。推荐安装示例形式填写"))
 
-    insert(GroupVar("all","","services_log_root","/var/log",0,"*各个服务的日志存放地方，需要预留10G空间"))
+    insert(GroupVar("all","","services_log_root","/var/log",0,u"*各个服务的日志存放地方，需要预留10G空间"))
 
     #初始化服务数据
     for service in static_config.services:

@@ -1,0 +1,7 @@
+
+- name: setup the gmetad
+  sudo: yes
+  yum: name={{ item }} state=installed
+  with_items:
+   - ganglia-gmetad
+

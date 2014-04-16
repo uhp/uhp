@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from sqlalchemy import Column, Integer, String, Text, schema,SmallInteger
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import ForeignKey, DateTime, Boolean, func,Index
+from sqlalchemy import ForeignKey, DateTime, Boolean, func,Index, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from models import UHPBase
 import time
@@ -24,7 +24,7 @@ class Instance(BASE, UHPBase):
     """ users tables for uhpkeeper """
 
     __tablename__ = 'instance'
-    __table_args__ = ( Index('uniqe_idx_%s' % __tablename__, 'service', 'host','role'), )
+    __table_args__ = ( UniqueConstraint('service', 'host','role', name='_name_host_role') , UHPBase.__table_args__ )
     id= Column(Integer, primary_key=True)
     service = Column(String(16))
     host = Column(String(32))

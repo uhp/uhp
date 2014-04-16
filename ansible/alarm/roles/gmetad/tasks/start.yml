@@ -1,0 +1,8 @@
+---
+
+- include: conf.yml
+
+- name: start the gmetad
+  sudo: yes
+  service: name=gmetad state=started
+

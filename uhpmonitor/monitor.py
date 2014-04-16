@@ -128,7 +128,7 @@ def execute(ins, ports):
     for port in ports:
         script += " " + port[0]
    
-    cmd = ["ansible", "-i", config.ansible_host_list, ins.host, "-m", "script", "-a", script]
+    cmd = ["/usr/bin/env", "ansible", "-i", config.ansible_host_list, ins.host, "-m", "script", "-a", script]
     log.debug("cmd="+" ".join(cmd))
     log.debug("host[%s], runner.run", ins.host)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

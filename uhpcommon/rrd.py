@@ -1,0 +1,242 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+from datetime import datetime
+import time
+import rrdtool
+import types
+import rrd_contants
+
+import config
+
+class RrdWrapper(object):
+
+    def __init__(self, rrd_rootdir, image_rootdir, cluster_name=''):
+        super(RrdWrapper, self).__init__()
+        self.rrd_rootdir = rrd_rootdir
+        self.image_rootdir = image_rootdir
+        self.cluster_name = cluster_name
+
+    def query(self, metricName, startTime, endTime='now', hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        """ Get dictionary with proper data from given period of time and for given node
+
+        :param startTime:
+        :type startTime: datetime, int or str
+        :param endTime:
+        :type endTime: datetime, int or str
+        :param metricName: Metric name.
+        :type metricName: String
+        :param hostname: Node's hostname.
+        :type hostname: String
+        :param clusterName: Cluster's name.
+        :type clusterName: String
+        :return:
+        :rtype: Dict
+        """
+
+        if metricName is None:
+            raise Exception("Null parameter %s", "metricName")
+
+        if startTime is None:
+            raise Exception("Null parameter %s", "startTime")
+
+        if type(startTime) == type(datetime.now()):
+            start = str(int(time.mktime(startTime.timetuple()) * 1000))
+        elif isinstance(startTime, types.FloatType):
+            start = str(int(startTime))
+        else:
+            start = startTime
+
+        if type(endTime) == type(datetime.now()):
+            end = str(int(time.mktime(endTime.timetuple()) * 1000))
+        elif isinstance(endTime, types.FloatType):
+            end = str(int(endTime))
+        else:
+            end = endTime
+
+        if clusterName is None:
+            filePath = os.path.join(self.rrd_rootdir, hostname, metricName + ".rrd")
+        else:
+            filePath = os.path.join(self.rrd_rootdir, clusterName, hostname, metricName + ".rrd")
+
+
+        return self._fetch_data(filePath, start, end)
+
+
+    def _fetch_data(self, rrdfile, startTime, endTime):
+        """ Fetch data from RRD archive for given period of time.
+
+        :param rrdObject: RRDclusterName
+        :type rrdObject: String
+        :type startTime: int
+        :type endTime: int
+        :return: Dictionary with data from RRD archive.
+        :rtype: Dict
+        """
+
+        if not os.path.exists(rrdfile):
+            raise Exception("RRD File not exists %s" % rrdfile)
+
+        return rrdtool.fetch(rrdfile, "AVERAGE", "--start", startTime, "--end", endTime)
+
+
+    def get_info(self, rrdfile):
+        #TODO: translate into human-redable output.
+        return rrdtool.info(rrdfile)
+
+
+    def get_rrd_file_path(self, metricName, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        """
+        :return the rrd file path
+        :param metricName:
+        :param hostname:
+        :param clusterName:
+        :return:
+        """
+        filePath = os.path.join(self.rrd_rootdir, clusterName, hostname, metricName + ".rrd")
+        return filePath
+
+    def get_rrd_names(self, prefix, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        """
+        get the rrd file names as list which match the prefix
+        :param prefix:
+        :param hostname:
+        :param clusterName:
+        :return:
+        """
+        names = []
+        rrd_dirname = os.path.join(self.rrd_rootdir, clusterName, hostname)
+        for name in os.listdir(rrd_dirname):
+            if name.startswith(prefix) and name.endswith('.rrd'):
+                names.append(name[:-4])
+        return names
+
+    def get_all_rrd_names(self, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        """
+        get the rrd file names as list which match the prefix
+        :param prefix:
+        :param hostname:
+        :param clusterName:
+        :return:
+        """
+        names = []
+        rrd_dirname = os.path.join(self.rrd_rootdir, clusterName, hostname)
+        for name in os.listdir(rrd_dirname):
+            if name.endswith('.rrd'):
+                _name = name[:-4]
+                names.append(_name)
+        return names
+
+    def get_metrics_names(self, prefix, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        """
+        get the rrd file names as list which match the prefix
+        :param prefix:
+        :param hostname:
+        :param clusterName:
+        :return:
+        """
+        names = []
+        rrd_dirname = os.path.join(self.rrd_rootdir, clusterName, hostname)
+        for name in os.listdir(rrd_dirname):
+            if name.endswith('.rrd'):
+                _name = name[:-4]
+                _name = _name.partition(prefix)[-1]
+                names.append(_name)
+        return names
+
+    def get_image_path(self, image_name, hostname="__SummaryInfo__", clusterName="default_cluster"):
+        """
+        :return the rrd file path
+        :param image_name:
+        :param hostname:
+        :param clusterName:
+        :return:
+        """
+        filePath = os.path.join(self.image_rootdir, clusterName, hostname, image_name + ".svg")
+
+        dirname = os.path.dirname(filePath)
+        print(dirname)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
+        return str(filePath)
+
+    def draw(self, image_path, title, rrd_lines, startTime, endTime='now'):
+        """
+
+        :param opts:
+        :type list
+        :return:
+        """
+        if image_path is None:
+            raise Exception("Null parameter %s", "image_path")
+
+        if startTime is None:
+            raise Exception("Null parameter %s", "startTime")
+
+        if type(startTime) == type(datetime.now()):
+            start = str(int(time.mktime(startTime.timetuple()) * 1000))
+        elif isinstance(startTime, types.FloatType):
+            start = str(int(startTime))
+        else:
+            start = startTime
+
+        if type(endTime) == type(datetime.now()):
+            end = str(int(time.mktime(endTime.timetuple()) * 1000))
+        elif isinstance(endTime, types.FloatType):
+            end = str(int(endTime))
+        else:
+            end = endTime
+
+        print rrdfile_in
+        print rrdfile_out
+        args = [image_path, '--start', start, '--end', end, '--alt-autoscale',  
+                      '-A', '--imgformat', 'SVG', '--rigid', '-c', 'SHADEA%s' % rrd_contants.white, '-w', '450', '-h', '180',
+                      '-c', 'SHADEB%s' % rrd_contants.white, '-c', 'FRAME%s' % rrd_contants.dark_blue, '-c',
+                      'FONT%s' % rrd_contants.light_blue, '--slope-mode', '-c', 'ARROW%s' % rrd_contants.red, '-c',
+                      'AXIS%s' % rrd_contants.dark_blue, '-c', 'BACK%s' % rrd_contants.white, '--interlaced',
+                      '--font', 'TITLE:9:', '--font', 'AXIS:7:', '--font', 'LEGEND:6:', '--font', 'UNIT:7:',
+                      '--alt-autoscale-max',
+                      '-t', title]
+        args.extend(rrd_lines)
+        apply(rrdtool.graph,args)
+
+
+
+
+if __name__ == '__main__':
+    rrd_wraper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+
+
+    from datetime import datetime
+
+    start = '-1h'
+    end = 'now'
+    
+    print(rrd_wraper.query('cpu_user',start, end, hostname='hadoop2', clusterName='test_hadoop'))
+
+    rrdfile_in = rrd_wraper.get_rrd_file_path('bytes_in', hostname='hadoop2', clusterName='test_hadoop')
+    rrdfile_out = rrd_wraper.get_rrd_file_path('bytes_out', hostname='hadoop2', clusterName='test_hadoop')
+    image_path = rrd_wraper.get_image_path('llddd', hostname='hadoop2', clusterName='test_hadoop')
+
+    rrd_lines = ['DEF:input=%s:sum:AVERAGE' % rrdfile_in,  #定义一个DEF变量
+                 'LINE1:input#BB1D48:In traffic',          #使用一个DEF变量定义一个LINE1
+                 'CDEF:bytes_in=input,8,*',                #定义一个CDEF变量
+                 'COMMENT: ',                              #注释
+                 'GPRINT:bytes_in:MAX:MAX in traffic\: %6.2lf %Sbps', #标注格式
+
+                 'DEF:output=%s:sum:AVERAGE' % rrdfile_out,
+                 'LINE2:output#002A6B:Out traffic', 
+                 'CDEF:bytes_out=output,8,*',
+                 'COMMENT: ',
+                 'GPRINT:bytes_out:MAX:MAX out traffic\: %6.2lf %Sbps',
+                 ]
+
+    rrd_wraper.draw(image_path, "网络流量", rrd_lines, '-1h')
+
+
+
+
+
+

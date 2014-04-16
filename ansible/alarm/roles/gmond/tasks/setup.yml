@@ -1,0 +1,8 @@
+
+- name: setup the gmond
+  sudo: yes
+  yum: name={{ item }} state=installed
+  with_items:
+   - ganglia-gmond
+   - ganglia-gmond-python
+

@@ -4,6 +4,10 @@ import os
 
 uhphome = os.getenv('UHP_HOME')
 
+# 是否安装 管理组件 和 监控组件
+install_manager = True
+install_monitor = False
+
 template_dir = os.path.join(uhphome,"ansible","service","roles","conf","templates")
 
 jar_dir = os.path.join(uhphome,"ansible","service","roles","jar","files")
@@ -39,6 +43,13 @@ monitor_thread_numb = 10
 monitor_timer_interval = 10
 port_key_flag = "file://%s/uhpmonitor/conf/port_key_flag.txt" % uhphome
 monitor_process_timeout = 10
+
+
+# for alarm
+ganglia_rrd_dir = "/var/lib/ganglia/rrds"
+rrd_image_dir = os.path.join(uhphome, "uhpalarm","imgs")
+
+alarm_interval = 60
 
 
 #USE FOR DEBUG

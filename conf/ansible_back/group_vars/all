@@ -22,6 +22,8 @@ YARN_HOME: /usr/lib/hadoop-yarn
 HBASE_HOME: /usr/lib/hbase
 HIVE_HOME: /usr/lib/hive
 
+ganglia_gmond: "hadoop1:8649"
+
 #以下是启动的java参数
 #自动添加到所有服务启动的参数
 SERVER_OPTS: "-Xmx1024m -XX:OnOutOfMemoryError='kill;-9;%p' -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:+UseCMSCompactAtFullCollection -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN" 
@@ -86,6 +88,7 @@ hdfs__qjournal_port: 8485
 hdfs__qjournal_http_port: 8480 
 hdfs__dfs_journalnode_edits_dir: /uhp/journaldir/
 hdfs__dfs_namenode_shared_edits_dir: "journalhdfs1"
+hdfs__fs_trash_checkpoint_interval: 60
 
 hdfs__dfs_datanode_data_dir:
     - /uhp/all_data_dir
@@ -168,6 +171,7 @@ hbase__hbase_master_handler_count: 25
 hbase__hbase_resigionserver_port: 50620
 hbase__hbase_resigionserver_info_port: 50630
 hbase__hbase_regionserver_handler_count: 10
+hbase__hbase_regionserver_codecs: snappy
 
 
     
@@ -197,4 +201,30 @@ impala__impala_server_beeswax_port: 21000
 impala__impala_server_hs2_port: 21050
 impala__impala_server_mem_limit: 2G
 
+#ganglia config
 
+ganglia__cluster_name: test_hadoop
+ganglia__data_source_ip: 10.1.74.45
+ganglia__gmond_port: 8649
+
+#这个变量较复杂一共3层
+#这个变量对于不同机器可以有不同实现
+#ganglia__gmond_python:
+#    - "name":"example"
+#      "params":{"a":100,"b":"temp"}
+#      "collect_once":"yes"
+#      "collect_every":10
+#      "time_threshold":10
+#      "metric":
+#        - "name":"xxx"
+#          "value_threshold":1.0
+#        - "name_match":"([\\S]+)-disk_total"
+#          "name":"\\1-disk_total"
+#    //如果 collect_once为yes collect_every将被忽略
+
+#1分钟保存2个小时 10分钟保存7天 1小时保存7天 1天保存1年
+ganglia__gmetad_rras:
+    - 'RRA:AVERAGE:0.5:4:120'
+    - 'RRA:AVERAGE:0.5:40:1008'
+    - 'RRA:AVERAGE:0.5:240:336' 
+    - 'RRA:AVERAGE:0.5:5760:376'
