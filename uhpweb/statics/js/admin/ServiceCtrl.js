@@ -66,7 +66,8 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	$scope.setupMove = 1;
 	$scope.showSetupService=function(){
 		if( $scope.hosts.length == 0 ){
-			$rootScope.alert("请先添加机器");
+			$rootScope.alert("请先添加机器", "now");
+			//alert("请先添加机器");
 			return;
 		}
 		$http({

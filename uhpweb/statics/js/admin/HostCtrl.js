@@ -145,7 +145,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	}
 	$scope.addHost=function(){
 		if( $scope.nowHost.hosts==null ){
-			$rootScope.alert("机器不能为空");
+			$rootScope.alert("机器不能为空", "now");
 			return;
 		}
 		$http({
@@ -173,7 +173,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	$scope.readySetRack=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr == "" ){
-			$rootScope.alert("请选择机器","warn")
+			$rootScope.alert("请选择机器", "now")
 			return 
 		}
 		if( $scope.settingRack == null || $scope.settingRack == "" ){
@@ -208,7 +208,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	$scope.readyDelHost=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr == "" ){
-			$rootScope.alert("请选择机器","warn")
+			$rootScope.alert("请选择机器","now")
 			return 
 		}
 		$("#hostDelHostModal").modal();
@@ -239,7 +239,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	$scope.readySendRepo=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr.length == 0 ){
-			$rootScope.alert("请选择机器")
+			$rootScope.alert("请选择机器", "now")
 			return;
 		}
 		$("#sendRepoModal").modal()

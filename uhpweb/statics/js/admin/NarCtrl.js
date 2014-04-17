@@ -84,6 +84,11 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 			$rootScope.alerts.push({"msg": "welcome to uhp !!","type":"info"})
 		} 
 		setCookie("alerts",angular.toJson($rootScope.alerts),{"expireSeconds":300});
+    // 初始化 Messenger 组件
+    Messenger.options = {
+      extraClasses: 'messenger-fixed messenger-on-top',
+      theme: 'flat'
+    }
 	}
 	$rootScope.initAlerts()
 	$rootScope.alert=function(msg,type){
@@ -95,7 +100,12 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 			type="danger"
 		}
 		if( type == "now"){
-			alert(msg);
+			// alert(msg);
+      Messenger().post({
+        message: msg,
+        type: 'error',
+        showCloseButton: true
+      });
 			return;
 		}
 		var msgHead = get_now_hms();
