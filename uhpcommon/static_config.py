@@ -18,7 +18,7 @@ adminmenus = {
          }
 
 if config.install_monitor:
-   adminmenus['menus'].insert(0,{"name":"hosts", "display":"机器", "href":"/monitor#/hosts"})
+   # adminmenus['menus'].insert(0,{"name":"hosts", "display":"机器", "href":"/monitor#/hosts"})
    adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"/monitor#/monitor"})  
 
 usermenus = {"name":"user", "display":"用户", "href":"/user",

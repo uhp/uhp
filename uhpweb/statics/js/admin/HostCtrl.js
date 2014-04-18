@@ -159,14 +159,13 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	        	"sudopasswd":$scope.nowHost.sudopasswd
 	        }
 	    }).success(function(response, status, headers, config){
-	    	if(response["ret"]!="ok"){
-	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
-	        }
-	    	else{
-	    		$rootScope.beginProgress(response["runningId"],$scope.initHost);
+        if(response["ret"]!="ok"){
+          $rootScope.alert("提交失败 ("+response["msg"]+")", "now");
+        } else {
+	    		$rootScope.beginProgress(response["runningId"], $scope.initHost);
 	    	}
 	    }).error(function(data, status) {
-	    	$rootScope.alert("发送add_host请求失败");
+	    	$rootScope.alert("发送add_host请求失败", "now");
 	    });
 	}
 	//添加机架

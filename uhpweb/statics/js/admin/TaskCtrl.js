@@ -31,13 +31,13 @@ uhpApp.controller('TaskCtrl',['$scope','$rootScope','$interval','$http',function
 	$scope.getIconClass=function(name){
 		if( $scope.orderbyField == name){
 			if( $scope.orderDir=="asc" ){
-				return "icon-arrow-up";
+				return "glyphicon glyphicon-arrow-up icon-arrow-up";
 			}
 			else{
-				return "icon-arrow-down";
+				return "glyphicon glyphicon-arrow-down icon-arrow-down";
 			}
 		}
-		else return "icon-minus";
+		else return "glyphicon glyphicon-minus icon-minus";
 	}
 	$scope.changeOrderBy=function(name){
 		if( $scope.orderbyField == name){
@@ -132,10 +132,10 @@ uhpApp.controller('TaskCtrl',['$scope','$rootScope','$interval','$http',function
 	        params:  {"taskid" : taskid}
 	    }).success(function(response, status, headers, config){
 	    	if(response["ret"]!="ok"){
-	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
+	        	$rootScope.alert("提交失败 ("+response["msg"]+")", "now");
 	        }
 	    	else{
-		    	$rootScope.alert("已经重新提交,新的任务id是"+response['taskid'],"info");
+		    	$rootScope.alert("已经重新提交,新的任务id是"+response['taskid'], "now");
 		    	$scope.query()
 	    	}
 	    }).error(function(data, status) {

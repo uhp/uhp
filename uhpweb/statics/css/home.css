@@ -1,10 +1,10 @@
 html { overflow-y: scroll; }
-
+/*
 .container {
 	width: 940px;
 	display: table;
 }
-
+*/
 .hor {
 	display: inline-block;
 }
