@@ -38,7 +38,7 @@ class LoginHandler(BaseHandler):
         if user:
             self.set_current_user({'name': user.name, 'password': user.password,"type": user.type })
             if user.type==0 :
-                self.redirect("/monitor")
+                self.redirect("/admin")
             else:
                 self.redirect("/user")
         else:
