@@ -10,7 +10,8 @@
 			  <li class="[[tabClass('group')]]"><a ng-click="tab='group'">分组</a></li>
       </ul>
 
-			<div class="tab-content"  style="margin-top:20px">
+      <div class="tab-content"  style="margin-top:20px">
+
         <!-- 机器-->	
         <div class="tab-pane fade [[tabClass('host','in')]]">
 
@@ -174,159 +175,171 @@
 
         <!-- 角色 -->	
         <div class="tab-pane fade [[tabClass('role','in')]] ">
-          <div>
-            <div class="row">
-              <div class="form-group">
-                <label for="select-chosenservice">选择服务：</label>
-                <select id="select-chosenservice" ng-model="chosenService" ng-options="ser for ser in serviceList" ></select>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="input-group">
+                <label class="input-group-addon">选择服务</label>
+                <select class="form-control" ng-model="chosenService" ng-options="ser for ser in serviceList" ></select>
               </div>
-              <!--
-              <div class="input-prepend" style="margin-bottom:20px;" >
-                <span class="add-on">选择服务:</span>
-                <select ng-model="chosenService" ng-options="ser for ser in serviceList" ></select>
-              </div>
-              -->
             </div>
-			  		<input type="text" ng-model="hostSearchText" style="margin-bottom:20px;" placeholder="过滤机器">
-			  		<button type="button" class="btn" style="margin-bottom:20px;" ng-click="initHostRole(0)">reset</button>
-					<button type="button" class="btn" style="margin-bottom:20px;" ng-click="readySetupInstance()">提交</button>
-					<label ng-show="isDoing" >有安装或者卸载正在进行，不能进行修改</label>
-			  		<table id="table_id" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
-					    <thead>
-					        <tr>
-					            <th>机器\角色</th>
-					            <th ng-repeat="role in roles[chosenService]">[[role]]</th>
-					        </tr>
-					    </thead>
-					    <tbody>
-					        <tr ng-repeat="(host,info) in filterHostBySearch(hostroles,hostSearchText)">
-					            <td>[[host]]</td>
-					            <td ng-repeat="role in roles[chosenService]">
-					            	<input type="checkbox" ng-model="hostRoleMap[host][role]" ng-disabled="isDoing" >
-					            	[[doingStatus(host,role)]]
-					            </td>
-					        </tr>
-					    </tbody>
-					</table>	
-			  	</div>
-			  	<!-- 提交服务的模式对话框 -->
-			  	<div id="hostNewServiceModal" class="modal hide fade" data-backdrop="static" aria-hidden="true">
-		            <div class="modal-header">
-		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-		                    &times;
-		                </button>
-		                <h3>安装/删除服务</h3>
-		            </div>
-		            <div class="modal-body">
-		            	<label>将会安装以下新服务：</label>
-		            		<ul>
-		            			<li ng-repeat="instance in addInstance">[[instance.host]]->[[instance.role]]</li>
-		            		</ul>
-		            	<label>将会删除以下旧服务：</label>
-		            		<ul>
-		            			<li ng-repeat="instance in delInstance">[[instance.host]]->[[instance.role]]</li>
-		            		</ul>
-		            	<div ng-show="vars.length!=0">
-							将会添加以下的安装变量:
-							<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
-							    <thead>
-							        <tr>
-							            <th >服务</th>
-							            <th >变量类型</th>
-							            <th >分组/机器</th>
-							            <th >名称</th>
-							            <th >值</th>
-							        </tr>
-							    </thead>
-							    <tbody>
-							        <tr ng-repeat="one in vars">
-							            <td>[[ one['service'] ]]</td>
-							            <td ng-show="one['showType']=='group'">分组变量</td>
-							            <td ng-show="one['showType']=='host'">机器变量</td>
-							            <td>[[ one['group'] ]]</td>
-							            <td>[[ one['name'] ]]</td>
-							            <td><input type="text" ng-model="one['value']" style="width:40px;" ></td>
-							        </tr>
-							    </tbody>
-							</table>	
-						</div>
-		            </div>
-		            <div class="modal-footer">
-		                <button type="button" class="btn" data-dismiss="modal">取消</button>
-		                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="setupInstance()" >确定</button>
-		            </div>
-		        </div>
-			  </div>
-			  <div class="tab-pane fade [[tabClass('group','in')]] ">
-			  	<div>
-			  		<input type="text" ng-model="hostSearchText" style="margin-bottom:20px;" placeholder="过滤机器">
-			  		<button type="button" class="btn" style="margin-bottom:20px;" ng-click="initHostGroup()">reset</button>
-			  		<button type="button" class="btn" style="margin-bottom:20px;" ng-click="readyAddGroup()">添加组</button>
-					<button type="button" class="btn" style="margin-bottom:20px;" ng-click="readySetupGroup()">提交</button>
-			  		<table id="table_id" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
-					    <thead>
-					        <tr>
-					            <th >机器\分组</th>
-					            <th ng-repeat="(group,text) in groups" ng-dblclick="editGroup(group)" >[[group]]</th>
-					        </tr>
-					    </thead>
-					    <tbody>
-					        <tr ng-repeat="(host,info) in filterHostBySearch(hostgroups,hostSearchText)">
-					            <td>[[host]]</td>
-					            <th ng-repeat="(group,text) in groups">
-					            	<input type="checkbox" ng-model="hostGroupMap[host][group]" ng-disabled="group=='all'">
-					            </th>
-					        </tr>
-					    </tbody>
-					</table>	
-			  	</div>
-			  	<!--  修改分组关系的模式对话框 -->
-			  	<div id="hostEditGroupModal" class="modal hide fade" data-backdrop="static" aria-hidden="true">
-		            <div class="modal-header">
-		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-		                    &times;
-		                </button>
-		                <h3>修改机器分组</h3>
-		            </div>
-		            <div class="modal-body">
-		            	<label>将会添加以下分组关系：</label>
-		            		<ul>
-		            			<li ng-repeat="group in addGroup">[[group.host]]->[[group.group]]</li>
-		            		</ul>
-		            	<label>将会删除以下分组关系：</label>
-		            		<ul>
-		            			<li ng-repeat="group in delGroup">[[group.host]]->[[group.group]]</li>
-		            		</ul>
-		            </div>
-		            <div class="modal-footer">
-		                <button type="button" class="btn" data-dismiss="modal">取消</button>
-		                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="setupGroup()" >确定</button>
-		            </div>
-		        </div>
-		        <!-- 增加组的模式对话框 -->
-			  	<div id="hostNewGroupModal" class="modal hide fade" data-backdrop="static" aria-hidden="true">
-		            <div class="modal-header">
-		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-		                    &times;
-		                </button>
-		                <h3>添加/修改机器分组</h3>
-		            </div>
-		            <div class="modal-body">
-			            <div class="input-prepend">
-			               <span class="add-on">分组名称:</span><input type="text" ng-model="nowGroup.group" ng-readonly="nowGroup.edit">
-			            </div>
-			            <div class="input-prepend">
-			               <span class="add-on">分组注释:</span><textarea rows="5" ng-model="nowGroup.text"></textarea>
-			            </div>
-		            </div>
-		            <div class="modal-footer">
-		                <button type="button" class="btn" data-dismiss="modal">取消</button>
-		                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveGroup()" >确定</button>
-		                <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="saveGroup('del')" ng-show="nowGroup.edit" >删除</button>
-		            </div>
-		        </div>
-			  </div>
-			</div> 	
-		</div>
-	</div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" ng-model="hostSearchText" placeholder="过滤机器">
+            </div>
+            <div class="col-md-2 col-md-offset-2">
+              <button type="button" class="btn btn-block" ng-click="initHostRole(0)">reset</button>
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-block btn-primary" ng-click="readySetupInstance()">提交</button>
+            </div>
+            <label ng-show="isDoing" >有安装或者卸载正在进行，不能进行修改</label>
+          </div>
+
+          <div class="row" style="margin-top:20px;">
+            <div class="col-md-12">
+              <table id="table_id" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
+                <thead>
+                  <tr>
+                    <th>机器\角色</th>
+                    <th ng-repeat="role in roles[chosenService]">[[role]]</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="(host,info) in filterHostBySearch(hostroles,hostSearchText)">
+                    <td>[[host]]</td>
+                    <td ng-repeat="role in roles[chosenService]">
+                      <input type="checkbox" ng-model="hostRoleMap[host][role]" ng-disabled="isDoing" >
+                      [[doingStatus(host,role)]]
+                    </td>
+                  </tr>
+                </tbody>
+              </table>	
+            </div>
+          </div>
+
+          <!-- 提交服务的模式对话框 -->
+          <div id="hostNewServiceModal" class="modal fade" data-backdrop="static" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fui-cross"></span></button>
+                  <h6 class="modal-title">安装/删除服务</h6>
+                </div>
+
+                <div class="modal-body">
+                  <label>将会安装以下新服务：</label>
+                  <ul>
+                    <li ng-repeat="instance in addInstance">[[instance.host]]->[[instance.role]]</li>
+                  </ul>
+                  <label>将会删除以下旧服务：</label>
+                  <ul>
+                    <li ng-repeat="instance in delInstance">[[instance.host]]->[[instance.role]]</li>
+                  </ul>
+                  <div ng-show="vars.length!=0">
+                    将会添加以下的安装变量:
+                    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
+                      <thead>
+                        <tr>
+                          <th >服务</th>
+                          <th >变量类型</th>
+                          <th >分组/机器</th>
+                          <th >名称</th>
+                          <th >值</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="one in vars">
+                          <td>[[ one['service'] ]]</td>
+                          <td ng-show="one['showType']=='group'">分组变量</td>
+                          <td ng-show="one['showType']=='host'">机器变量</td>
+                          <td>[[ one['group'] ]]</td>
+                          <td>[[ one['name'] ]]</td>
+                          <td><input type="text" ng-model="one['value']" style="width:40px;" ></td>
+                        </tr>
+                      </tbody>
+                    </table>	
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn" data-dismiss="modal">取消</button>
+                  <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="setupInstance()" >确定</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- ~ 提交服务的模式对话框 -->
+        </div>
+
+        <div class="tab-pane fade [[tabClass('group','in')]] ">
+          <div>
+            <input type="text" ng-model="hostSearchText" style="margin-bottom:20px;" placeholder="过滤机器">
+            <button type="button" class="btn" style="margin-bottom:20px;" ng-click="initHostGroup()">reset</button>
+            <button type="button" class="btn" style="margin-bottom:20px;" ng-click="readyAddGroup()">添加组</button>
+            <button type="button" class="btn" style="margin-bottom:20px;" ng-click="readySetupGroup()">提交</button>
+            <table id="table_id" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
+              <thead>
+                <tr>
+                  <th >机器\分组</th>
+                  <th ng-repeat="(group,text) in groups" ng-dblclick="editGroup(group)" >[[group]]</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(host,info) in filterHostBySearch(hostgroups,hostSearchText)">
+                  <td>[[host]]</td>
+                  <th ng-repeat="(group,text) in groups">
+                    <input type="checkbox" ng-model="hostGroupMap[host][group]" ng-disabled="group=='all'">
+                  </th>
+                </tr>
+              </tbody>
+            </table>	
+          </div>
+          <!--  修改分组关系的模式对话框 -->
+          <div id="hostEditGroupModal" class="modal hide fade" data-backdrop="static" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                &times;
+              </button>
+              <h3>修改机器分组</h3>
+            </div>
+            <div class="modal-body">
+              <label>将会添加以下分组关系：</label>
+              <ul>
+                <li ng-repeat="group in addGroup">[[group.host]]->[[group.group]]</li>
+              </ul>
+              <label>将会删除以下分组关系：</label>
+              <ul>
+                <li ng-repeat="group in delGroup">[[group.host]]->[[group.group]]</li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="setupGroup()" >确定</button>
+            </div>
+          </div>
+          <!-- 增加组的模式对话框 -->
+          <div id="hostNewGroupModal" class="modal hide fade" data-backdrop="static" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                &times;
+              </button>
+              <h3>添加/修改机器分组</h3>
+            </div>
+            <div class="modal-body">
+              <div class="input-prepend">
+                <span class="add-on">分组名称:</span><input type="text" ng-model="nowGroup.group" ng-readonly="nowGroup.edit">
+              </div>
+              <div class="input-prepend">
+                <span class="add-on">分组注释:</span><textarea rows="5" ng-model="nowGroup.text"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveGroup()" >确定</button>
+              <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="saveGroup('del')" ng-show="nowGroup.edit" >删除</button>
+            </div>
+          </div>
+        </div>
+      </div> 	
+    </div>
+  </div>
 </div>

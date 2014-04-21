@@ -92,6 +92,14 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 	}
 	$rootScope.initAlerts()
 	$rootScope.alert=function(msg,type){
+    // zhaigy
+    Messenger().post({
+      message: msg,
+      type: 'error',
+      showCloseButton: true
+    });
+		return;
+    // ~zhaigy
 		var temp = getCookie("alerts")
 		if( temp != null && temp != "" ){
 			$rootScope.alerts = angular.fromJson(temp)
@@ -100,13 +108,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 			type="danger"
 		}
 		if( type == "now"){
-			// alert(msg);
-      Messenger().post({
-        message: msg,
-        type: 'error',
-        showCloseButton: true
-      });
-			return;
+			alert(msg);
 		}
 		var msgHead = get_now_hms();
 		if( type == "danger" ){
