@@ -642,10 +642,7 @@ class AdminBackHandler(BaseHandler):
         #更新instance表的对应状态为removing
         session = database.getSession()
         for delInst in delInstance:
-            tempService = static_config.get_service_from_role(delInst["role"])
-            newIn = Instance(tempService,delInst["host"],delInst["role"])
-            newIn.status = Instance.STATUS_REMOVING
-            session.merge(newIn)
+            database.update_instance(session,delInst["host"],delInst["role"],Instance.STATUS_REMOVING)
         session.commit()
         #提交卸载活动
         running_id=[]
