@@ -4,22 +4,27 @@
 import config
 
 adminmenus = {
-        "name":"admin", "display":"管理员", "href":"/admin",
-        "menus":[
-            {"name":"admin", "display":"管理", "href":"/admin", "active":"active" }
-            ],
-        "submenus":[
-            {"name":"service", "display":"服务", "href":"#admin-service"},
-            {"name":"host", "display":"机器", "href":"#admin-host"},
-            {"name":"task", "display":"任务", "href":"#admin-task"},
-            {"name":"setting", "display":"设置", "href":"#admin-setting"},
-            {"name":"template", "display":"模板", "href":"#admin-template"}
-            ]    
-         }
+    "name":"admin", 
+    "display":"管理员", 
+    "href":"/admin",
+    "menus":[
+        {"name":"admin", "display":"管理", "href":"/admin"}
+    ]
+}
+
+if config.install_manager:
+   adminmenus['menus'][0]['active'] = 'active'
+   adminnenus['submenus'] = [
+       {"name":"service", "display":"服务", "href":"#admin-service"},
+       {"name":"host", "display":"机器", "href":"#admin-host"},
+       {"name":"task", "display":"任务", "href":"#admin-task"},
+       {"name":"setting", "display":"设置", "href":"#admin-setting"},
+       {"name":"template", "display":"模板", "href":"#admin-template"}
+   ]    
 
 if config.install_monitor:
    # adminmenus['menus'].insert(0,{"name":"hosts", "display":"机器", "href":"/monitor#/hosts"})
-   adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"/monitor#/monitor"})  
+   adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"/admin#/monitor"})  
 
 usermenus = {"name":"user", "display":"用户", "href":"/user",
         "submenus":[

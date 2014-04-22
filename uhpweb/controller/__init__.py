@@ -3,6 +3,7 @@ import tornado
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import and_
 
+import config
 import database
 import static_config
 from model.user import User
@@ -39,12 +40,17 @@ class LoginHandler(BaseHandler):
             self.set_current_user({'name': user.name, 'password': user.password,"type": user.type })
             if user.type==0 :
                 self.redirect("/admin")
+                return
+                if config.install_manager:
+                    self.redirect("/admin")
+                elif config.install_monitor:
+                    self.redirect("/monitor")
+                else:
+                    self.redirect('/login')
             else:
                 self.redirect("/user")
         else:
             self.redirect('/login')
-        
-
         
 class UserHandler(BaseHandler):
     @tornado.web.authenticated

@@ -7,11 +7,9 @@
     <link href="http://cdn.bootcss.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="/statics/css/flatui/2.1.3/css/flat-ui.css" rel="stylesheet">
     <link rel="shortcut icon" href="/statics/favicon.ico">
+    
     <!-- for this page -->
     <link rel="stylesheet" href="/statics/css/home.css" />
-    <!--
-    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.1.0/css/bootstrap-responsive.css" />
-    -->
     <link rel="stylesheet" href="/statics/css/animations.css" />
     <link rel="stylesheet" href="/statics/css/font-awesome.min.css" />
     <script type="text/javascript" src="/statics/jslib/vendor/jquery.js"></script>
@@ -23,22 +21,21 @@
     <script type="text/javascript" src="/statics/jslib/vendor/angular-resource.js"></script>
     <script type="text/javascript" src="/statics/jslib/vendor/bootstrap.js"></script>
     <script type="text/javascript" src="/statics/jslib/vendor/ui-bootstrap-tpls-0.10.0.min.js"></script>
-    <!-- for Messenger -->
-    <link href="http://cdn.bootcss.com/messenger/1.4.0/css/messenger.css" rel="stylesheet">
-    <link href="http://cdn.bootcss.com/messenger/1.4.0/css/messenger-theme-flat.css" rel="stylesheet">
-    <script src="http://cdn.bootcss.com/messenger/1.4.0/js/messenger.min.js"></script>
-    <script src="http://cdn.bootcss.com/messenger/1.4.0/js/messenger-theme-flat.js"></script>
+    
+    <!-- for sco.js -->
+    <link href="/statics/jslib/sco.js-1.0.2/css/scojs.css" rel="stylesheet">
+    <script type="text/javascript" src="/statics/jslib/sco.js-1.0.2/js/sco.message.js"></script>
 
     <link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings.png" />
     <link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings-white.png" />
 
-    <style>
-    </style>
   </head>
 
   <body>
-    <!-- 标题 一级菜单 消息 和 用户 --> 
+    
     <div class="container" ng-controller="NarCtrl" style="margin-bottom:20px">
+      
+      <!-- 标题 一级菜单 消息 和 用户 --> 
       <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
         <div class="container">
           <div class="navbar-header">
@@ -50,24 +47,29 @@
             </button>
             <a href="/" class="navbar-brand">UHP</a>
           </div>
-          <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-          <ul class="nav navbar-nav">
-            <li class="[[item.active]]" ng-repeat="item in menus.menus">
-            <a href="[[item.href]]">[[item.display]]</a>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li>
-            <a href="../about"><span class="glyphicon glyphicon-info-sign"></span></a>
-            </li>
-            <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user fui-user icon-white"></span> [[user.name]]<b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> 安全退出</a></li>
+
+          <!-- 一级菜单内容 -->
+          <div class="collapse navbar-collapse bs-navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li class="[[item.active]]" ng-repeat="item in menus.menus">
+              <a href="[[item.href]]" ng-click="activeMenu(item)">[[item.display]]</a>
+              </li>
             </ul>
-            </li>
-          </ul>
-          </nav>
+
+            <!-- 飘游菜单 -->
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+              <a href="../about"><span class="glyphicon glyphicon-info-sign"></span></a>
+              </li>
+              <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user fui-user icon-white"></span> [[user.name]]<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> 安全退出</a></li>
+              </ul>
+              </li>
+            </ul>
+          </div>
+          <!-- ~一级菜单内容 -->
         </div>
       </div>
 
@@ -134,6 +136,7 @@
     <script type="text/javascript" src="/statics/js/admin/SettingCtrl.js"></script>
     <script type="text/javascript" src="/statics/js/admin/TemplateCtrl.js"></script>
     <script type="text/javascript" src="/statics/js/admin/ManualCtrl.js"></script>
+    <script type="text/javascript" src="/statics/js/monitor/MonitorCtrl.js"></script>
 
   </body>
 </html>

@@ -362,50 +362,68 @@
       <div class="modal-content">
 
         <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fui-cross"></span></button>
           <h6>心跳报告</h6>
         </div>
 
         <div class="modal-body">
+          <form class="form-horizontal" role="form">
 
-          <div class="input-group" style="display: block;">
-            <span class="input-group-addon">名称:</span>
-            <input type="text" ng-model="showInstance.name" readonly>
-          </div>
+            <div class="form-group" >
+              <span class="col-md-4 control-label">名称:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.name]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" ng-show="showType=='group'" style="display: block;">
-            <span class="input-group-addon">机器:</span>
-            <input type="text" ng-model="showInstance.host" readonly>
-          </div>
+            <div class="form-group" ng-show="showType=='group'" >
+              <span class="col-md-4 control-label">机器:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.host]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" ng-show="showType=='host'" style="display: block;">
-            <span class="input-group-addon">角色:</span>
-            <input type="text" ng-model="showInstance.role" readonly>
-          </div>
+            <div class="form-group" ng-show="showType=='host'" >
+              <span class="col-md-4 control-label">角色:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.role]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" style="display: block;">
-            <span class="input-group-addon">状态:</span>
-            <input type="text" ng-model="showInstance.status" readonly>
-          </div>
+            <div class="form-group" >
+              <span class="col-md-4 control-label">状态:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.status]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" style="display: block;">
-            <span class="input-group-addon">启动时间:</span>
-            <input type="text" ng-model="showInstance.uptime" readonly>
-          </div>
+            <div class="form-group" >
+              <span class="col-md-4 control-label">启动时间:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.uptime]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" style="display: block;">
-            <span class="input-group-addon">健康:</span>
-            <input type="text" ng-model="showInstance.health" readonly>	
-          </div>
+            <div class="form-group" >
+              <span class="col-md-4 control-label">健康:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.health]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" style="display: block;">
-            <span class="input-group-addon">最近检测:</span>
-            <input type="text" ng-model="showInstance.monitor_time" readonly>
-          </div>
+            <div class="form-group" >
+              <span class="col-md-4 control-label">最近检测:</span>
+              <div class="col-md-8">
+                <p class="form-control-static">[[showInstance.monitor_time]]</p>
+              </div>
+            </div>
 
-          <div class="input-group" style="display: block;">
-            <label>检测报告:</label>
-            <pre style="border-style:groove">[[showInstance.msg]]</pre>
-          </div>
+            <div class="form-group">
+              <label>检测报告:</label>
+              <pre style="display:block;">[[showInstance.msg]]</pre>
+            </div>
+          </form>
+
         </div>
 
         <div class="modal-footer">

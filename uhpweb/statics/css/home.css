@@ -10,4 +10,5 @@ body { padding-top: 70px; }
 td, th { max-width: 600px; }
 td>pre { margin:0px 0px; }
 select.form-control { -webkit-appearance: menulist; }
+/*.form-group { margin-bottom: 0px; }*/
 

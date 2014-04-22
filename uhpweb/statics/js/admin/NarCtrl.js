@@ -1,23 +1,40 @@
 
 uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function($scope,$rootScope,$interval,$http){
+
 	$scope.user={}
 	$scope.menus={}
+	$scope.menu=''
 	$scope.submenus={}
+
 	$http({
-	        method: 'GET',
-	        url: '/adminback/user'
-	    }).success(function(response, status, headers, config){
-	        $scope.menus = response["menus"];
-	        $scope.user= response["user"];
-	        //TODO 判断深度连接使用adminmenus或者usermenus
-	        $scope.submenus = response["menus"]["submenus"];
-	    }).error(function(data, status) {
-	        $scope.status = status;
-	    });
+	  method: 'GET',
+	  url: '/adminback/user'
+	}).success(function(response, status, headers, config){
+	  $scope.menus = response["menus"];
+	  $scope.user= response["user"];
+	  //TODO 判断深度连接使用adminmenus或者usermenus
+	  $scope.submenus = response["menus"]["submenus"];
+    $.each($scope.menus.menus, function(i, v) {
+      if(v.active == 'active'){
+        $scope.menu = v;
+        return false;
+      }
+    });
+	}).error(function(data, status) {
+	  $scope.status = status;
+	});
+
+  $scope.activeMenu = function(menu) {
+    if($scope.menu != '') $scope.menu.active = '';
+    $scope.menu = menu;
+    $scope.menu.active = 'active';
+  }
+
 	$rootScope.isActiveSubmenu=function(submenu){
 		if($rootScope.submenu == submenu) return "active";
 		else return "";
 	}
+
 	//轮询指定的执行任务，获取进度。在任务地方想调用进度条。
 	//调用$rootScope.beginProgress即可传入任务id的数组
 	$rootScope.beginProgress=function(id,callback){
@@ -33,7 +50,6 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 	}
 	$rootScope.updateProgress=function(){
 		if( $rootScope.close ) return;
-//		console.log(angular.toJson($rootScope.runningId))
 		$http({
 	        method: 'GET',
 	        url: '/adminback/query_progress',
@@ -84,20 +100,16 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 			$rootScope.alerts.push({"msg": "welcome to uhp !!","type":"info"})
 		} 
 		setCookie("alerts",angular.toJson($rootScope.alerts),{"expireSeconds":300});
-    // 初始化 Messenger 组件
-    Messenger.options = {
-      extraClasses: 'messenger-fixed messenger-on-top',
-      theme: 'flat'
-    }
 	}
 	$rootScope.initAlerts()
 	$rootScope.alert=function(msg,type){
     // zhaigy
-    Messenger().post({
-      message: msg,
-      type: 'error',
-      showCloseButton: true
-    });
+		if( type == null || type == "" || type == "now" || type == "error" || type == "warn"){
+			type = $.scojs_message.TYPE_ERROR;
+		} else {
+			type = $.scojs_message.TYPE_OK;
+    }
+    $.scojs_message(msg, type);
 		return;
     // ~zhaigy
 		var temp = getCookie("alerts")

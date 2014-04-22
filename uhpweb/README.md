@@ -3,10 +3,10 @@
 使用了如下组件
 
 * JQuery 1.9.0
+* AngularJS 1.2.4 
 * Bootstrap 3.1.0
 * FlatUI Free 2.1.3
-* [Messenger 1.4.0](https://github.com/HubSpot/messenger)
-
+* [sco.js.1.0.2](https://github.com/terebentina/sco.js/tree/1.0.2)
 
 额外注意
 
