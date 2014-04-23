@@ -36,8 +36,7 @@ uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', fu
             controller: 'ManualCtrl',
             templateUrl: '/statics/partials/admin/manual.html'
         })
-        .when('/monitor',
-        {
+        .when('/monitor', {
             controller: 'MonitorCtrl',
             templateUrl: '/statics/partials/monitor/monitor.html'
         })

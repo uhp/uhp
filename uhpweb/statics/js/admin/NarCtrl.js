@@ -1,33 +1,40 @@
 
-uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function($scope,$rootScope,$interval,$http){
+uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$location',function($scope,$rootScope,$interval,$http,$location){
 
-	$scope.user={}
-	$scope.menus={}
-	$scope.menu=''
-	$scope.submenus={}
+	$rootScope.user={}
+	$rootScope.menus={}
+	$rootScope.menu=''
+	$rootScope.submenus={}
 
 	$http({
 	  method: 'GET',
 	  url: '/adminback/user'
 	}).success(function(response, status, headers, config){
-	  $scope.menus = response["menus"];
-	  $scope.user= response["user"];
+	  $rootScope.menus = response["menus"];
+	  $rootScope.user= response["user"];
 	  //TODO 判断深度连接使用adminmenus或者usermenus
-	  $scope.submenus = response["menus"]["submenus"];
-    $.each($scope.menus.menus, function(i, v) {
-      if(v.active == 'active'){
-        $scope.menu = v;
-        return false;
-      }
-    });
+	  $rootScope.submenus = response["menus"]["submenus"];
+    
+    path = $location.path();
+    if(path != null && path.length > 0){
+      path = path.replace('/', '');
+      $.each($rootScope.menus.menus, function(i, item){
+        if(path.slice(0, item.name.length) == item.name){
+          $rootScope.menu = item;
+          return false;
+        }
+      });
+    }
+    $rootScope.menu.active = 'active';
 	}).error(function(data, status) {
 	  $scope.status = status;
 	});
 
-  $scope.activeMenu = function(menu) {
-    if($scope.menu != '') $scope.menu.active = '';
-    $scope.menu = menu;
-    $scope.menu.active = 'active';
+  $rootScope.activeMenu = function(menu) {
+    if($rootScope.menu == menu) return;
+    if($rootScope.menu != '') $rootScope.menu.active = '';
+    $rootScope.menu = menu;
+    $rootScope.menu.active = 'active';
   }
 
 	$rootScope.isActiveSubmenu=function(submenu){

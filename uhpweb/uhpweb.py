@@ -55,7 +55,7 @@ class Application(tornado.web.Application):
             (r"/login", LoginHandler),
             (r"/admin", AdminHandler),
             (r"/user", UserHandler),
-            (r"/monitor", MonitorHandler),
+            (r"/monitorback/(.*)", MonitorBackHandler),
             (r"/adminback/(.*)", AdminBackHandler),
             (r"/userback/(.*)", UserBackHandler),
             (r"/debug", DebugHandler),

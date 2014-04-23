@@ -723,8 +723,9 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 			"removing":{"class":"fa fa-refresh fa-lg","style":"color:rgb(78, 65, 223)"}
 		}
 	
-	$rootScope.menu="admin";
-	$rootScope.submenu="service";
+	//$rootScope.menu="admin";
+	//$rootScope.submenu="service";
+  
 	//注册自动刷新
 	$rootScope.registerAutoFlush( "service", $scope.initInstance)
 	$scope.init();
