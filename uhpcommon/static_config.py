@@ -10,27 +10,51 @@ adminmenus = {
     "menus":[{"name":"admin", "display":"管理", "href":"/admin"}]
 }
 
-if config.install_manager:
-    adminmenus['is_manager'] = "True"
-    adminmenus['submenus'] = [
-        {"name":"service", "display":"服务", "href":"#admin-service"},
-        {"name":"host", "display":"机器", "href":"#admin-host"},
-        {"name":"task", "display":"任务", "href":"#admin-task"},
-        {"name":"setting", "display":"设置", "href":"#admin-setting"},
-        {"name":"template", "display":"模板", "href":"#admin-template"}
-    ]    
+adminmenus['submenus'] = [
+    {"name":"service", "display":"服务", "href":"#admin-service"},
+    {"name":"host", "display":"机器", "href":"#admin-host"},
+    {"name":"task", "display":"任务", "href":"#admin-task"},
+    {"name":"setting", "display":"设置", "href":"#admin-setting"},
+    {"name":"template", "display":"模板", "href":"#admin-template"}
+]    
+    
+adminmenus['is_manager'] = config.install_manager
+adminmenus['is_monitor'] = config.install_monitor
 
 if config.install_monitor:
-    adminmenus['is_monitor'] = "True"
-    # adminmenus['menus'].insert(0,{"name":"hosts", "display":"机器", "href":"/monitor#/hosts"})
     adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"#/monitor"})  
 
 monitormenus = [
-    {"name":"概况", "href":"/static/partials/monitor/overview.html"},
-    {"name":"机器", "href":"/static/partials/monitor/host.html"},
-    {"name":"服务", "href":"/static/partials/monitor/service.html"},
-    {"name":"作业", "href":"/static/partials/monitor/job.html"},
-    {"name":"配置", "href":"/static/partials/monitor/conf.html"}
+    {"name":"概况", "href":"/statics/partials/monitor/overview.html",
+        "tabs": [
+            {"name":"当前状态"},
+            {"name":"历史状态"},
+            {"name":"告警列表"}
+        ]
+    },
+    {"name":"机器", "href":"/statics/partials/monitor/host.html",
+        "tabs": [
+            {"name":"监控指标"}
+        ]
+    },
+    {"name":"服务", "href":"/statics/partials/monitor/service.html",
+        "tabs": [
+            {"name":"监控指标"}
+        ]
+    },
+    {"name":"作业", "href":"/statics/partials/monitor/job.html",
+        "tabs": [
+            {"name":"监控指标"}
+        ]
+    },
+    {"name":"配置", "href":"/statics/partials/monitor/conf.html",
+        "tabs": [
+            {"name":"公共变量", "func":"query_global_variate()"},
+            {"name":"监控项"},
+            {"name":"监控组"},
+            {"name":"监控部署"}
+        ]
+    }
 ]
 
 usermenus = {"name":"user", "display":"用户", "href":"/user",

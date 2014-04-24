@@ -3,7 +3,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
 
 	$rootScope.user={}
 	$rootScope.menus={}
-	$rootScope.menu=''
+	$rootScope.narmenu=''
 	$rootScope.submenus={}
 
 	$http({
@@ -11,6 +11,10 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
 	  url: '/adminback/user'
 	}).success(function(response, status, headers, config){
 	  $rootScope.menus = response["menus"];
+    $rootScope.is_manager = response["menus"]["is_manager"];
+    $rootScope.is_monitor = response["menus"]["is_monitor"];
+    console.log("is_manager:" + $rootScope.is_manager);
+    console.log("is_monitor:" + $rootScope.is_monitor);
 	  $rootScope.user= response["user"];
 	  //TODO 判断深度连接使用adminmenus或者usermenus
 	  $rootScope.submenus = response["menus"]["submenus"];
@@ -20,21 +24,23 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
       path = path.replace('/', '');
       $.each($rootScope.menus.menus, function(i, item){
         if(path.slice(0, item.name.length) == item.name){
-          $rootScope.menu = item;
+          $rootScope.narmenu = item;
           return false;
         }
       });
     }
-    $rootScope.menu.active = 'active';
+    $rootScope.narmenu.active = 'active';
 	}).error(function(data, status) {
 	  $scope.status = status;
 	});
 
   $rootScope.activeMenu = function(menu) {
-    if($rootScope.menu == menu) return;
-    if($rootScope.menu != '') $rootScope.menu.active = '';
-    $rootScope.menu = menu;
-    $rootScope.menu.active = 'active';
+    if($rootScope.narmenu == menu) return;
+    console.log($rootScope.narmenu)
+    if($rootScope.narmenu != '') $rootScope.narmenu.active = '';
+    $rootScope.narmenu = menu;
+    $rootScope.narmenu.active = 'active';
+    console.log($rootScope.narmenu)
   }
 
 	$rootScope.isActiveSubmenu=function(submenu){
