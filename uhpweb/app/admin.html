@@ -26,6 +26,7 @@
     <!-- for sco.js -->
     <link href="/statics/jslib/sco.js-1.0.2/css/scojs.css" rel="stylesheet">
     <script type="text/javascript" src="/statics/jslib/sco.js-1.0.2/js/sco.message.js"></script>
+    <script type="text/javascript" src="/statics/jslib/squel/3.1.1/squel.min.js"></script>
 
     <link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings.png" />
     <link rel="apple-touch-ico" href="/statics/img/glyphicons-halflings-white.png" />
@@ -75,7 +76,7 @@
       </div>
 
       <!-- 二级菜单 -->
-      <div class="row" ng-show="narmenu.name == 'admin' && submenus">
+      <div class="row" ng-show="narmenu.name == 'admin' && submenus" style="margin-top:20px;">
         <div class="col-md-12 span12">
           <ul class="nav nav-tabs">
             <li class="[[isActiveSubmenu(item.name)]]" ng-repeat="item in submenus">
@@ -96,7 +97,7 @@
     </div>
     <!-- ~header -->
 
-    <div class="container">
+    <div class="container" style="margin-top:20px;">
       <div ng-view class="reveal-animation"></div>
     </div>
 

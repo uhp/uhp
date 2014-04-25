@@ -955,4 +955,23 @@ class AdminBackHandler(BaseHandler):
         session.flush()
         session.close()
         self.ret("ok","")
+    
+    #修改数据库 直接使用merge进行合并
+    # 未完成
+    def manual_execute2(self):
+        method = self.get_argument("method")
+        table = self.get_argument("table")
+        values = self.get_argument("values")
+        app_log.debug("method:" + method)
+        app_log.debug("table:" + table)
+        app_log.debug("values:" + str(values))
+        #method:insert
+        #table:monitor_assist
+        #values:{"name":"a","value":"b"}
+        #session = database.getSession()
+        #result = session.execute(sql)
+        #session.commit()
+        #session.flush()
+        #session.close()
+        self.ret("error","未完成")
         
