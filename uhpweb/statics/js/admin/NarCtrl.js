@@ -1,23 +1,53 @@
 
-uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function($scope,$rootScope,$interval,$http){
-	$scope.user={}
-	$scope.menus={}
-	$scope.submenus={}
+uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$location',function($scope,$rootScope,$interval,$http,$location){
+
+	$rootScope.user={}
+	$rootScope.menus={}
+	$rootScope.narmenu=''
+	$rootScope.submenus={}
+
 	$http({
-	        method: 'GET',
-	        url: '/adminback/user'
-	    }).success(function(response, status, headers, config){
-	        $scope.menus = response["menus"];
-	        $scope.user= response["user"];
-	        //TODO 判断深度连接使用adminmenus或者usermenus
-	        $scope.submenus = response["menus"]["submenus"];
-	    }).error(function(data, status) {
-	        $scope.status = status;
-	    });
+	  method: 'GET',
+	  url: '/adminback/user'
+	}).success(function(response, status, headers, config){
+	  $rootScope.menus = response["menus"];
+    $rootScope.is_manager = response["menus"]["is_manager"];
+    $rootScope.is_monitor = response["menus"]["is_monitor"];
+    console.log("is_manager:" + $rootScope.is_manager);
+    console.log("is_monitor:" + $rootScope.is_monitor);
+	  $rootScope.user= response["user"];
+	  //TODO 判断深度连接使用adminmenus或者usermenus
+	  $rootScope.submenus = response["menus"]["submenus"];
+    
+    path = $location.path();
+    if(path != null && path.length > 0){
+      path = path.replace('/', '');
+      $.each($rootScope.menus.menus, function(i, item){
+        if(path.slice(0, item.name.length) == item.name){
+          $rootScope.narmenu = item;
+          return false;
+        }
+      });
+    }
+    $rootScope.narmenu.active = 'active';
+	}).error(function(data, status) {
+	  $scope.status = status;
+	});
+
+  $rootScope.activeMenu = function(menu) {
+    if($rootScope.narmenu == menu) return;
+    console.log($rootScope.narmenu)
+    if($rootScope.narmenu != '') $rootScope.narmenu.active = '';
+    $rootScope.narmenu = menu;
+    $rootScope.narmenu.active = 'active';
+    console.log($rootScope.narmenu)
+  }
+
 	$rootScope.isActiveSubmenu=function(submenu){
 		if($rootScope.submenu == submenu) return "active";
 		else return "";
 	}
+
 	//轮询指定的执行任务，获取进度。在任务地方想调用进度条。
 	//调用$rootScope.beginProgress即可传入任务id的数组
 	$rootScope.beginProgress=function(id,callback){
@@ -33,7 +63,6 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 	}
 	$rootScope.updateProgress=function(){
 		if( $rootScope.close ) return;
-//		console.log(angular.toJson($rootScope.runningId))
 		$http({
 	        method: 'GET',
 	        url: '/adminback/query_progress',
@@ -87,6 +116,15 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 	}
 	$rootScope.initAlerts()
 	$rootScope.alert=function(msg,type){
+    // zhaigy
+		if( type == null || type == "" || type == "now" || type == "error" || type == "warn"){
+			type = $.scojs_message.TYPE_ERROR;
+		} else {
+			type = $.scojs_message.TYPE_OK;
+    }
+    $.scojs_message(msg, type);
+		return;
+    // ~zhaigy
 		var temp = getCookie("alerts")
 		if( temp != null && temp != "" ){
 			$rootScope.alerts = angular.fromJson(temp)
@@ -96,7 +134,6 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http',function(
 		}
 		if( type == "now"){
 			alert(msg);
-			return;
 		}
 		var msgHead = get_now_hms();
 		if( type == "danger" ){

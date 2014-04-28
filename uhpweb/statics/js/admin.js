@@ -1,5 +1,5 @@
 //use base.js
-var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap']);
+var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngSanitize']);
 //,'ui.bootstrap'
 //'$cookiesProvider',
 uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', function($routeProvider, $interpolateProvider,$rootScopeProvider) {
@@ -35,6 +35,10 @@ uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', fu
         {
             controller: 'ManualCtrl',
             templateUrl: '/statics/partials/admin/manual.html'
+        })
+        .when('/monitor', {
+            controller: 'MonitorCtrl',
+            templateUrl: '/statics/partials/monitor/monitor.html'
         })
         .otherwise({ redirectTo: '/admin-service' });
 

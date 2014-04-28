@@ -28,14 +28,14 @@ from model.callback import CallBack
 
 app_log = logging.getLogger("tornado.application")
 
-class MonitorHandler(BaseHandler):
-    @tornado.web.authenticated
-    def get(self):
-        user = self.get_current_user();
-        if user['type'] != 0 :
-            self.ret("error","this user is not Monitor")
-            return
-        self.render("monitor.html")
+#class MonitorHandler(BaseHandler):
+#    @tornado.web.authenticated
+#    def get(self):
+#        user = self.get_current_user();
+#        if user['type'] != 0 :
+#            self.ret("error","this user is not Monitor")
+#            return
+#        self.render("monitor.html")
         
 class MonitorBackHandler(BaseHandler):
     
@@ -61,6 +61,10 @@ class MonitorBackHandler(BaseHandler):
         ret = {"user":user,"menus":static_config.monitormenus}
         self.ret("ok", "", ret);
         
+    def submenu(self):
+        ret = {"submenu":static_config.monitormenus}
+        self.ret("ok", "", ret);
+
     #获取所有服务的静态信息
     def services_info(self):
         session = database.getSession()

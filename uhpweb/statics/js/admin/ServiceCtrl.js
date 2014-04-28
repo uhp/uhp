@@ -66,7 +66,8 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	$scope.setupMove = 1;
 	$scope.showSetupService=function(){
 		if( $scope.hosts.length == 0 ){
-			$rootScope.alert("请先添加机器");
+			$rootScope.alert("请先添加机器", "now");
+			//alert("请先添加机器");
 			return;
 		}
 		$http({
@@ -258,7 +259,7 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	        params:  {"service" : $scope.nowService}
 	    }).success(function(response, status, headers, config){
 	    	if(response["ret"]!="ok"){
-	        	$rootScope.alert("不能删除服务 信息:"+response["msg"]);
+	        	$rootScope.alert("不能删除服务 信息:"+response["msg"], "now");
 	        }
 	    	else{
 	    		$("#delServiceModal").modal()	
@@ -541,7 +542,8 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	}
 	
 	$scope.serviceClass=function(serviceName){
-		if($scope.nowService==serviceName) return "active-li-a";
+		//if($scope.nowService==serviceName) return "active-li-a";
+		if($scope.nowService==serviceName) return "active";
 		else return "";
 	}
 	$scope.changeService=function(serviceName){
@@ -575,19 +577,19 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 		}
 	}
 	$scope.readySendServiceAction=function(action,display){
-		//拦截特殊的服务操作
-//		if( $scope.nowService=="yarn" && action=="moverm"){
-//			$scope.infoTargetRM = false;
-//			$scope.steps = ["在目标机器上安装ResourceManager","关闭原来的ResourceManager",
-//			"修改数据库中ResourceManager的位置","启动新的ResourceManager","重启所有的NodeManager"];
-//			console.log($scope.steps)
-//			$scope.dostep = []
-//			for(var index in $scope.steps){
-//				$scope.dostep[index]=true
-//			}
-//			$("#moveRmModal").modal()
-//		}
-//		else{
+    //拦截特殊的服务操作
+    //		if( $scope.nowService=="yarn" && action=="moverm"){
+    //			$scope.infoTargetRM = false;
+    //			$scope.steps = ["在目标机器上安装ResourceManager","关闭原来的ResourceManager",
+    //			"修改数据库中ResourceManager的位置","启动新的ResourceManager","重启所有的NodeManager"];
+    //			console.log($scope.steps)
+    //			$scope.dostep = []
+    //			for(var index in $scope.steps){
+    //				$scope.dostep[index]=true
+    //			}
+    //			$("#moveRmModal").modal()
+    //		}
+    //		else{
 		$scope.todoAction = action;
 		$scope.todoDisplay = display;
 		$scope.actionType = "service";
@@ -723,6 +725,7 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	
 	$rootScope.menu="admin";
 	$rootScope.submenu="service";
+  
 	//注册自动刷新
 	$rootScope.registerAutoFlush( "service", $scope.initInstance)
 	$scope.init();

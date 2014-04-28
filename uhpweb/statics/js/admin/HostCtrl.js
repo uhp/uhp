@@ -145,7 +145,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	}
 	$scope.addHost=function(){
 		if( $scope.nowHost.hosts==null ){
-			$rootScope.alert("机器不能为空");
+			$rootScope.alert("机器不能为空", "now");
 			return;
 		}
 		$http({
@@ -159,21 +159,20 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	        	"sudopasswd":$scope.nowHost.sudopasswd
 	        }
 	    }).success(function(response, status, headers, config){
-	    	if(response["ret"]!="ok"){
-	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
-	        }
-	    	else{
-	    		$rootScope.beginProgress(response["runningId"],$scope.initHost);
+        if(response["ret"]!="ok"){
+          $rootScope.alert("提交失败 ("+response["msg"]+")", "now");
+        } else {
+	    		$rootScope.beginProgress(response["runningId"], $scope.initHost);
 	    	}
 	    }).error(function(data, status) {
-	    	$rootScope.alert("发送add_host请求失败");
+	    	$rootScope.alert("发送add_host请求失败", "now");
 	    });
 	}
 	//添加机架
 	$scope.readySetRack=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr == "" ){
-			$rootScope.alert("请选择机器","warn")
+			$rootScope.alert("请选择机器", "now")
 			return 
 		}
 		if( $scope.settingRack == null || $scope.settingRack == "" ){
@@ -208,7 +207,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	$scope.readyDelHost=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr == "" ){
-			$rootScope.alert("请选择机器","warn")
+			$rootScope.alert("请选择机器","now")
 			return 
 		}
 		$("#hostDelHostModal").modal();
@@ -239,7 +238,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	$scope.readySendRepo=function(){
 		$scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr.length == 0 ){
-			$rootScope.alert("请选择机器")
+			$rootScope.alert("请选择机器", "now")
 			return;
 		}
 		$("#sendRepoModal").modal()
