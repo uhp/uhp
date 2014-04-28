@@ -50,9 +50,9 @@ monitormenus = [
     {"name":"配置", "href":"/statics/partials/monitor/conf.html",
         "tabs": [
             {"name":"公共变量", "func":"query_global_variate()"},
-            {"name":"监控项"},
-            {"name":"监控组"},
-            {"name":"监控部署"}
+            {"name":"监控项", "func":"query_monitor_metric()"},
+            {"name":"监控组", "func":"query_monitor_group()"},
+            {"name":"监控部署", "func":"query_monitor_host()"}
         ]
     }
 ]
@@ -69,6 +69,18 @@ usermenus = {"name":"user", "display":"用户", "href":"/user",
 #由于基本不修改，所以不存放在数据库
 #保存了所有的素服和角色
 services = [
+    {"name":"ganglia", 
+     "role": ["gmond","gmetad"],
+     "actions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始配置等"},
+                {"name":"start","display":"启动","tooptip":"启动集群"},
+                {"name":"stop","display":"停止","tooptip":"关闭集群"},
+                {"name":"restart","display":"重启","tooptip":"重启集群"}], 
+     "instanceActions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始化myid"},
+                        {"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : []
+     },
     {"name":"zookeeper", 
      "role": ["zookeeper"],
      "actions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始化myid"},
