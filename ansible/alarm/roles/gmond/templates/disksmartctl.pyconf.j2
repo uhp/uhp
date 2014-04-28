@@ -1,0 +1,19 @@
+modules {
+    module {
+        name = "disksmartctl"
+        language = "python"
+        param mounts {
+            value = '/proc/mounts'
+        }
+    }
+}
+
+collection_group {
+    collect_every = 180
+    time_threshold = 360
+    metric {
+       name_match = "disk_smartctl_(.+)"
+    }
+
+}
+

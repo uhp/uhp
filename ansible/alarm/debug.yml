@@ -1,16 +1,8 @@
 
 - hosts:
-  - hadoop2
+  - platform2
   tasks: 
-  - include: roles/gmetad/tasks/stop.yml
-  - include: roles/gmetad/tasks/stop_web.yml
-
-- hosts:
-  - hadoop4
-  - hadoop2
-  - hadoop5
-  tasks:
-  - include:  roles/gmond/tasks/stop.yml
+  - include:  roles/gmond/tasks/start.yml
 
 
 

@@ -1,5 +1,18 @@
+
+export JMX_OPEN_1100=" -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.port=1100 -Djava.rmi.server.hostname={{ansible_hostname}} "
+
+export JMX_OPEN_1110=" -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.port=1110 -Djava.rmi.server.hostname={{ansible_hostname}} "
+
+export REGIONSERVER_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source_ip }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/hbase/conf/hbase-regionserver-jmxetric.xml"
+
+export MASTER_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source_ip }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/hbase/conf/hbase-master-jmxetric.xml"
+
 export HBASE_CLASSPATH=$HBASE_CLASSPATH
-export HBASE_MASTER_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_MASTER_OPTS}} "
-export HBASE_REGIONSERVER_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_REGIONSERVER_OPTS}} "
+export HBASE_MASTER_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_MASTER_OPTS}} $MASTER_JMXETRIC $JMX_OPEN_1100"
+export HBASE_REGIONSERVER_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_REGIONSERVER_OPTS}} $REGIONSERVER_JMXETRIC $JMX_OPEN_1110 "
 export HBASE_THRIFT_OPTS=" {{SERVER_OPTS}} {{hbase__HBASE_THRIFT_OPTS}} "
 export HBASE_OPTS=" -Xmx256m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:+CMSIncrementalMode $HBASE_OPTS "
+
+#TODO if you want to add jmx port add below line
+
+#

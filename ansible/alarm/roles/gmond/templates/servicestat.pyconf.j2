@@ -1,0 +1,37 @@
+#
+
+modules {
+  module {
+    name = 'servicestat'
+    language = 'python'
+
+    # the role you want to monitor,
+    # example value = "datanode,namenode"
+    param services {
+      value = "{{ check_role_list|join(',') }}"
+    }
+  }
+}
+
+collection_group {
+  collect_every = 60
+  time_threshold = 120
+
+  metric {
+    name_match = "servicestat_(.+)"
+  }
+
+}
+
+#  metric {
+#    name_match = "servicestat_(.+)_mem"
+#  }
+#
+#  metric {
+#    name_match = "servicestat_(.+)_io_count"
+#  }
+#
+#  metric {
+#    name_match = "servicestat_(.+)_io_bytes"
+#  }
+

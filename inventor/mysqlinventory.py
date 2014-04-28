@@ -65,6 +65,7 @@ class MysqlInventory(object):
 
         groups = self.groups
     
+        host_role_map = {}
         #查询instance表的数据
         for instance in session.query(Instance):
             gname = instance.role.upper()
@@ -72,6 +73,9 @@ class MysqlInventory(object):
                 groups[gname] = {}
                 groups[gname][self.HOSTS] = []
             groups[gname][self.HOSTS].append(instance.host)
+            if not host_role_map.has_key(instance.host):
+                host_role_map[instance.host] = []
+            host_role_map[instance.host].append(instance.role)
 
         for gh in session.query(GroupHost):
             if not groups.has_key(gh.group):
@@ -106,7 +110,15 @@ class MysqlInventory(object):
             net_topology_map.append( "%s %s %s" % (host.ip,host.hostname,host.rack) )
         groups['all']['vars']['hdfs__net_topology_map'] = net_topology_map
 
-
+        ##添加特殊的ganglia变量
+        #groups['all']['vars']['ganglia__cluster_name'] = "test_hadoop"
+        #groups['all']['vars']['ganglia__data_srouce_ip'] = "10.1.74.45"
+        #groups['all']['vars']['ganglia__gmond_port'] = 8649
+        #groups['all']['vars']['ganglia__gmetad_rras'] = ['RRA:AVERAGE:0.5:4:120','RRA:AVERAGE:0.5:40:1008','RRA:AVERAGE:0.5:240:336','RRA:AVERAGE:0.5:5760:376']
+        #groups['all']['vars']['ganglia__gmond_python'] = [
+#{"name":"example","params":{"a":100,"b":"temp"},"collection_group":[{"collect_once":"yes","collect_every":10,"time_threshold":10,"metric":[{"name":"PyConstant_Number","value_threshold":1.0}]},{"collect_once":"no","collect_every":10,"time_threshold":10,"metric":[{"name":"PyRandom_Numbers","value_threshold":1.0}]}]},
+#{"name":"example2","params":{"a":100,"b":"temp"},"collection_group":[{"collect_once":"yes","collect_every":10,"time_threshold":10,"metric":[{"name":"qjw_Number","value_threshold":1.0}]},{"collect_once":"no","collect_every":10,"time_threshold":10,"metric":[{"name":"qjw_Numbers","value_threshold":1.0}]}]}]
+#
         
         #写机器变量
         # _meta:hostvars
@@ -130,6 +142,12 @@ class MysqlInventory(object):
                 host_vars[host][name] = value
             else:
                 host_vars[host][name] = value.split(",")
+
+        #为每个机器写入一个check_role_list变量
+        for host in hosts:
+            host_vars[host] = {}
+        for (host,role_list) in host_role_map.items():
+            host_vars[host]['check_role_list'] = role_list
 
         session.close()
 

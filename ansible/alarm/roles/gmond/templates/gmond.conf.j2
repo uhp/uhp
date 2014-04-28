@@ -3,16 +3,16 @@
 globals {
   daemonize = yes
   setuid = yes
-  user = ganglia
+  user = root
   debug_level = 0
   max_udp_msg_len = 1472
   mute = no
   deaf = no
   allow_extra_data = yes
-  host_dmax = 0 /*secs */
+  host_dmax = 86400 /*secs */
   cleanup_threshold = 300 /*secs */
   gexec = no
-  send_metadata_interval = 0 /*secs */
+  send_metadata_interval = 30 /*secs */
 }
 
 /*
@@ -20,7 +20,7 @@ globals {
  * tag that will wrap all hosts collected by this instance.
  */
 cluster {
-  name = "{{ganglia__cluster_name}}"
+  name = "{{ ganglia__cluster_name }}"
   owner = "unspecified"
   latlong = "unspecified"
   url = "unspecified"
@@ -30,12 +30,14 @@ cluster {
 host {
   location = "unspecified"
 }
+{% for ds in groups.DATASOURCE %}
 udp_send_channel {
   #bind_hostname = yes 
-  host = {{ ganglia__data_srouce_ip }}
+  host = {{ ds }}
   port = {{ ganglia__gmond_port }}
   ttl = 1
 }
+{% endfor %}
 udp_recv_channel {
   port = {{ ganglia__gmond_port }}
   bind = {{ ansible_default_ipv4['address'] }}

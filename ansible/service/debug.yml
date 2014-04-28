@@ -1,7 +1,8 @@
 
 - hosts: 
-  - hadoop3
+  - hadoop2
+  - platform2
   tasks:
-  - include: roles/hivemetastore/tasks/stop.yml
+  - include: roles/prepare/tasks/repo.yml
 
 

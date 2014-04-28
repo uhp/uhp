@@ -1,5 +1,6 @@
 
 - include: ulimit.yml
-- include: java.yml
-- include: repo.yml
 - include: tmpwatch.yml
+- include: repo.yml
+- include: java.yml
+- include: jmxetric.yml

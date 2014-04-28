@@ -6,3 +6,8 @@
     - hbase-site.xml
     - log4j.properties
     - hbase-env.sh
+    - hbase-regionserver-jmxetric.xml
+    - hbase-master-jmxetric.xml
+    - hbase-jmxetric-logging.properties
+
+#    - hadoop-metrics.properties

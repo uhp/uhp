@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- <!DOCTYPE jmxetric-config [
+   <!ELEMENT jmxetric-config (sample|ganglia|jvm)*>
+   <!ELEMENT sample (mbean)*>
+      <!ATTLIST sample delay CDATA #REQUIRED>
+      <!ATTLIST sample initialdelay CDATA "0">
+   <!ELEMENT mbean (attribute)*>
+      <!ATTLIST mbean name CDATA #REQUIRED>
+      <!ATTLIST mbean pname CDATA #REQUIRED>
+   <!ELEMENT attribute (composite*)>
+      <!ATTLIST attribute name CDATA #REQUIRED>
+      <!ATTLIST attribute type CDATA "" >
+      <!ATTLIST attribute units CDATA "" >
+      <!ATTLIST attribute pname CDATA "" >
+      <!ATTLIST attribute slope CDATA "both" >
+   <!ELEMENT composite EMPTY>
+      <!ATTLIST composite name CDATA #REQUIRED>
+      <!ATTLIST composite type CDATA "" >
+      <!ATTLIST composite units CDATA "" >
+      <!ATTLIST composite pname CDATA "" >
+      <!ATTLIST composite slope CDATA "both" >
+   <!ELEMENT ganglia EMPTY>
+      <!ATTLIST ganglia hostname CDATA #REQUIRED>
+      <!ATTLIST ganglia port CDATA #REQUIRED>
+      <!ATTLIST ganglia mode CDATA #REQUIRED>
+      <!ATTLIST ganglia wireformat31x CDATA #REQUIRED>
+      <!ATTLIST ganglia spoof CDATA #IMPLIED>
+   <!ELEMENT jvm EMPTY>
+      <!ATTLIST jvm process CDATA "">
+]>  -->
+<jmxetric-config>
+    <jvm process="regionserver"/>
+    <sample delay="300">
+        <mbean name="java.lang:type=Memory" pname="memory">
+            <attribute name="HeapMemoryUsage">
+                <composite name="committed" pname="memHeapCommitted" type="int32" units="bytes" slope="both" />
+                <composite name="used" pname="memHeapUsed" type="int32" units="bytes"  slope="both" />
+                <composite name="max" pname="memHeapMax" type="int32" units="bytes"  slope="both" />
+            </attribute>
+            <attribute name="NonHeapMemoryUsage" >
+                <composite name="committed" pname="memNonHeapCommitted" type="int32" units="bytes"  slope="both" />
+                <composite name="used" pname="memNonHeapUsed" type="int32" units="bytes"  slope="both" />
+                <composite name="max" pname="memNonHeapMax" type="int32" units="bytes"  slope="both" />
+            </attribute>
+        </mbean>
+        <mbean name="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep" pname="gccms">
+            <attribute name="CollectionCount" pname="gcCount" type="int16"  slope="both" />
+            <attribute name="CollectionTime" pname="gcTime" type="int32"  slope="both" />
+        </mbean>
+        <mbean name="java.lang:type=GarbageCollector,name=ParNew" pname="gcparnew">
+            <attribute name="CollectionCount" pname="gcCount" type="int16"  slope="both" />
+            <attribute name="CollectionTime" pname="gcTime" type="int32"  slope="both" />
+        </mbean>
+        <mbean name="java.lang:type=Threading" pname="Threading" >
+            <attribute name="ThreadCount" type="int16"  slope="both" />
+        </mbean>
+        <!-- regionserver -->
+        <mbean name="hadoop:service=RegionServer,name=RegionServerStatistics" pname="rs">
+
+            <attribute name="regions" type="int16"  slope="both" />
+            <attribute name="stores" type="int16"  slope="both" />
+            <attribute name="storefiles" type="int16"  slope="both" />
+            <attribute name="memstoreSizeMB" type="int16"  slope="both" />
+
+            <attribute name="blockCacheFree" type="int32"  slope="both" />
+            <attribute name="blockCacheCount" type="int16" slope="both" />
+            <attribute name="blockCacheHitRatio" type="int16" slope="both" />
+            <attribute name="blockCacheHitCachingRatio" type="int16" slope="both" />
+            <attribute name="blockCacheSize" type="int16" slope="both" />
+
+            <attribute name="compactionQueueSize" type="int16" slope="both" />
+            <attribute name="compactionTimeNumOps" type="int16" slope="both" />
+            <attribute name="compactionTimeAvgTime" type="int32" slope="both" />
+            <attribute name="compactionSizeNumOps" type="int16" slope="both" />
+            <attribute name="compactionSizeAvgTime" type="int32" slope="both" />
+
+            <attribute name="flushQueueSize" type="int16" slope="both" />
+            <attribute name="flushTimeNumOps" type="int16" slope="both" />
+            <attribute name="flushTimeAvgTime" type="int32" slope="both" />
+            <attribute name="flushSizeNumOps" type="int16" slope="both" />
+            <attribute name="flushSizeAvgTime" type="int32" slope="both" />
+
+            <attribute name="slowHLogAppendCount" type="int32" slope="both" />
+
+            <attribute name="requests" type="double" slope="both" />
+            <attribute name="readRequestsCount" type="int32" slope="both" />
+            <attribute name="writeRequestsCount" type="int32" slope="both" />
+
+        </mbean>
+    </sample>
+    <ganglia mode="unicast" />
+</jmxetric-config>

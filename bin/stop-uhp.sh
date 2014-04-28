@@ -15,4 +15,5 @@ cd $UHP_HOME;
 sh bin/stop-web.sh
 sh bin/stop-worker.sh
 sh bin/stop-monitor.sh
+sh bin/stop-alarm.sh
 

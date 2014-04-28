@@ -4,14 +4,37 @@
   sudo: yes
   template: src=gmond.conf.j2 dest=/etc/ganglia/gmond.conf
 
-- name: template the gmond python conf
+#copy some python module
+- name: template some python conf
   sudo: yes
-  template: src=python.pyconf.j2 dest=/etc/ganglia/conf.d/{{item.name}}.pyconf
+  template: src={{ item }}.pyconf.j2 dest=/etc/ganglia/conf.d/{{ item }}.pyconf
   with_items:
-   - "{{ ganglia__gmond_python }}"
+   - disksmartctl
+   - diskiostat
+   - servicestat
 
-- name: copy the gmond python py
+#   - serviceport
+
+- name: copy the python py
   sudo: yes
-  copy: src={{item.name}}.py dest=/usr/lib64/ganglia/python_modules/{{item.name}}.py
+  copy: src={{ item }}.py dest=/usr/lib64/ganglia/python_modules/{{ item }}.py
   with_items:
-   - "{{ ganglia__gmond_python }}" 
+   - disksmartctl
+   - diskiostat
+   - servicestat
+
+#   - serviceport
+
+#copy some diy but not for all python script
+#
+#- name: template the gmond python conf
+#  sudo: yes
+#  template: src=python.pyconf.j2 dest=/etc/ganglia/conf.d/{{item.name}}.pyconf
+#  with_items:
+#   - "{{ ganglia__gmond_python }}"
+#
+#- name: copy the gmond python py
+#  sudo: yes
+#  copy: src={{item.name}}.py dest=/usr/lib64/ganglia/python_modules/{{item.name}}.py
+#  with_items:
+#   - "{{ ganglia__gmond_python }}" 

@@ -1,15 +1,50 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from alarm import Manager
+import database
+from model.alarm import Alarm
+from lib.manager import Manager
+from lib.logger import log
+
 
 class AlarmRuleManager(Manager):
     def __init__(self):
-        pass
+        self.alarm_rule_map = {}
         
-    def get_rule_by_host(self):
+    def pre_check(self):
+        '''
+        覆盖manager的pre_check
+        每次检查之前都获取判断规则
+        '''
+        self.alarm_rule_map = {}
+        session = database.getSession()
+        for alarm in session.query(Alarm):
+            host = alarm.host
+            if not self.alarm_rule_map.has_key(host):
+                self.alarm_rule_map[host] = []
+            self.alarm_rule_map[host].append( Rule(alarm.name,alarm.expression,alarm.callback) )
+
+
+    def get_rule_by_host(self, host):
+        if host == "cluster":
+            if self.alarm_rule_map.has_key("cluster") :
+                return self.alarm_rule_map["cluster"];
+            else:
+                return []
+        
+        combine = {}
+        #combine the * rule
+        if self.alarm_rule_map.has_key("*") :
+            for rule in self.alarm_rule_map["*"] :
+                combine[rule.name] = rule
+        #combine the own host
+        if self.alarm_rule_map.has_key(host) :
+            for rule in self.alarm_rule_map[host] :
+                combine[rule.name] = rule
+        
         rule_list = []
-        rule_list.append(Rule("max(a,10)","sendmail"))
+        for (name,rule) in combine.items():
+            rule_list.append(rule)
         return rule_list
         
 class Rule:
@@ -19,6 +54,9 @@ class Rule:
         self.callback = callback
         self.exp_func = None
         self.exp_args = None
-        self.cb_func = None
+        self.callback_func = None
         
+
+    def __str__(self):
+        return "Rule : %s %s %s" % (self.name, self.expression, self.callback)
         

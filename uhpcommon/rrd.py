@@ -80,6 +80,26 @@ class RrdWrapper(object):
 
         return rrdtool.fetch(rrdfile, "AVERAGE", "--start", startTime, "--end", endTime)
 
+    def get_last(self, rrdfile):
+        '''
+        获取最近5分钟的数据,选取最新更新的。
+        返回（时间戳，数值）的二元组
+        如果,最近5分钟没有数据则返回None
+        '''
+        result = rrdtool.fetch(rrdfile, "AVERAGE", "--start", "-300s", "--end", "now")
+        time_meta = result[0]
+        data = result[2]
+        last_ts = None
+        last_value = None
+        ts_iter = time_meta[0]
+        index = 0
+        for ts_iter in range( time_meta[0], time_meta[1], time_meta[2] ):
+            if data[index][0] != None:
+                last_ts = ts_iter
+                last_value = data[index][0]
+            index = index + 1
+
+        return (last_ts, last_value)
 
     def get_info(self, rrdfile):
         #TODO: translate into human-redable output.
@@ -156,7 +176,6 @@ class RrdWrapper(object):
         filePath = os.path.join(self.image_rootdir, clusterName, hostname, image_name + ".svg")
 
         dirname = os.path.dirname(filePath)
-        print(dirname)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
@@ -189,8 +208,6 @@ class RrdWrapper(object):
         else:
             end = endTime
 
-        print rrdfile_in
-        print rrdfile_out
         args = [image_path, '--start', start, '--end', end, '--alt-autoscale',  
                       '-A', '--imgformat', 'SVG', '--rigid', '-c', 'SHADEA%s' % rrd_contants.white, '-w', '450', '-h', '180',
                       '-c', 'SHADEB%s' % rrd_contants.white, '-c', 'FRAME%s' % rrd_contants.dark_blue, '-c',
@@ -206,7 +223,7 @@ class RrdWrapper(object):
 
 
 if __name__ == '__main__':
-    rrd_wraper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+    rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
 
     from datetime import datetime
@@ -214,11 +231,11 @@ if __name__ == '__main__':
     start = '-1h'
     end = 'now'
     
-    print(rrd_wraper.query('cpu_user',start, end, hostname='hadoop2', clusterName='test_hadoop'))
+    print(rrd_wrapper.query('cpu_user',start, end, hostname='hadoop2', clusterName='test_hadoop'))
 
-    rrdfile_in = rrd_wraper.get_rrd_file_path('bytes_in', hostname='hadoop2', clusterName='test_hadoop')
-    rrdfile_out = rrd_wraper.get_rrd_file_path('bytes_out', hostname='hadoop2', clusterName='test_hadoop')
-    image_path = rrd_wraper.get_image_path('llddd', hostname='hadoop2', clusterName='test_hadoop')
+    rrdfile_in = rrd_wrapper.get_rrd_file_path('bytes_in', hostname='hadoop2', clusterName='test_hadoop')
+    rrdfile_out = rrd_wrapper.get_rrd_file_path('bytes_out', hostname='hadoop2', clusterName='test_hadoop')
+    image_path = rrd_wrapper.get_image_path('llddd', hostname='hadoop2', clusterName='test_hadoop')
 
     rrd_lines = ['DEF:input=%s:sum:AVERAGE' % rrdfile_in,  #定义一个DEF变量
                  'LINE1:input#BB1D48:In traffic',          #使用一个DEF变量定义一个LINE1
@@ -233,7 +250,8 @@ if __name__ == '__main__':
                  'GPRINT:bytes_out:MAX:MAX out traffic\: %6.2lf %Sbps',
                  ]
 
-    rrd_wraper.draw(image_path, "网络流量", rrd_lines, '-1h')
+    rrd_wrapper.draw(image_path, "网络流量", rrd_lines, '-1h')
+    print rrd_wrapper.get_last(rrdfile_in)
 
 
 

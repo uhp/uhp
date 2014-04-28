@@ -12,28 +12,22 @@ commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
 sys.path.append(commondir)
 
 import config
+import database
+import mail_center
+from model.instance import Instance
+from lib.logger import log
 from alarm_rule import AlarmRuleManager
 from alarm_data import AlarmDataManager
 from alarm_expression import AlarmExpManager
 from alarm_callback import AlarmCallbackManager
 
 
-class Manager:
-    def init(self):
-        pass
-    
-    def close(self):
-        pass
 
 class Alarm:
     '''
         定期进行告警检查
     '''
-    
-    ALARM_OK = "ok"
-    ALARM_WARN = "warn"
-    ALARM_ERROR = "error"
-    
+   
     def __init__(self):
         self.manager_list = []
         
@@ -54,42 +48,61 @@ class Alarm:
     def run(self):
         while not self.stop:
             
-            self.init_manager_list()
-            try:
-                host_list = self.get_host_list()
-                for host in host_list:
-                    rule_list = self.rule_manager.get_rule_by_host(host)
-                    data_set = self.data_manager.get_data_by_host(host)
-                    for rule in rule_list:
-                        exp_result = self.exp_manager.judge(data_set,rule)
-                        self.cb_manager.callback(exp_result)
-            except:
-                log.exception("get exeception in alarm run")
-                
-            self.close_manager_list()
+            log.info("BEGIN TO CHECK")
+            self.pre_check_manager_list()
+            self.judge_host_rule()
+               
+            self.post_check_manager_list()
+            log.info("END CHECK")
             
             self.interval()
             
-            
+
+    def judge_specify_rule(self, host, rule, data_set ):
+        try:
+            exp_result = self.exp_manager.judge(host, rule, data_set)
+            self.cb_manager.callback(host, rule, exp_result)
+        except:
+            log.exception("get exception with h:%s r:%s" % (host,rule) )
+
+    def judge_host_rule(self):
+        '''
+        为每个host的规则进行判断
+        '''
+        try:
+            host_list = self.get_host_list()
+            #添加集群规则
+            host_list.append("cluster")
+            for host in host_list:
+                rule_list = self.rule_manager.get_rule_by_host(host)
+                data_set = self.data_manager.get_data_by_host(host)
+                for rule in rule_list:
+                    self.judge_specify_rule(host, rule, data_set)
+        except:
+            log.exception("get exeception judge_host_rule")
+
     def get_host_list(self):
         #TODO
-        return ['hadoop1']
+        host_list = []
+        session = database.getSession()
+        for instance in session.query(Instance).filter(Instance.role == "gmond"):
+            host_list.append(instance.host)
+        session.close()
+        return host_list
             
-    def init_manager_list(self):
+    def pre_check_manager_list(self):
         for manager in self.manager_list:
-            manager.init()
+            manager.pre_check()
         
-    def close_manager_list(self):
+    def post_check_manager_list(self):
         for manager in self.manager_list:
-            manager.close()
+            manager.post_check()
             
     def interval(self):
         time.sleep(config.alarm_interval)
         
 os.chdir(config.uhphome)
-APP = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-logging.config.fileConfig("%s/uhp%s/conf/logging.conf" % (config.uhphome, APP))
-log   = logging.getLogger(APP)
+APP = "alarm"
 
 if __name__ == "__main__":
     log.info("start...")
@@ -99,6 +112,9 @@ if __name__ == "__main__":
         files_preserve=[logging.root.handlers[1].stream.fileno()]
         dmn = daemon.DaemonContext(None, os.getcwd(), pidfile=pidfile, files_preserve=files_preserve)
         dmn.open()
+        #start mail loop
+        mail_center.start_mail_center()
+        #start alarm loop
         alarm = Alarm()
         alarm.run()
     except Exception as e:

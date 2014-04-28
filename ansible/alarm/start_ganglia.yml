@@ -1,14 +1,14 @@
 
-- hosts: 
-  - hadoop2
+- hosts: GMETAD
   tasks:
   - include: roles/gmetad/tasks/start.yml
-  - include: roles/gmetad/tasks/start_web.yml
 
-- hosts:
-  - hadoop4
-  - hadoop2
-  - hadoop5
+
+#- hosts: DATASOURCE
+#  tasks:
+#  - include: roles/gmond/tasks/start.yml
+
+- hosts: GMOND
   tasks:
   - include:  roles/gmond/tasks/start.yml
 

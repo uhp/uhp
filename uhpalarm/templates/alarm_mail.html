@@ -1,0 +1,35 @@
+<h1> UHP自动告警邮件 </h1>
+
+<style type="text/css">
+th 
+{
+    font-size: 20px;
+    border: 1px solid rgb(221, 221, 221)
+}
+td
+{
+    font-size: 18px;
+    border: 1px solid rgb(221, 221, 221)
+}
+</style>
+以下是最近捕获到的告警监控项
+<table>
+    <thead>
+        <th>时间</th>
+        <th>监控名称</th>
+        <th>监控对象</th>
+        <th>告警状态</th>
+        <th>详细信息</th>
+    </thead>
+    <tbody>
+        {% for record in alarm_list %}
+        <tr>
+            <td>{{ record.ts }}</td>
+            <td>{{ record.name }}</td>
+            <td>{{ record.host }}</td>
+            <td>{{ record.state }}</td>
+            <td>{{ record.msg }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

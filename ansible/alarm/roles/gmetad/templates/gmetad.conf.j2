@@ -1,6 +1,6 @@
 # this is generate from the UHP
 
-data_source "{{ ganglia__cluster_name }}" {{ ganglia__data_srouce_ip }}
+data_source "{{ ganglia__cluster_name }}" {{ groups.DATASOURCE|join(" ") }}
 
 # Round-Robin Archives
 RRAs {% for rra in ganglia__gmetad_rras %}"{{rra}}" {% endfor %}

@@ -3,10 +3,4 @@
 - hosts: WANT_HOST
   tasks:
   - name: build template remote file
-    template: src=roles/conf/templates/WANT_DIR/WANT_FILE dest=/tmp/TMP_FILE
-    sudo: yes
-  - name: copy back
-    fetch: src=/tmp/TMP_FILE dest=/tmp
-    sudo: yes
-
-
+    local_action: template src=roles/conf/templates/WANT_DIR/WANT_FILE dest=/tmp/TMP_FILE

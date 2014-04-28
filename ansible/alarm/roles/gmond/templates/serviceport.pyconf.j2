@@ -1,0 +1,33 @@
+#
+
+modules {
+  module {
+    name = 'serviceport'
+    language = 'python'
+
+    # the role you want to monitor,
+    # example value = "datanode,namenode"
+    param services {
+      value = "{{ check_role_list|join(',') }}"
+    }
+    #pass all real port to the python
+    #the port list's format is like this
+    # key=port,key2=port2...
+    # if the port is not define it would be 0
+    param port_list{
+      value = "hdfs__dfs_namenode_http_address_port={{ hdfs__dfs_namenode_http_address_port if hdfs__dfs_namenode_http_address_port != None else 0 }},hdfs__dfs_namenode_https_address_port={{ hdfs__dfs_namenode_https_address_port if hdfs__dfs_namenode_https_address_port != None else 0 }},hdfs__dfs_namenode_servicerpc_address_port={{ hdfs__dfs_namenode_servicerpc_address_port if hdfs__dfs_namenode_servicerpc_address_port != None else 0 }},hdfs__dfs_namenode_rpc_address_port={{ hdfs__dfs_namenode_rpc_address_port if hdfs__dfs_namenode_rpc_address_port != None else 0 }},hdfs__dfs_datanode_address_port={{ hdfs__dfs_datanode_address_port if hdfs__dfs_datanode_address_port != None else 0 }},hdfs__dfs_datanode_ipc_address_port={{ hdfs__dfs_datanode_ipc_address_port if hdfs__dfs_datanode_ipc_address_port != None else 0 }},hdfs__dfs_datanode_http_address_port={{ hdfs__dfs_datanode_http_address_port if hdfs__dfs_datanode_http_address_port != None else 0 }},hdfs__qjournal_http_port={{ hdfs__qjournal_http_port if hdfs__qjournal_http_port != None else 0 }},hdfs__qjournal_port={{ hdfs__qjournal_port if hdfs__qjournal_port != None else 0 }},zookeeper__zookeeper_election_port={{ zookeeper__zookeeper_election_port if zookeeper__zookeeper_election_port != None else 0 }},zookeeper__zookeeper_client_port={{ zookeeper__zookeeper_client_port if zookeeper__zookeeper_client_port != None else 0 }},zookeeper__zookeeper_leader_port={{ zookeeper__zookeeper_leader_port if zookeeper__zookeeper_leader_port != None else 0 }},hive__hive_server2_thrift_port={{ hive__hive_server2_thrift_port if hive__hive_server2_thrift_port != None else 0 }},hive__hive_metastore_port={{ hive__hive_metastore_port if hive__hive_metastore_port != None else 0 }},hive__hive_server_thrift_port={{ hive__hive_server_thrift_port if hive__hive_server_thrift_port != None else 0 }},yarn__yarn_nm_port={{ yarn__yarn_nm_port if yarn__yarn_nm_port != None else 0 }},yarn__yarn_nm_localizer_port={{ yarn__yarn_nm_localizer_port if yarn__yarn_nm_localizer_port != None else 0 }},yarn__mapreduce_shuffle_port={{ yarn__mapreduce_shuffle_port if yarn__mapreduce_shuffle_port != None else 0 }},yarn__yarn_nm_webapp_port={{ yarn__yarn_nm_webapp_port if yarn__yarn_nm_webapp_port != None else 0 }},yarn__mapreduce_jobhistory_webapp_port={{ yarn__mapreduce_jobhistory_webapp_port if yarn__mapreduce_jobhistory_webapp_port != None else 0 }},yarn__mapreduce_jobhistory_port={{ yarn__mapreduce_jobhistory_port if yarn__mapreduce_jobhistory_port != None else 0 }},yarn__yarn_rm_scheduler_port={{ yarn__yarn_rm_scheduler_port if yarn__yarn_rm_scheduler_port != None else 0 }},yarn__yarn_rm_webapp_port={{ yarn__yarn_rm_webapp_port if yarn__yarn_rm_webapp_port != None else 0 }},yarn__yarn_rm_port={{ yarn__yarn_rm_port if yarn__yarn_rm_port != None else 0 }},yarn__yarn_rm_admin_port={{ yarn__yarn_rm_admin_port if yarn__yarn_rm_admin_port != None else 0 }},yarn__yarn_rm_resource_tracker_port={{ yarn__yarn_rm_resource_tracker_port if yarn__yarn_rm_resource_tracker_port != None else 0 }},hbase__hbase_resigionserver_info_port={{ hbase__hbase_resigionserver_info_port if hbase__hbase_resigionserver_info_port != None else 0 }},hbase__hbase_resigionserver_port={{ hbase__hbase_resigionserver_port if hbase__hbase_resigionserver_port != None else 0 }},hbase__hbase_master_info_port={{ hbase__hbase_master_info_port if hbase__hbase_master_info_port != None else 0 }},hbase__hbase_master_port={{ hbase__hbase_master_port if hbase__hbase_master_port != None else 0 }},impala__impala_state_store_web_port={{ impala__impala_state_store_web_port if impala__impala_state_store_web_port != None else 0 }},impala__impala_state_store_port={{ impala__impala_state_store_port if impala__impala_state_store_port != None else 0 }},impala__impala_server_beeswax_port={{ impala__impala_server_beeswax_port if impala__impala_server_beeswax_port != None else 0 }},impala__impala_server_web_port={{ impala__impala_server_web_port if impala__impala_server_web_port != None else 0 }},impala__impala_backend_port={{ impala__impala_backend_port if impala__impala_backend_port != None else 0 }},impala__impala_server_hs2_port={{ impala__impala_server_hs2_port if impala__impala_server_hs2_port != None else 0 }}"
+    }
+  }
+}
+
+collection_group {
+  collect_every = 60
+  time_threshold = 120
+
+  metric {
+    name_match = "serviceport_(.+)"
+  }
+
+}
+
+

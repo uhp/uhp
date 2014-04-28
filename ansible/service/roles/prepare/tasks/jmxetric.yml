@@ -1,0 +1,18 @@
+
+- name: mkdir /usr/java
+  shell: mkdir -p /usr/java
+  sudo: yes
+
+- name: check weather the jmxetric is install
+  shell: ls /usr/java/ | grep jmxetric |wc -l
+  register: need_jmxetric
+
+- name: copy jmxetric to machine
+  sudo: yes
+  copy: src={{item}} dest=/usr/java/
+  with_items:
+    - jmxetric/jmxetric-1.0.6.jar
+    - jmxetric/oncrpc-1.0.7.jar
+    - jmxetric/gmetric4j-1.0.4.jar
+  when: need_jmxetric.stdout|int == 0
+

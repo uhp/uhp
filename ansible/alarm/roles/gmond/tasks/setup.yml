@@ -1,8 +1,8 @@
 
-- name: setup the gmond
-  sudo: yes
-  yum: name={{ item }} state=installed
-  with_items:
-   - ganglia-gmond
-   - ganglia-gmond-python
+- include: setup_6.yml
+  when: ansible_lsb.major_release  == "6"
+
+- include: setup_5.yml
+  when: ansible_lsb.major_release  == "5"
+
 

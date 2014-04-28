@@ -15,4 +15,5 @@ cd $UHP_HOME;
 sh bin/start-web.sh
 sh bin/start-worker.sh
 sh bin/start-monitor.sh
+sh bin/start-alarm.sh
 
