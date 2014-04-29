@@ -4,4 +4,5 @@
   yum: name={{ item }} state=installed
   with_items:
    - ganglia-gmond-3.1.7-6.el6
+   - ganglia-gmond-python-3.1.7-6.el6
 
