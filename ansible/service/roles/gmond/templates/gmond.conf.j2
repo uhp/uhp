@@ -30,7 +30,7 @@ cluster {
 host {
   location = "unspecified"
 }
-{% for ds in groups.DATASOURCE %}
+{% for ds in ganglia__data_source %}
 udp_send_channel {
   #bind_hostname = yes 
   host = {{ ds }}
