@@ -1,6 +1,6 @@
 ---
 
-- include: conf.yml
+- include: ../../conf/tasks/gmetad.yml
 
 - name: start the gmetad
   sudo: yes

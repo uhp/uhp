@@ -1,0 +1,23 @@
+---
+
+- name: template the gmond conf
+  sudo: yes
+  template: src=ganglia/gmond.conf.j2 dest=/etc/ganglia/gmond.conf
+
+#copy some python module
+- name: template some python conf
+  sudo: yes
+  template: src=ganglia/{{ item }}.pyconf.j2 dest=/etc/ganglia/conf.d/{{ item }}.pyconf
+  with_items:
+   - disksmartctl
+   - diskiostat
+   - servicestat
+
+#   - serviceport
+
+#- name: template the gmond python conf
+#  sudo: yes
+#  template: src=python.pyconf.j2 dest=/etc/ganglia/conf.d/{{item.name}}.pyconf
+#  with_items:
+#   - "{{ ganglia__gmond_python }}"
+#

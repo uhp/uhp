@@ -1,0 +1,17 @@
+---
+
+- name: copy the python py
+  sudo: yes
+  copy: src={{ item }}.py dest=/usr/lib64/ganglia/python_modules/{{ item }}.py
+  with_items:
+   - disksmartctl
+   - diskiostat
+   - servicestat
+
+
+#copy some diy but not for all python script
+#- name: copy the gmond python py
+#  sudo: yes
+#  copy: src={{item.name}}.py dest=/usr/lib64/ganglia/python_modules/{{item.name}}.py
+#  with_items:
+#   - "{{ ganglia__gmond_python }}" 

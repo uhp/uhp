@@ -1,0 +1,19 @@
+modules {
+    module {
+        name = "diskiostat"
+        language = "python"
+        param mounts {
+            value = '/proc/mounts'
+        }
+    }
+}
+
+collection_group {
+    collect_every = 60
+    time_threshold = 180
+    metric {
+       name_match = "disk_iostat_(.+)"
+    }
+
+}
+

@@ -4,10 +4,6 @@
   - include: roles/gmetad/tasks/start.yml
 
 
-#- hosts: DATASOURCE
-#  tasks:
-#  - include: roles/gmond/tasks/start.yml
-
 - hosts: GMOND
   tasks:
   - include:  roles/gmond/tasks/start.yml

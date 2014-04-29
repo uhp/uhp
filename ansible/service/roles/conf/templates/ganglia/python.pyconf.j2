@@ -1,0 +1,25 @@
+#/* this file is generate from uhp */
+modules {
+  module {
+    name = "{{ item.name }}"
+    language = "python"
+  }
+}
+
+{%  for cg in item.collection_group %}
+collection_group {
+{% if cg.collect_once == "yes" %}
+  collect_once = yes
+{% else %}
+  collect_every = {{ cg.collect_every }}
+{% endif %}
+  time_threshold = {{ cg.time_threshold }}
+{% for me in cg.metric %}
+  metric {
+    name = "{{ me.name }}"
+    value_threshold = "{{ me.value_threshold }}"
+  }
+{% endfor %}
+}
+{% endfor %}
+

@@ -1,6 +1,8 @@
 ---
 
-- include: conf.yml
+- include: ../../conf/tasks/gmond.yml
+
+- include: module.yml
 
 - name: start the gmond
   sudo: yes
