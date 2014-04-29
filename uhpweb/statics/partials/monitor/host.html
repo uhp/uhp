@@ -1,3 +1,21 @@
-<div>
-  Host
+<div class="row">
+  <div class="col-md-3">
+    <div class="input-group">
+      <span class="input-group-addon">时间精度</span>
+      <select class="form-control" ng-model="precision" ng-options="v for v in precisions"></select>
+    </div>
+  </div>
+  <div class="col-md-3 col-md-offset-6">
+    <div class="input-group">
+      <span class="input-group-addon">指标</span>
+      <select class="form-control" ng-model="metric" ng-options="v.name as v.display for v in metrics"></select>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div ng-dblclick="showBig(host)" ng-repeat="host in hosts">
+    </div>
+  </div>
 </div>

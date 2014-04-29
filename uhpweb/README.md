@@ -13,3 +13,8 @@
 
 yum install redhat-lsb -y 
 # LSB 是Linux标准规范，它保证了LINUX发行版同LINUX应用程序之间的良好结合。
+yum install cairo-devel -y # 绘图库 rrdtool需要
+yum install pango-devel -y # 字体服务 rrdtool需要
+yum install libxml2-devel -y
+yum install rrdtool-devel -y
+pip install python-rrdtool
