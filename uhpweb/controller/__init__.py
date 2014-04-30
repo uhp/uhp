@@ -28,7 +28,11 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class LoginHandler(BaseHandler):
     def get(self):
-        self.render("login.html", title="uhp管理平台")
+        user = self.get_current_user()
+        if user == None :
+            self.render("login.html", title="uhp管理平台")
+        else:
+            self.login_jump(user['type'])
 
     def post(self):
         username = self.get_argument('useranme')
@@ -38,19 +42,23 @@ class LoginHandler(BaseHandler):
         session.close()
         if user:
             self.set_current_user({'name': user.name, 'password': user.password,"type": user.type })
-            if user.type==0 :
-                self.redirect("/admin")
-                return
-                if config.install_manager:
-                    self.redirect("/admin")
-                elif config.install_monitor:
-                    self.redirect("/monitor")
-                else:
-                    self.redirect('/login')
-            else:
-                self.redirect("/user")
+            self.login_jump(user.type)
         else:
             self.redirect('/login')
+
+    def login_jump(self, type):
+        if type == 0 :
+            self.redirect("/admin")
+            return
+            if config.install_manager:
+                self.redirect("/admin")
+            elif config.install_monitor:
+                self.redirect("/monitor")
+            else:
+                self.redirect('/login')
+        else:
+            self.redirect("/user")
+
         
 class UserHandler(BaseHandler):
     @tornado.web.authenticated
