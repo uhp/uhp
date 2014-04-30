@@ -228,14 +228,14 @@ if __name__ == '__main__':
 
     from datetime import datetime
 
-    start = '-1h'
+    start = '-2h'
     end = 'now'
     
-    print(rrd_wrapper.query('cpu_user',start, end, hostname='hadoop2', clusterName='test_hadoop'))
+    print(rrd_wrapper.query('cpu_user',start, end, hostname='hadoop5', clusterName='test_hadoop'))
 
-    rrdfile_in = rrd_wrapper.get_rrd_file_path('bytes_in', hostname='hadoop2', clusterName='test_hadoop')
-    rrdfile_out = rrd_wrapper.get_rrd_file_path('bytes_out', hostname='hadoop2', clusterName='test_hadoop')
-    image_path = rrd_wrapper.get_image_path('llddd', hostname='hadoop2', clusterName='test_hadoop')
+    rrdfile_in = rrd_wrapper.get_rrd_file_path('bytes_in', hostname='hadoop5', clusterName='test_hadoop')
+    rrdfile_out = rrd_wrapper.get_rrd_file_path('bytes_out', hostname='hadoop5', clusterName='test_hadoop')
+    image_path = rrd_wrapper.get_image_path('llddd', hostname='hadoop5', clusterName='test_hadoop')
 
     rrd_lines = ['DEF:input=%s:sum:AVERAGE' % rrdfile_in,  #定义一个DEF变量
                  'LINE1:input#BB1D48:In traffic',          #使用一个DEF变量定义一个LINE1

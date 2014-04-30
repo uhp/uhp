@@ -57,6 +57,21 @@ monitormenus = [
     }
 ]
 
+monitor_show_info = {
+        'precisions':[
+            {'name':'p1', 'display':'分钟'},
+            {'name':'p2', 'display':'10分钟'},
+            {'name':'p3', 'display':'小时'},
+            {'name':'p4', 'display':'天'}
+        ],
+        'precision':'p1',
+        'metrics':[
+            {'name':'metric_1','display':'指标1'},
+            {'name':'metric_2','display':'指标2'},
+            {'name':'metric_3','display':'指标3'}
+        ],
+        'metric':'metric_1' 
+    }
 usermenus = {"name":"user", "display":"用户", "href":"/user",
         "submenus":[
             #{"name":"info", "display":"概况", "href":"#user-info"},

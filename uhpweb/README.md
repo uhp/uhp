@@ -8,6 +8,7 @@
 * FlatUI Free 2.1.3
 * [sco.js.1.0.2](https://github.com/terebentina/sco.js/tree/1.0.2)
 * [squel.js 3.1.1](https://raw.githubusercontent.com/hiddentao/squel/3.1.1/squel.min.js)
+* [requeire.js](http://requirejs.org/docs/api.html)
 
 额外注意
 
