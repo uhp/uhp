@@ -436,71 +436,28 @@
   <!-- ~展示心跳报告的模式对话框 -->
 
   <!-- 配置公平调度器的模式对话框 -->
-  <div id="configFairScheduler" class="modal fade" data-backdrop="static" aria-hidden="true">
+  <div id="configFairScheduler" class="modal fade" data-backdrop="static" aria-hidden="true" sytle="">  
     <!--  style="width:950px;left:auto;margin-left:0px;" -->
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width:800px">
       <div class="modal-content">
 
         <div class="modal-header">
-          <h3>配置公平调度器</h3>
+          <h4>配置公平调度器</h4>
         </div>
 
         <div class="modal-body">
 
-          <div>
-            <div class="input-group" >
-              <span class="input-group-addon">总内存数(MB)</span>
-              <input style="width:50px"  type="text" ng-model="fair.totalMemory" disabled > 
-            </div>
-            <div class="input-group"  >
-              <span class="input-group-addon">节点数</span>
-              <input style="width:50px"  type="text" ng-model="fair.nodes" disabled>
-            </div>
-            <div class="input-group" >
-              <span class="input-group-addon">节点平均内存(MB)</span>
-              <input style="width:50px"  type="text" ng-model="fair.nodememory" disabled>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-group"  >
-              <span class="input-group-addon">AM内存(MB)</span>
-              <input style="width:50px" type="text" ng-model="fair.am" disabled>
-            </div>
-            <div class="input-group"  >
-              <span class="input-group-addon">MAP内存(MB)</span>
-              <input style="width:50px" type="text" ng-model="fair.map" disabled >
-            </div>
-            <div class="input-group" >
-              <span class="input-group-addon">REDUCE内存(MB)</span>
-              <input style="width:50px" type="text" ng-model="fair.reduce" disabled>
-            </div>
-            <div class="input-group" >
-              <span class="input-group-addon">Container平均内存(MB)</span>
-              <input style="width:50px" type="text" ng-model="fair.container" disabled>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-group" >
-              <span class="input-group-addon">权值总和</span>
-              <input style="width:50px" type="text" ng-model="fair.weightSum" disabled>
-            </div>
-            <div class="input-group" >
-              <span class="input-group-addon">并发应用总和</span>
-              <input style="width:50px" type="text" ng-model="fair.appSum" disabled>
-            </div>
-            <div class="input-group" >
-              <span class="input-group-addon">AM占用资源比</span>
-              <input style="width:50px;[[rateWarn(fair.appRate)]]" type="text" value="[[fair.appRate]]%" disabled>
-            </div>
+          <div >
+            <p style="font-size:13px">总内存数 <blue>[[ fair.totalMemory ]]</blue> MB. 节点数 <blue>[[ fair.nodes ]]</blue> 个. 节点平均内存 <blue>[[ fair.nodememory ]]</blue> MB.</p>
+            <p style="font-size:13px">AM内存 <blue>[[ fair.am ]]</blue> MB. MAP内存 <blue>[[ fair.map ]]</blue> MB. REDUCE内存 <blue>[[ fair.reduce ]]</blue> MB. Container平均内存 <blue>[[ fair.container ]]</blue> MB.</p>
+            <p style="font-size:13px">权值总和 <blue>[[ fair.weightSum ]]</blue> . 并发应用数量 <blue>[[ fair.appSum ]]</blue> . AM占用资源比 <temp style="[[rateWarn(fair.appRate)]]">[[ fair.appRate ]]% <temp> .</p>
           </div>
 
           <div>
             用户资源期望占比:
-            <div class="progress">
-              <div class="bar bar-[[user.type]]" ng-repeat="user in userResource" style="width:[[user.value]]%;">
-                <span>[[user.name]]:[[user.value]]%</span>		
+            <div class="progress" style="height:20px">
+              <div class="progress-bar progress-bar-[[user.type]]" ng-repeat="user in userResource" style="width:[[user.value]]%;">
+                <span style="font-size:">[[user.name]]:[[user.value]]%</span>		
               </div>
             </div>
           </div>
@@ -517,25 +474,24 @@
                 <th>权值</th>
                 <th>最小共享量(MB)</th>
                 <th>并发应用数</th>
-                <th>期望资源</th>
-                <th>AM资源占比</th>
+                <th>期望资源(MB)</th>
+                <th>AM占比</th>
                 <th>删除</th>
               </tr>
             </thead>
             <tbody>
               <tr ng-repeat="queue in fairqueues">
-                <td style="width:100px"><input type="text" ng-model="queue.name" style="width:70px" ng-change="recal()" ></td>
-                <td style="width:100px"><input type="text" ng-model="queue.user" style="width:70px" ng-change="recal()" ></td>
+                <td><input type="text" ng-model="queue.name" style="width:130px" ng-change="recal()" ></td>
+                <td><input type="text" ng-model="queue.user" style="width:70px" ng-change="recal()" ></td>
                 <td><input type="text" ng-model="queue.weight" style="width:50px" ng-change="recal()" > </td>
                 <td><input type="text" ng-model="queue.minResource" style="width:100px" ng-change="recal()" > </td>
                 <td><input type="text" ng-model="queue.maxApps" style="width:50px" ng-change="recal()" > </td>
-                <td>[[ queue.fairResource ]] MB</td>
+                <td>[[ queue.fairResource ]]</td>
                 <td style="[[rateWarn(queue.appRate)]]"> [[ queue.appRate ]]%</td>
                 <td><button class="btn btn-danger" ng-click="delQueue($index)" >删除</button></td>
               </tr>
             </tbody>
           </table>
-
         </div>
 
         <div class="modal-footer">
