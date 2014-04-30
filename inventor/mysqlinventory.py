@@ -145,7 +145,8 @@ class MysqlInventory(object):
 
         #为每个机器写入一个check_role_list变量
         for host in hosts:
-            host_vars[host] = {}
+            if not host_vars.has_key(host):
+                host_vars[host] = {}
         for (host,role_list) in host_role_map.items():
             host_vars[host]['check_role_list'] = role_list
 
