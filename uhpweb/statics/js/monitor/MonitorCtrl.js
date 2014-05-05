@@ -1,5 +1,21 @@
-uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce', function($scope, $rootScope, $http, $sce){
-  
+uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+
+  function myHttp(method, url, params, func){
+		$http({
+	    method: method,
+	    url: url,
+	    params: params || {}
+	  }).success(function(response, status, headers, config){
+      if(response["ret"] != "ok") {
+	  	  $rootScope.alert("服务失败:" + response['msg']);
+        return false;
+      }
+      func(response);
+	  }).error(function(data, status) {
+	  	$rootScope.alert("发送请求失败:" + data + ":" + status);
+	  });
+  }   
+ 
 	$scope.init=function(){
 		//初始化service的静态信息
 		$http({
@@ -16,8 +32,179 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce', funct
 	  }).error(function(data, status) {
 	  	$rootScope.alert("发送请求失败:" + data + ":" + status);
 	  });
+
+    // for show
+    $scope.show={};
+    myHttp('GET', '/monitorback/show_info', {}, function(res){
+      $scope.show=res['data'];
+    });
+
+    function onSelect(){
+      myHttp('GET', '/monitorback/show_metric', 
+        {precision:$scope.show.precision, metric:$scope.show.metric}, 
+        function(res){
+          $scope.show=res['data'];
+        }
+      );
+    }
+
+    $scope.$watch(function(){return $scope.show.precision;}, onSelect);
+    $scope.$watch(function(){return $scope.show.metrics;}, onSelect);
+   
+    //$scope.show={
+    //  precisions:[{name:'p1', display:'分钟'},{name:'p2',display:'10分钟'},
+    //              {name:'p3', display:'小时'},{name:'p4',display:'天'}],
+    //  precision:'p1',
+    //  metrics:[{name:'metric_1',display:'指标1'},{name:'metric_2',display:'指标2'},
+    //           {name:'metric_3',display:'指标3'}],
+    //  metric:'metric_1', 
+    //  hosts:[
+    //    {host:'hadoop5',
+    //      chartOpt:{
+    //        tooltip : { trigger: 'axis' },
+    //        legend: { x:'left', data:['蒸发量','降水量'] },
+    //        toolbox: {
+    //            show : true,
+    //            feature : {
+    //                mark : {show: false},
+    //                dataView : {show: true, readOnly: false},
+    //                magicType : {show: true, type: ['line', 'bar', 'stack']},
+    //                restore : {show: false},
+    //                saveAsImage : {show: true},
+    //                dataZoom:{show: false}
+    //            }
+    //        },
+    //        dataZoom: {show:true},
+    //        calculable : false,
+    //        xAxis : [
+    //            {
+    //                type : 'category',
+    //                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+    //            }
+    //        ],
+    //        yAxis : [
+    //            {
+    //                type : 'value',
+    //                splitArea : {show : true}
+    //            }
+    //        ],
+    //        series : [
+    //            {
+    //                name:'蒸发量',
+    //                type:'bar',
+    //                data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+    //            },
+    //            {
+    //                name:'降水量',
+    //                type:'bar',
+    //                data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+    //            }
+    //        ]
+    //      }
+    //    },
+    //    {host:'hadoop6',
+    //      chartOpt:{
+    //        tooltip : { trigger: 'axis' },
+    //        legend: { data:['蒸发量','降水量'] },
+    //        toolbox: {
+    //            show : true,
+    //            feature : {
+    //                mark : {show: true},
+    //                dataView : {show: true, readOnly: false},
+    //                magicType : {show: true, type: ['line', 'bar']},
+    //                restore : {show: true},
+    //                saveAsImage : {show: true}
+    //            }
+    //        },
+    //        calculable : true,
+    //        xAxis : [
+    //            {
+    //                type : 'category',
+    //                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+    //            }
+    //        ],
+    //        yAxis : [
+    //            {
+    //                type : 'value',
+    //                splitArea : {show : true}
+    //            }
+    //        ],
+    //        series : [
+    //            {
+    //                name:'蒸发量',
+    //                type:'bar',
+    //                data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+    //            },
+    //            {
+    //                name:'降水量',
+    //                type:'bar',
+    //                data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+    //            }
+    //        ]
+    //      }
+    //    },
+    //    {host:'hadoop7',
+    //      chartOpt:{
+    //        tooltip : { trigger: 'axis' },
+    //        legend: { data:['蒸发量','降水量'] },
+    //        toolbox: {
+    //            show : true,
+    //            feature : {
+    //                mark : {show: true},
+    //                dataView : {show: true, readOnly: false},
+    //                magicType : {show: true, type: ['line', 'bar']},
+    //                restore : {show: true},
+    //                saveAsImage : {show: true}
+    //            }
+    //        },
+    //        calculable : true,
+    //        xAxis : [
+    //            {
+    //                type : 'category',
+    //                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+    //            }
+    //        ],
+    //        yAxis : [
+    //            {
+    //                type : 'value',
+    //                splitArea : {show : true}
+    //            }
+    //        ],
+    //        series : [
+    //            {
+    //                name:'蒸发量',
+    //                type:'bar',
+    //                data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+    //            },
+    //            {
+    //                name:'降水量',
+    //                type:'bar',
+    //                data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+    //            }
+    //        ]
+    //      }
+    //      // ~chartOpt
+    //    }
+    //    // ~host
+    //  ]
+    //  // ~hosts
+    //};
+    // ~show
 	}
 
+  $scope.draw=function(host){
+    $timeout(function(){
+        var target = $("#draw_"+host.host).get(0);
+        console.log(target);
+        if(target){
+          var myChart = echarts.init(target,{grid:{x:40,y:30,x2:10,y2:55}});
+          myChart.setOption(host.chartOpt); // ~ setOption
+        }
+      },
+      100
+    );
+  }
+ 
   $scope.setActiveMonMenu=function(item){
     if(item == $scope.activeMonMenu) return;
     if($scope.activeMonMenu) $scope.activeMonMenu.active = '';
