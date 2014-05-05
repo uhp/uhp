@@ -12,8 +12,8 @@
    - disksmartctl
    - diskiostat
    - servicestat
-
-#   - serviceport
+   
+   #- serviceport
 
 #- name: template the gmond python conf
 #  sudo: yes

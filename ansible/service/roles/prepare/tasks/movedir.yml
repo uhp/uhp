@@ -1,0 +1,20 @@
+
+
+- name: mkdir the server log dir
+  file: state=directory path={{ services_log_root }} mode=755 
+  sudo: yes
+  when: source_dir|dirname!=services_log_root
+
+- name: add x for all dir
+  sudo: yes
+  script: add_x.sh {{ services_log_root }}
+  when: source_dir|dirname!=services_log_root
+
+- name: mkdir the same name dir in server log dir
+  sudo: yes
+  file: state=directory path={{ services_log_root }}/{{ source_dir|basename }} mode=755 owner={{ user }} group={{ user }}
+
+
+- name: remove the dir and link the dir to the source_dir
+  sudo: yes
+  shell: rm -rf {{ source_dir }}; ln -sf {{ services_log_root }}/{{ source_dir|basename }} {{ source_dir }}

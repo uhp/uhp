@@ -1,0 +1,3 @@
+
+
+- { include : link_jar.yml , WANT_HOME : "{{ YARN_HOME }}", NEW_JAR : "hadoop-yarn-server-resourcemanager-2.0.0-cdh4.2.1-20140430.jar" , JAR_PREFIX : "hadoop-yarn-server-resourcemanager" }

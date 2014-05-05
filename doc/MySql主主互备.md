@@ -114,16 +114,22 @@ CentOS 6+
 			CHANGE MASTER TO MASTER_HOST='host1', MASTER_PORT=3306, MASTER_USER='slave',  MASTER_PASSWORD='slave';
 			start slave;
 
-3.	在第一台机上
+3. 在第一台机上
 
 		stop slave;
 		change master to master_host='host2', master_user='slave',master_password='slave';
 		start slave;
 
-4.	验证
+4. 验证
 
 		show slave status\G;
 		# 搜索这三行，如下则主主互备配置成功
 		Slave_IO_State: Waiting for master to send event
 		Slave_IO_Running: Yes
 		Slave_SQL_Running: Yes
+		
+5. 消除binlog
+
+		使用在root用户添加以下语句到crontab中
+		# uhp mysql bin log clean
+		0 0 * * * mysql -h pagediff1 -proot -e 'PURGE MASTER LOGS BEFORE DATE_SUB( NOW( ), INTERVAL 3 DAY);' >/dev/null 2>&1

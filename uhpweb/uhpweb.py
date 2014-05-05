@@ -60,7 +60,8 @@ class Application(tornado.web.Application):
             (r"/userback/(.*)", UserBackHandler),
             (r"/debug", DebugHandler),
             (r"/logout", AuthLogoutHandler),
-            (r'/statics/(.*)', tornado.web.StaticFileHandler, {'path':os.path.join(os.path.dirname(__file__), "statics")})
+            (r'/statics/(.*)', tornado.web.StaticFileHandler, {'path':os.path.join(os.path.dirname(__file__), "statics")}),
+            (r'/tmp/(.*)', tornado.web.StaticFileHandler, {'path':'/tmp'})
         ]
         settings = dict(
             app_title=u"uhpweb",

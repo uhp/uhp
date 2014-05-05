@@ -268,9 +268,40 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	$rootScope.alert("发送请求失败");
 	    });
 	}
-	
-	
-	
+    //TODO
+	$scope.readyMoveLog=function(){
+        $scope.chosenHostStr=$scope.getChosenHostStr();
+		if( $scope.chosenHostStr.length == 0 ){
+			$rootScope.alert("请选择机器", "now")
+			return;
+		}
+		$("#sendMoveLogModal").modal()
+    }
+    $scope.sendMoveLog=function(){
+        var instanceList = [] ; 
+		for(var host in $scope.chosenHost){
+			if( $scope.chosenHost[host]) {
+				instanceList.push(host+"-prepare");
+			}
+		}
+		$http({
+	        method: 'GET',
+	        url: '/adminback/send_action',
+	        params:{
+        		"service" : "prepare",
+        		"taskName" : "movelog",
+        		"actionType" : "instance",
+        		"instances" : instanceList.join(",")
+	        }
+	    }).success(function(response, status, headers, config){
+	    	if(response["ret"] !="ok" ){
+	        	$rootScope.alert("提交失败:"+response["msg"]);
+	        }
+	    	
+	    }).error(function(data, status) {
+	    	$rootScope.alert("发送请求失败");
+	    });
+    }
 	
 	//角色相关的函数
 	$scope.filterHostBySearch=function(hosts,search){

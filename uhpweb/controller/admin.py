@@ -238,8 +238,7 @@ class AdminBackHandler(BaseHandler):
                 session.merge(hostVar)
                 session.commit()
         session.close()
-    
-    
+
     # 提交一个执行任务 
     # 当前直接把收到start的instance，标记为start状态
     # 当前直接把收到stop的instance，标记为stop状态
@@ -274,11 +273,8 @@ class AdminBackHandler(BaseHandler):
             
         elif actionType=="instance":
             for instance in instances.split(","):
-                temp = instance.split("-")
-                app_log.info(instance)
-                if len(temp) == 2 :
-                    host = temp[0]
-                    role = temp[1]
+                (host,role) = Instance.split_instance_name(instance)
+                if host != None and role != None :
                     task = Task(taskType,service,host,role,taskName);    
                     session.add(task)
                     
@@ -286,8 +282,12 @@ class AdminBackHandler(BaseHandler):
                     
                     session.flush()
                     running_id.append(task.id)
+                else:
+                    self.ret("error","split instance name %s error" % instance)
+                    return
         else:
             self.ret("error", "unsport actionType")
+            return
         session.commit()
         session.close()
         #发送消息到MQ
@@ -546,7 +546,7 @@ class AdminBackHandler(BaseHandler):
         session = database.getSession()
         instances = [];
         for instance in session.query(Instance).filter(Instance.service == service):
-            instances.append(instance.host+"-"+instance.role)
+            instances.append(instance.get_instance_name(instance.host, instance.role))
         session.close()
         if len(instances) == 0:
             self.ret("ok", "")
@@ -874,7 +874,6 @@ class AdminBackHandler(BaseHandler):
         '''
         dir = self.get_argument("dir")
         file = self.get_argument("file")
-        file = file+".j2"
         host = self.get_argument("host")
         (content,output) = shell_lib.get_template_file(host,dir,file);
         if content != "":

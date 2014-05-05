@@ -1,0 +1,9 @@
+
+- { include : movedir.yml , source_dir : "/var/log/hadoop" , user : "hdfs"}
+- { include : movedir.yml , source_dir : "/var/log/hadoop-hdfs" , user : "hdfs"}
+- { include : movedir.yml , source_dir : "/var/log/hadoop-mapreduce" , user : "hdfs"}
+- { include : movedir.yml , source_dir : "/var/log/hadoop-yarn" , user : "yarn"}
+- { include : movedir.yml , source_dir : "/var/log/hive" , user : "hive"}
+- { include : movedir.yml , source_dir : "/var/log/hbase" , user : "hbase"}
+- { include : movedir.yml , source_dir : "/var/log/impala" , user : "impala"}
+

@@ -62,15 +62,36 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn" data-dismiss="modal">取消</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="saveConf('del')" ng-show="nowConfVar.del" >删除</button>
-          <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="saveConf()" >确定</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" >确定</button>
         </div>
 
       </div>
     </div>
   </div>
 
+  <!-- 下载配置文件对话框 -->
+  <div id="templateDownloadModal" class="modal fade" role="dialog" aria-hidden="true" data-backdrop="static">
+    <!--  style="width:950px;left:auto;margin-left:0px;" -->
+    <div class="modal-dialog" style="min-width:800px">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fui-cross"></span></button>
+          <h6>下载配置文件</h6>
+        </div>
+
+        <div class="modal-body">
+          <label>针对[[nowhost]]的配置项，查看最终生成的[[nowdir]]的配置文件:</label>
+          <pre>[[downloadContent]]</pre>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" >确定</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
   <!-- 保存文件对话框 -->
   <div id="templateSaveModal" class="modal fade" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
