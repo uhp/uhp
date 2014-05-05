@@ -49,10 +49,12 @@ monitormenus = [
     },
     {"name":"配置", "href":"/statics/partials/monitor/conf.html",
         "tabs": [
-            {"name":"公共变量", "func":"query_global_variate()"},
             {"name":"监控项", "func":"query_monitor_metric()"},
             {"name":"监控组", "func":"query_monitor_group()"},
-            {"name":"监控部署", "func":"query_monitor_host()"}
+            {"name":"监控部署", "func":"query_monitor_host()"},
+            {"name":"监控公共变量", "func":"query_global_variate()"},
+            {"name":"告警配置", "func":"query_alarm()"},
+            {"name":"告警公共变量", "func":"query_alarm_assist()"}
         ]
     }
 ]
@@ -66,12 +68,13 @@ monitor_show_info = {
         ],
         'precision':'p1',
         'metrics':[
-            {'name':'metric_1','display':'指标1'},
-            {'name':'metric_2','display':'指标2'},
-            {'name':'metric_3','display':'指标3'}
+            {'name':'load_one','display':'一分钟负载'},
+            {'name':'load_five','display':'五分钟负载'},
+            {'name':'load_fifteen','display':'十五分钟负载'}
         ],
-        'metric':'metric_1' 
+        'metric':'load_one' 
     }
+
 usermenus = {"name":"user", "display":"用户", "href":"/user",
         "submenus":[
             #{"name":"info", "display":"概况", "href":"#user-info"},

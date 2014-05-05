@@ -40,6 +40,10 @@ uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', fu
             controller: 'MonitorCtrl',
             templateUrl: '/statics/partials/monitor/monitor.html'
         })
+        .when('/monitor/overview', {
+            controller: 'MonitorCtrl',
+            templateUrl: '/statics/partials/monitor/monitor.html'
+        })
         .otherwise({ redirectTo: '/admin-service' });
 
 }]);

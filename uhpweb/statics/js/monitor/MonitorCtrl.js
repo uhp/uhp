@@ -35,161 +35,62 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
 
     // for show
     $scope.show={};
+
     myHttp('GET', '/monitorback/show_info', {}, function(res){
       $scope.show=res['data'];
     });
 
     function onSelect(){
+      console.log('precision:' + $scope.show.precision);
+      console.log('metric:' + $scope.show.metric);
+      if(!$scope.show.precision || !$scope.show.metric) return;
       myHttp('GET', '/monitorback/show_metric', 
         {precision:$scope.show.precision, metric:$scope.show.metric}, 
         function(res){
-          $scope.show=res['data'];
+          //$scope.show.hosts=res['data'];
+          $scope.show.hosts=[];
+          var d=res['data'];
+          function r(arr){
+            for(i=0;i<arr.length;i++){
+              if(arr[i] == null){
+                arr[i]='-';
+              }
+            }
+          }
+
+          angular.forEach(d, function(v, k){
+            r(v.y);
+            this.push(
+              {host:v.host,
+                chartOpt:{
+                  tooltip : { trigger: 'axis' },
+                  legend: { x:'left', data:[$scope.show.metric] },
+                  toolbox: {
+                      show : true,
+                      feature : {
+                          mark : {show: false},
+                          dataView : {show: false, readOnly: false},
+                          magicType : {show: true, type: ['line', 'bar', 'stack']},
+                          restore : {show: false},
+                          saveAsImage : {show: true},
+                          dataZoom:{show: true}
+                      }
+                  },
+                  dataZoom: {show:true},
+                  calculable : false,
+                  xAxis : [ { type : 'category', data : v.x } ],
+                  yAxis : [ { type : 'value', splitArea : {show:true} } ],
+                  series : [ { name:$scope.show.metric, type:'bar', data:v.y } ]
+                }
+              }
+            ); // add one
+          }, $scope.show.hosts);
         }
       );
     }
 
     $scope.$watch(function(){return $scope.show.precision;}, onSelect);
-    $scope.$watch(function(){return $scope.show.metrics;}, onSelect);
-   
-    //$scope.show={
-    //  precisions:[{name:'p1', display:'分钟'},{name:'p2',display:'10分钟'},
-    //              {name:'p3', display:'小时'},{name:'p4',display:'天'}],
-    //  precision:'p1',
-    //  metrics:[{name:'metric_1',display:'指标1'},{name:'metric_2',display:'指标2'},
-    //           {name:'metric_3',display:'指标3'}],
-    //  metric:'metric_1', 
-    //  hosts:[
-    //    {host:'hadoop5',
-    //      chartOpt:{
-    //        tooltip : { trigger: 'axis' },
-    //        legend: { x:'left', data:['蒸发量','降水量'] },
-    //        toolbox: {
-    //            show : true,
-    //            feature : {
-    //                mark : {show: false},
-    //                dataView : {show: true, readOnly: false},
-    //                magicType : {show: true, type: ['line', 'bar', 'stack']},
-    //                restore : {show: false},
-    //                saveAsImage : {show: true},
-    //                dataZoom:{show: false}
-    //            }
-    //        },
-    //        dataZoom: {show:true},
-    //        calculable : false,
-    //        xAxis : [
-    //            {
-    //                type : 'category',
-    //                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-    //            }
-    //        ],
-    //        yAxis : [
-    //            {
-    //                type : 'value',
-    //                splitArea : {show : true}
-    //            }
-    //        ],
-    //        series : [
-    //            {
-    //                name:'蒸发量',
-    //                type:'bar',
-    //                data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
-    //            },
-    //            {
-    //                name:'降水量',
-    //                type:'bar',
-    //                data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-    //            }
-    //        ]
-    //      }
-    //    },
-    //    {host:'hadoop6',
-    //      chartOpt:{
-    //        tooltip : { trigger: 'axis' },
-    //        legend: { data:['蒸发量','降水量'] },
-    //        toolbox: {
-    //            show : true,
-    //            feature : {
-    //                mark : {show: true},
-    //                dataView : {show: true, readOnly: false},
-    //                magicType : {show: true, type: ['line', 'bar']},
-    //                restore : {show: true},
-    //                saveAsImage : {show: true}
-    //            }
-    //        },
-    //        calculable : true,
-    //        xAxis : [
-    //            {
-    //                type : 'category',
-    //                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-    //            }
-    //        ],
-    //        yAxis : [
-    //            {
-    //                type : 'value',
-    //                splitArea : {show : true}
-    //            }
-    //        ],
-    //        series : [
-    //            {
-    //                name:'蒸发量',
-    //                type:'bar',
-    //                data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
-    //            },
-    //            {
-    //                name:'降水量',
-    //                type:'bar',
-    //                data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-    //            }
-    //        ]
-    //      }
-    //    },
-    //    {host:'hadoop7',
-    //      chartOpt:{
-    //        tooltip : { trigger: 'axis' },
-    //        legend: { data:['蒸发量','降水量'] },
-    //        toolbox: {
-    //            show : true,
-    //            feature : {
-    //                mark : {show: true},
-    //                dataView : {show: true, readOnly: false},
-    //                magicType : {show: true, type: ['line', 'bar']},
-    //                restore : {show: true},
-    //                saveAsImage : {show: true}
-    //            }
-    //        },
-    //        calculable : true,
-    //        xAxis : [
-    //            {
-    //                type : 'category',
-    //                data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-    //            }
-    //        ],
-    //        yAxis : [
-    //            {
-    //                type : 'value',
-    //                splitArea : {show : true}
-    //            }
-    //        ],
-    //        series : [
-    //            {
-    //                name:'蒸发量',
-    //                type:'bar',
-    //                data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
-    //            },
-    //            {
-    //                name:'降水量',
-    //                type:'bar',
-    //                data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-    //            }
-    //        ]
-    //      }
-    //      // ~chartOpt
-    //    }
-    //    // ~host
-    //  ]
-    //  // ~hosts
-    //};
-    // ~show
+    $scope.$watch(function(){return $scope.show.metric;}, onSelect);
 	}
 
   $scope.draw=function(host){
@@ -274,8 +175,21 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
     $scope.sql = "select * from "+$scope.sql_table;
     $scope.query();
   }
+
   function query_monitor_host() {
     $scope.sql_table = "monitor_host";
+    $scope.sql = "select * from "+$scope.sql_table;
+    $scope.query();
+  }
+  
+  function query_alarm() {
+    $scope.sql_table = "alarm";
+    $scope.sql = "select * from "+$scope.sql_table;
+    $scope.query();
+  }
+  
+  function query_alarm_assist() {
+    $scope.sql_table = "alarm_assist";
     $scope.sql = "select * from "+$scope.sql_table;
     $scope.query();
   }

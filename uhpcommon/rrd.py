@@ -77,7 +77,7 @@ class RrdWrapper(object):
 
         if not os.path.exists(rrdfile):
             raise Exception("RRD File not exists %s" % rrdfile)
-
+        
         return rrdtool.fetch(rrdfile, "AVERAGE", "--start", startTime, "--end", endTime)
 
     def get_last(self, rrdfile):
@@ -219,8 +219,18 @@ class RrdWrapper(object):
         args.extend(rrd_lines)
         apply(rrdtool.graph,args)
 
-
-
+def convert_to_xy(rrd_fetch):
+    x=[]
+    y=[]
+    time_info, columns, rows = rrd_fetch
+    start, end, interval = time_info
+    cur = start
+    for row in rows:
+        cur += interval
+        x.append(cur)
+        y.append(row[0])
+    
+    return (x,y)
 
 if __name__ == '__main__':
     rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
@@ -230,28 +240,29 @@ if __name__ == '__main__':
 
     start = '-2h'
     end = 'now'
-    
-    print(rrd_wrapper.query('cpu_user',start, end, hostname='hadoop5', clusterName='test_hadoop'))
+   
+    data=rrd_wrapper.query('load_one',start, end, hostname='hadoop5', clusterName='test_hadoop')
+    print data
+    print convert_to_xy(data)
+    #rrdfile_in = rrd_wrapper.get_rrd_file_path('bytes_in', hostname='hadoop5', clusterName='test_hadoop')
+    #rrdfile_out = rrd_wrapper.get_rrd_file_path('bytes_out', hostname='hadoop5', clusterName='test_hadoop')
+    #image_path = rrd_wrapper.get_image_path('llddd', hostname='hadoop5', clusterName='test_hadoop')
 
-    rrdfile_in = rrd_wrapper.get_rrd_file_path('bytes_in', hostname='hadoop5', clusterName='test_hadoop')
-    rrdfile_out = rrd_wrapper.get_rrd_file_path('bytes_out', hostname='hadoop5', clusterName='test_hadoop')
-    image_path = rrd_wrapper.get_image_path('llddd', hostname='hadoop5', clusterName='test_hadoop')
+    #rrd_lines = ['DEF:input=%s:sum:AVERAGE' % rrdfile_in,  #定义一个DEF变量
+    #             'LINE1:input#BB1D48:In traffic',          #使用一个DEF变量定义一个LINE1
+    #             'CDEF:bytes_in=input,8,*',                #定义一个CDEF变量
+    #             'COMMENT: ',                              #注释
+    #             'GPRINT:bytes_in:MAX:MAX in traffic\: %6.2lf %Sbps', #标注格式
 
-    rrd_lines = ['DEF:input=%s:sum:AVERAGE' % rrdfile_in,  #定义一个DEF变量
-                 'LINE1:input#BB1D48:In traffic',          #使用一个DEF变量定义一个LINE1
-                 'CDEF:bytes_in=input,8,*',                #定义一个CDEF变量
-                 'COMMENT: ',                              #注释
-                 'GPRINT:bytes_in:MAX:MAX in traffic\: %6.2lf %Sbps', #标注格式
+    #             'DEF:output=%s:sum:AVERAGE' % rrdfile_out,
+    #             'LINE2:output#002A6B:Out traffic', 
+    #             'CDEF:bytes_out=output,8,*',
+    #             'COMMENT: ',
+    #             'GPRINT:bytes_out:MAX:MAX out traffic\: %6.2lf %Sbps',
+    #             ]
 
-                 'DEF:output=%s:sum:AVERAGE' % rrdfile_out,
-                 'LINE2:output#002A6B:Out traffic', 
-                 'CDEF:bytes_out=output,8,*',
-                 'COMMENT: ',
-                 'GPRINT:bytes_out:MAX:MAX out traffic\: %6.2lf %Sbps',
-                 ]
-
-    rrd_wrapper.draw(image_path, "网络流量", rrd_lines, '-1h')
-    print rrd_wrapper.get_last(rrdfile_in)
+    #rrd_wrapper.draw(image_path, "网络流量", rrd_lines, '-1h')
+    #print rrd_wrapper.get_last(rrdfile_in)
 
 
 
