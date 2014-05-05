@@ -1,42 +1,17 @@
 <div class="row">
 
-  <!-- submenu -->
-  <div class="col-md-2 span2" style="border-right:3px dashed rgba(128, 128, 128, 0.3)">
-    <!-- 标签页切换 -->
-    <ul class="nav nav-pills nav-stacked">
-      <li class="[[item.active]]" ng-style="$last && {'margin-top':'2em'}" ng-click="setActiveMonMenu(item)" ng-repeat="item in monmenu">
-      <a style="border:1px dashed rgba(128, 128, 128, 0.5)" href="javascript:void(0)">[[item.name]]</a>
-      </li>
-    </ul>
-  </div>
-  <!-- ~submenu -->
+  <ul class="nav nav-tabs">
+    <li class="[[item2.active]]" ng-click="setActiveMonMenuTab(item, item2)" ng-repeat="item2 in item.tabs">
+    <a href="javascript:void(0)">[[item2.name]]</a>
+    </li>
+  </ul>
 
-  <div class="col-md-10 span10">
-
-    <div class="tab-content">
-
-      <div class="tab-pane fade" ng-class="activeMonMenu==item && 'in active'" ng-repeat="item in monmenu">
-        
-        <ul class="nav nav-tabs">
-          <li class="[[item2.active]]" ng-click="setActiveMonMenuTab(item, item2)" ng-repeat="item2 in item.tabs">
-          <a href="javascript:void(0)">[[item2.name]]</a>
-          </li>
-        </ul>
-
-        <div class="tab-content" style="margin-top:20px;">
-          <div class="tab-pane fade" ng-class="item2.active && 'in active'" ng-repeat="item2 in item.tabs">
-            <div class="slide-animate-container">
-              <div class="slid-animate" ng-include="item2.href || item.href" autoscroll></div>
-            </div>
-          </div>
-        </div>
-        <!-- ~tabcontent -->
+  <div class="tab-content" style="margin-top:20px;">
+    <div class="tab-pane fade" ng-class="item2.active && 'in active'" ng-repeat="item2 in item.tabs">
+      <div class="slide-animate-container">
+        <div class="slid-animate" ng-include="item2.href || item.href" autoscroll></div>
       </div>
-
     </div>
-    <!-- ~tabcontent -->
-
   </div>
-  <!-- ~tabs -->
 
 </div>

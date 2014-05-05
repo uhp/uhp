@@ -7,22 +7,30 @@ adminmenus = {
     "name":"admin", 
     "display":"管理员", 
     "href":"/admin",
-    "menus":[{"name":"admin", "display":"管理", "href":"/admin"}]
+    "menus":[{"name":"admin", "display":"管理", "href":"/admin",
+        'submenus':[
+            {"name":"service", "display":"服务", "href":"#admin-service"},
+            {"name":"host", "display":"机器", "href":"#admin-host"},
+            {"name":"task", "display":"任务", "href":"#admin-task"},
+            {"name":"setting", "display":"设置", "href":"#admin-setting"},
+            {"name":"template", "display":"模板", "href":"#admin-template"}
+        ]
+    }]
 }
 
-adminmenus['submenus'] = [
-    {"name":"service", "display":"服务", "href":"#admin-service"},
-    {"name":"host", "display":"机器", "href":"#admin-host"},
-    {"name":"task", "display":"任务", "href":"#admin-task"},
-    {"name":"setting", "display":"设置", "href":"#admin-setting"},
-    {"name":"template", "display":"模板", "href":"#admin-template"}
-]    
-    
 adminmenus['is_manager'] = config.install_manager
 adminmenus['is_monitor'] = config.install_monitor
 
 if config.install_monitor:
-    adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"#/monitor"})  
+    adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"#/monitor",
+        'submenus':[
+            {"name":"overview", "display":'概况', "href":"#/monitor/overview"},
+            {"name":"host", "display":"机器", "href":"#/monitor/host"},
+            {"name":"service", "display":"服务", "href":"#/monitor/service"},
+            {"name":"job", "display":"作业", "href":"#/monitor/job"},
+            {"name":"conf", "display":"配置", "href":"#/monitor/conf"}
+        ]
+    })
 
 monitormenus = [
     {"name":"概况", "href":"/statics/partials/monitor/overview.html",

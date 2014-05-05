@@ -2,9 +2,38 @@
 uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$location',function($scope,$rootScope,$interval,$http,$location){
 
 	$rootScope.user={}
-	$rootScope.menus={}
-	$rootScope.narmenu=''
-	$rootScope.submenus={}
+	$rootScope.menus={} //第一菜单
+	$rootScope.narmenu={} //激活的第一菜单
+	$rootScope.submenus={} //第二菜单
+  $rootScope.menu='' //激活的第一菜单项的name, admin使用
+  $rootScope.submenu='' //激活的第二菜单项的name, admin使用
+  
+  $rootScope.activeMenu = function(menu) {
+    $rootScope.narmenu = menu;
+  }
+
+  $rootScope.$on('$locationChangeSuccess', function(){
+    menu = $rootScope.narmenu;
+    if(menu.name=='monitor'){ //继续深入子目录
+      path = $location.path();
+      console.log('path:'+path);
+      path = path.replace('/'+menu.name+'/', '');
+      angular.forEach($rootScope.narmenu.submenus, function(v, k){
+        if(v.name == path){
+          v.active = 'active';  
+        }else{
+          v.active = '';
+        }
+      });
+    }
+  });
+
+  $rootScope.activeSubMenu = function(menu) {
+    angular.forEach($rootScope.narmenu.submenus, function(v, k){
+      if(v.active == 'active') v.active = '';
+    });
+    menu.active = 'active';
+  }
 
 	$http({
 	  method: 'GET',
@@ -16,32 +45,33 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
     console.log("is_manager:" + $rootScope.is_manager);
     console.log("is_monitor:" + $rootScope.is_monitor);
 	  $rootScope.user= response["user"];
-	  //TODO 判断深度连接使用adminmenus或者usermenus
-	  $rootScope.submenus = response["menus"]["submenus"];
+	  //$rootScope.submenus = response["menus"]["menus"]["submenus"];
     
     path = $location.path();
+    console.log('path1:'+path);
     if(path != null && path.length > 0){
       path = path.replace('/', '');
       $.each($rootScope.menus.menus, function(i, item){
         if(path.slice(0, item.name.length) == item.name){
           $rootScope.narmenu = item;
+          if(item.name=='monitor'){ //继续深入子目录
+            path = path.replace(item.name+'/', '');
+            angular.forEach($rootScope.narmenu.submenus, function(v, k){
+              if(v.name == path){
+                v.active = 'active';  
+              }else{
+                v.active = '';
+              }
+            });
+          }
           return false;
         }
       });
     }
-    $rootScope.narmenu.active = 'active';
 	}).error(function(data, status) {
 	  $scope.status = status;
 	});
 
-  $rootScope.activeMenu = function(menu) {
-    if($rootScope.narmenu == menu) return;
-    console.log($rootScope.narmenu)
-    if($rootScope.narmenu != '') $rootScope.narmenu.active = '';
-    $rootScope.narmenu = menu;
-    $rootScope.narmenu.active = 'active';
-    console.log($rootScope.narmenu)
-  }
 
 	$rootScope.isActiveSubmenu=function(submenu){
 		if($rootScope.submenu == submenu) return "active";
