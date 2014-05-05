@@ -874,7 +874,6 @@ class AdminBackHandler(BaseHandler):
         '''
         dir = self.get_argument("dir")
         file = self.get_argument("file")
-        file = file+".j2"
         host = self.get_argument("host")
         (content,output) = shell_lib.get_template_file(host,dir,file);
         if content != "":

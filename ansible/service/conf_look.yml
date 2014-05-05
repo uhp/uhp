@@ -1,6 +1,0 @@
-#用于web生成配置文件查看不能直接执行，请执行script/get_template_file.sh
----
-- hosts: WANT_HOST
-  tasks:
-  - name: build template remote file
-    local_action: template src=roles/conf/templates/WANT_DIR/WANT_FILE dest=/tmp/TMP_FILE

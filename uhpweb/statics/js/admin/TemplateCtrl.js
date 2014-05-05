@@ -135,7 +135,8 @@ uhpApp.controller('TemplateCtrl',['$scope','$rootScope','$http',function($scope,
 	        }
 	    }).success(function(response, status, headers, config){
 	    	if(response["ret"]=="ok"){
-	    		
+	    		$("#templateDownloadModal").modal('hide')
+                window.location.href=response['url']
 	        }
 	        else{
 	        	$scope.downloadContent = "下载"+$scope.nowhost+"的"+$scope.nowdir+"配置文件失败:"+response["msg"];
