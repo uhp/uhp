@@ -6,3 +6,9 @@
   yum: name={{item}} state=installed
   with_items: 
   - hbase-master
+
+
+- name: use the env var classpath to replace the -classpath jvm params
+  sudo: yes
+  copy: src=hbase dest=/usr/lib/hbase/bin/hbase mode=0755
+

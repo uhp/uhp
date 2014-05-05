@@ -1,0 +1,3 @@
+
+
+- { include : link_jar.yml , WANT_HOME : "{{ HDFS_HOME }}", NEW_JAR : "hadoop-hdfs-2.0.0-cdh4.2.1-1009.jar" , JAR_prefix : "hadoop-hdfs" }

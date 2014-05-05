@@ -22,7 +22,18 @@ YARN_HOME: /usr/lib/hadoop-yarn
 HBASE_HOME: /usr/lib/hbase
 HIVE_HOME: /usr/lib/hive
 
-ganglia_gmond: "hadoop1:8649"
+ganglia_gmond_host: hadoop1
+ganglia_gmond_port: 8649
+ganglia__cluster_name: test_hadoop
+ganglia__gmetad_rras:
+    - RRA:AVERAGE:0.5:4:120
+    - RRA:AVERAGE:0.5:40:1008
+ganglia__data_source:
+    - hadoop2
+    - hadoop3
+ganglia__gmetad_xml_port:8651
+
+ 
 
 #以下是启动的java参数
 #自动添加到所有服务启动的参数
@@ -60,7 +71,7 @@ hdfs__namenode2: "nn2"
     
 hdfs__dfs_namenode_support_allow_format: "true"
 hdfs__dfs_namenode_rpc_address_port: 50900
-hdfs__dfs_namenode_servicerpc_address_port: 50900
+hdfs__dfs_namenode_servicerpc_address_port: 50901
 hdfs__dfs_namenode_http_address_port: 50070
 hdfs__dfs_namenode_https_address_port: 50470
 hdfs__dfs_include_hosts: []

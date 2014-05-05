@@ -8,4 +8,4 @@
    - hadoop-lzo-cdh4
    - bigtop-utils
 
-- include: ../../jar/tasks/hadoop.yml
+- include: ../../jar/tasks/datanode.yml

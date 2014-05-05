@@ -1,8 +1,13 @@
 ---
-# Hbase master servers
+# Hbase region servers
 
-- name: Install the hbase msater packages
+- name: Install the hbase regionserver packages
   sudo: yes
   yum: name={{item}} state=installed
   with_items: 
   - hbase-regionserver
+
+- name: use the env var classpath to replace the -classpath jvm params
+  sudo: yes
+  copy: src=hbase dest=/usr/lib/hbase/bin/hbase mode=0755
+

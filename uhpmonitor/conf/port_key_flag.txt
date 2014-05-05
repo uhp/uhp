@@ -74,5 +74,13 @@
             "impala_server_beeswax_port": false,
             "impala_server_web_port": true
         }
+    },
+    "ganglia": {
+        "gmetad": {
+            "gmetad_xml_port": true
+        },
+        "gmond": {
+            "gmond_port": true 
+        }
     }
 }
