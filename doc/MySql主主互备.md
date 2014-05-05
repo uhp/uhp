@@ -127,3 +127,9 @@ CentOS 6+
 		Slave_IO_State: Waiting for master to send event
 		Slave_IO_Running: Yes
 		Slave_SQL_Running: Yes
+		
+5.      消除binlog
+
+		使用在root用户添加以下语句到crontab中
+		# uhp mysql bin log clean
+0 0 * * * mysql -h pagediff1 -proot -e 'PURGE MASTER LOGS BEFORE DATE_SUB( NOW( ), INTERVAL 3 DAY);' >/dev/null 2>&1
