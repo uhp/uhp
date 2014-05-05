@@ -2,7 +2,7 @@
 
 - hosts: QJM
   tasks:
-  - include: roles/namenode/tasks/init.yml
+  - include: roles/qjm/tasks/init.yml
 
 - hosts: NAMENODE
   tasks:
@@ -10,4 +10,4 @@
 
 - hosts: DATANODE
   tasks:
-  - include: roles/namenode/tasks/init.yml
+  - include: roles/datanode/tasks/init.yml

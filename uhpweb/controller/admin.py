@@ -274,11 +274,8 @@ class AdminBackHandler(BaseHandler):
             
         elif actionType=="instance":
             for instance in instances.split(","):
-                temp = instance.split("-")
-                app_log.info(instance)
-                if len(temp) == 2 :
-                    host = temp[0]
-                    role = temp[1]
+                (host,role) = Instance.split_instance_name(instance) 
+                if host != None and role != None : 
                     task = Task(taskType,service,host,role,taskName);    
                     session.add(task)
                     
@@ -286,8 +283,12 @@ class AdminBackHandler(BaseHandler):
                     
                     session.flush()
                     running_id.append(task.id)
+                else:
+                    self.ret("error","split instance name %s error" % instance) 
+                    return
         else:
             self.ret("error", "unsport actionType")
+            return
         session.commit()
         session.close()
         #发送消息到MQ
@@ -546,7 +547,7 @@ class AdminBackHandler(BaseHandler):
         session = database.getSession()
         instances = [];
         for instance in session.query(Instance).filter(Instance.service == service):
-            instances.append(instance.host+"-"+instance.role)
+            instances.append(instance.get_instance_name(instance.host, instance.role))
         session.close()
         if len(instances) == 0:
             self.ret("ok", "")
@@ -642,10 +643,8 @@ class AdminBackHandler(BaseHandler):
         #更新instance表的对应状态为removing
         session = database.getSession()
         for delInst in delInstance:
-            tempService = static_config.get_service_from_role(delInst["role"])
-            newIn = Instance(tempService,delInst["host"],delInst["role"])
-            newIn.status = Instance.STATUS_REMOVING
-            session.merge(newIn)
+            session.query(Instance).filter(and_(Instance.host==delInst["host"],Instance.role==delInst["role"])) \
+                    .update({Instance.status:Instance.STATUS_REMOVING})
         session.commit()
         #提交卸载活动
         running_id=[]

@@ -20,9 +20,9 @@
     - cloudera-impala.repo
     - epel.repo
 
-- name: clear yum
-  sudo: yes
-  shell: yum clean all
+#- name: clear yum
+#  sudo: yes
+#  shell: yum clean all
 
 
 
