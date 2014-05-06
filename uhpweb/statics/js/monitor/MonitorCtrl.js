@@ -115,6 +115,18 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
 }]);
 
 uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+  
+  $scope.$watch(function(){return $rootScope.activedSubMenu.activeTab;}, function(newValue, oldValue){
+    tabItem = newValue;
+    if(tabItem.func) {
+      try {
+        eval(tabItem.func);
+      } catch (err){
+        $rootScope.alert("eval " + tabItem.func + " error:" + err.message);
+      }
+    }
+  });
+
   $scope.query=function(is_refresh){
 		if( $scope.sql==null || $scope.sql=="") return;
 		$http({

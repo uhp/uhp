@@ -33,18 +33,10 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
   // 设置监控的ActivedSubMenu的ActiveTab
   $rootScope.setActiveMonMenuTab=function(tabItem){
     menuItem = $rootScope.activedSubMenu;
-    if(menuItem.activeTab == tabItem) return;
+    if(menuItem.activeTab === tabItem) return;
     if(menuItem.activeTab) menuItem.activeTab.active = '';
     menuItem.activeTab = tabItem;
     tabItem.active = 'active';
-    if(tabItem.func) {
-      try {
-        eval(tabItem.func);
-      } catch (err){
-        $rootScope.alert("eval " + tabItem.func + " error:" + err.message);
-      }
-    }
-    console.log(menuItem.activeTab);
   }
 
   function findAndActiveSubMenu(path){
@@ -72,8 +64,9 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
     angular.forEach($rootScope.narmenu.submenus, function(v, k){
       if(v.active == 'active') v.active = '';
     });
+    $rootScope.activedSubMenu = menu;
     menu.active = 'active';
-    setActiveMonMenuTab
+
     if(menu && menu.tabs){
       var noActiveTab = true;
       angular.forEach(menu.tabs, function(v, k){
@@ -82,9 +75,10 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
           return false;
         }
       });
-      if(noActiveTab) menu.tabs[0].active='active';
+      if(noActiveTab) {
+        $rootScope.setActiveMonMenuTab(menu.tabs[0]);
+      }
     }
-    $rootScope.activedSubMenu = menu;
   }
 
 	$http({
