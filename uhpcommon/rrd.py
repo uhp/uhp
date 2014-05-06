@@ -7,6 +7,7 @@ import time
 import rrdtool
 import types
 import rrd_contants
+import math
 
 import config
 
@@ -231,6 +232,18 @@ def convert_to_xy(rrd_fetch):
         y.append(row[0])
     
     return (x,y)
+
+# 从指定rras中分析出精度取值
+# rras: [ RRA:AVERAGE:0.5:4:120 ]
+def parse_precision(rras):
+    precisions = []
+    for rra in rras:
+        vs = rra.split(':')
+        interval = int(vs[3])
+        numb = int(vs[4])
+        sec = 15 * interval * numb
+        precisions.append(sec)
+    return precisions
 
 if __name__ == '__main__':
     rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)

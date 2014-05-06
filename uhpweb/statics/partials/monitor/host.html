@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-3">
     <div class="input-group">
-      <span class="input-group-addon">时间精度</span>
+      <span class="input-group-addon">时间</span>
       <select class="form-control" ng-model="show.precision" required ng-options="v.name as v.display for v in show.precisions"></select>
     </div>
   </div>
@@ -15,10 +15,28 @@
 
 <div class="row" style="margin-top:20px;">
   <div class="col-md-12">
-    <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host)" ng-repeat="host in show.hosts">
-      <span ng-bind="host.host"></span>
-      <div id="draw_[[host.host]]" style="width:450px;height:250px;border:1px solid black;"></div>
-      <div ng-init="draw(host)" class="hide"></div>
+    <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.hosts_metric">
+      <button type="button" class="btn btn-primary btn-xs" ng-click="showHost(host_metric)">[[host_metric.host]]</button>
+      <div id="draw_[[host_metric.host]]" style="width:450px;height:250px;border:1px solid black;"></div>
+      <div ng-init="draw(host_metric)" class="hide"></div>
     </div>
   </div>
 </div>
+
+<!-- 大图 -->
+<div id="bigDrawModal" class="modal fade" data-backdrop="static" aria-hidden="true">
+  <div class="modal-dialog" style="width:840px;">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</span></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="draw_big" style="width:800px;height:450px;border:1px solid gray;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ~ modal -->

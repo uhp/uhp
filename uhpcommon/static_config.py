@@ -33,7 +33,8 @@ if config.install_monitor:
             },
             {"name":"mHost", "display":"机器", "href":"#/monitor/host",
                 "tabs": [
-                    {"name":"监控指标", "href":"/statics/partials/monitor/host.html"}
+                    {"name":"监控指标", "href":"/statics/partials/monitor/host.html"},
+                    {"name":"监控机器", "href":"/statics/partials/monitor/host_host.html"}
                 ]
             },
             {"name":"mService", "display":"服务", "href":"#/monitor/service",
@@ -59,53 +60,82 @@ if config.install_monitor:
         ]
     })
 
-#monitormenus = [
-#    {"name":"概况", "href":"/statics/partials/monitor/overview.html",
-#        "tabs": [
-#            {"name":"当前状态"},
-#            {"name":"历史状态"},
-#            {"name":"告警列表"}
-#        ]
-#    },
-#    {"name":"机器", "href":"/statics/partials/monitor/host.html",
-#        "tabs": [
-#            {"name":"监控指标"}
-#        ]
-#    },
-#    {"name":"服务", "href":"/statics/partials/monitor/service.html",
-#        "tabs": [
-#            {"name":"监控指标"}
-#        ]
-#    },
-#    {"name":"作业", "href":"/statics/partials/monitor/job.html",
-#        "tabs": [
-#            {"name":"监控指标"}
-#        ]
-#    },
-#    {"name":"配置", "href":"/statics/partials/monitor/conf.html",
-#        "tabs": [
-#            {"name":"监控项", "func":"query_monitor_metric()"},
-#            {"name":"监控组", "func":"query_monitor_group()"},
-#            {"name":"监控部署", "func":"query_monitor_host()"},
-#            {"name":"监控公共变量", "func":"query_global_variate()"},
-#            {"name":"告警配置", "func":"query_alarm()"},
-#            {"name":"告警公共变量", "func":"query_alarm_assist()"}
-#        ]
-#    }
-#]
-
 monitor_show_info = {
         'precisions':[
-            {'name':'p1', 'display':'分钟'},
-            {'name':'p2', 'display':'10分钟'},
-            {'name':'p3', 'display':'小时'},
-            {'name':'p4', 'display':'天'}
+            {'name':'p1', 'display':'2小时'},
+            {'name':'p2', 'display':'一周'},
+            {'name':'p3', 'display':'一月'},
+            {'name':'p4', 'display':'一年'}
         ],
         'precision':'p1',
         'metrics':[
+            {'name':'boottime','display':'开机时间'},
+            {'name':'bytes_in','display':'网络输入'},
+            {'name':'bytes_out','display':'网络输出'},
+            {'name':'cpu_aidle','display':'cpu_aidle'},
+            {'name':'cpu_idle', 'display':'cpu_idle'},
+            {'name':'cpu_nice', 'display':'cpu_nice'},
+            {'name':'cpu_num', 'display':'CPU数量'},
+            {'name':'cpu_speed', 'display':'cpu_speed'},
+            {'name':'cpu_system', 'display':'系统使用CPU'},
+            {'name':'cpu_user', 'display':'用户使用CPU'},
+            {'name':'cpu_wio', 'display':'CPU等待IO'},
+            {'name':'dev-sda1-disk_total', 'display':'dev-sda1-disk_total'},
+            {'name':'dev-sda1-disk_used', 'display':'dev-sda1-disk_used'},
+            {'name':'dev-sda2-disk_total', 'display':'dev-sda2-disk_total'},
+            {'name':'dev-sda2-disk_used', 'display':'dev-sda2-disk_used'},
+            {'name':'disk_free', 'display':'磁盘可用空间'},
+            {'name':'disk_iostat_sda1_avgqu-sz', 'display':'disk_iostat_sda1_avgqu-sz'},
+            {'name':'disk_iostat_sda1_avgrq-sz', 'display':'disk_iostat_sda1_avgrq-sz'},
+            {'name':'disk_iostat_sda1_await', 'display':'disk_iostat_sda1_await'},
+            {'name':'disk_iostat_sda1_r_await', 'display':'disk_iostat_sda1_r_await'},
+            {'name':'disk_iostat_sda1_rkB_s', 'display':'disk_iostat_sda1_rkB_s'},
+            {'name':'disk_iostat_sda1_rrqm_s', 'display':'disk_iostat_sda1_rrqm_s'},
+            {'name':'disk_iostat_sda1_r_s', 'display':'disk_iostat_sda1_r_s'},
+            {'name':'disk_iostat_sda1_w_await', 'display':'disk_iostat_sda1_w_await'},
+            {'name':'disk_iostat_sda1_wkB_s', 'display':'disk_iostat_sda1_wkB_s'},
+            {'name':'disk_iostat_sda1_wrqm_s', 'display':'disk_iostat_sda1_wrqm_s'},
+            {'name':'disk_iostat_sda1_w_s', 'display':'disk_iostat_sda1_w_s'},
+            {'name':'disk_iostat_sda2_avgqu-sz', 'display':'disk_iostat_sda2_avgqu-sz'},
+            {'name':'disk_iostat_sda2_avgrq-sz', 'display':'disk_iostat_sda2_avgrq-sz'},
+            {'name':'disk_iostat_sda2_await', 'display':'disk_iostat_sda2_await'},
+            {'name':'disk_iostat_sda2_r_await', 'display':'disk_iostat_sda2_r_await'},
+            {'name':'disk_iostat_sda2_rkB_s', 'display':'disk_iostat_sda2_rkB_s'},
+            {'name':'disk_iostat_sda2_rrqm_s', 'display':'disk_iostat_sda2_rrqm_s'},
+            {'name':'disk_iostat_sda2_r_s', 'display':'disk_iostat_sda2_r_s'},
+            {'name':'disk_iostat_sda2_w_await', 'display':'disk_iostat_sda2_w_await'},
+            {'name':'disk_iostat_sda2_wkB_s', 'display':'disk_iostat_sda2_wkB_s'},
+            {'name':'disk_iostat_sda2_wrqm_s', 'display':'disk_iostat_sda2_wrqm_s'},
+            {'name':'disk_iostat_sda2_w_s', 'display':'disk_iostat_sda2_w_s'},
+            {'name':'disk_total', 'display':'disk_total'},
             {'name':'load_one','display':'一分钟负载'},
             {'name':'load_five','display':'五分钟负载'},
-            {'name':'load_fifteen','display':'十五分钟负载'}
+            {'name':'load_fifteen','display':'十五分钟负载'},
+            {'name':'mem_buffers', 'display':'mem_buffers'},
+            {'name':'mem_cached', 'display':'mem_cached'},
+            {'name':'mem_free', 'display':'mem_free'},
+            {'name':'mem_shared', 'display':'mem_shared'},
+            {'name':'mem_total', 'display':'mem_total'},
+            {'name':'part_max_used', 'display':'part_max_used'},
+            {'name':'pkts_in', 'display':'pkts_in'},
+            {'name':'pkts_out', 'display':'pkts_out'},
+            {'name':'proc_run', 'display':'proc_run'},
+            {'name':'proc_total', 'display':'proc_total'},
+            {'name':'swap_free', 'display':'swap_free'},
+            {'name':'swap_total', 'display':'swap_total'},
+            {'name':'tcp_closed', 'display':'tcp_closed'},
+            {'name':'tcp_closewait', 'display':'tcp_closewait'},
+            {'name':'tcp_closing', 'display':'tcp_closing'},
+            {'name':'tcp_established', 'display':'tcp_established'},
+            {'name':'tcp_finwait1', 'display':'tcp_finwait1'},
+            {'name':'tcp_finwait2', 'display':'tcp_finwait2'},
+            {'name':'tcp_lastack', 'display':'tcp_lastack'},
+            {'name':'tcp_listen', 'display':'tcp_listen'},
+            {'name':'tcp_synrecv', 'display':'tcp_synrecv'},
+            {'name':'tcp_synsent', 'display':'tcp_synsent'},
+            {'name':'tcp_synwait', 'display':'tcp_synwait'},
+            {'name':'tcp_timewait', 'display':'tcp_timewait'},
+            {'name':'tcp_unknown', 'display':'tcp_unknown'}
         ],
         'metric':'load_one' 
     }

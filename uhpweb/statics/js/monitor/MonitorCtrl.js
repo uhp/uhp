@@ -29,77 +29,109 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
 
 uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
 	$scope.init=function(){
-    // for show
+    /**
+     * for show  
+     * { precisions:[{name:,display:}], precision:'',
+     *   metrics:[{name:,display:}], metric:'',
+     *   hosts:[''], host:'',
+     *   hosts_metric:[{host:, x:, y:}],
+     *   host_metrics:[{metric:, x:, y:}]
+     * }
+     **/
     $scope.show={};
 
     $rootScope.myHttp('GET', '/monitorback/show_info', {}, function(res){
       $scope.show=res['data'];
     });
+    
+    // host_metric:{metric:,x:,y:}
+    function make_chartOpt(host_metric){
+      ////时间转换，从时间戳转为可读
+      //host_metric.r sec = parseInt($scope.show.precision.substr(1));
+      //console.debug(sec);
+      //host_metric.x = $.map(host_metric.x, function(n){
+      //  return sec>86400 ? date('n-j/H:i', n): date('H:i', n);
+      //});
+      ////转换null值为echart要求格式
+      //host_metric.y = $.map(host_metric.y, function(n){
+      //  return (n===null)?'-':n;
+      //});
+
+      //return {
+      //    tooltip : { trigger: 'axis' },
+      //    legend: { x:'left', data:[host_metric.metric] },
+      //    toolbox: {
+      //        show : true,
+      //        feature : {
+      //            mark : {show: false},
+      //            dataView : {show: false, readOnly: false},
+      //            magicType : {show: true, type: ['line', 'bar', 'stack']},
+      //            restore : {show: false},
+      //            saveAsImage : {show: true},
+      //            dataZoom:{show: true}
+      //        }
+      //    },
+      //    dataZoom: {show:true},
+      //    calculable : false,
+      //    xAxis : [ { type : 'category', data : host_metric.x } ],
+      //    yAxis : [ { type : 'value', splitArea : {show:true} } ],
+      //    series : [ { name:$scope.show.metric, type:'bar', data:host_metric.y } ]
+      //}
+    }
 
     function onSelect(){
       console.log('precision:' + $scope.show.precision);
       console.log('metric:' + $scope.show.metric);
       if(!$scope.show.precision || !$scope.show.metric) return;
-      $rootScope.myHttp('GET', '/monitorback/show_metric', 
-        {precision:$scope.show.precision, metric:$scope.show.metric}, 
+      $rootScope.myHttp('POST', '/monitorback/show_hosts_metric', 
+        {precision:$scope.show.precision, metric:$scope.show.metric, hosts:$scope.show.hosts}, 
         function(res){
-          //$scope.show.hosts=res['data'];
-          $scope.show.hosts=[];
+          $scope.show.hosts_metric=[];
           var d=res['data'];
-          function r(arr){
-            for(i=0;i<arr.length;i++){
-              if(arr[i] == null){
-                arr[i]='-';
-              }
-            }
-          }
 
           angular.forEach(d, function(v, k){
-            r(v.y);
-            this.push(
-              {host:v.host,
-                chartOpt:{
-                  tooltip : { trigger: 'axis' },
-                  legend: { x:'left', data:[$scope.show.metric] },
-                  toolbox: {
-                      show : true,
-                      feature : {
-                          mark : {show: false},
-                          dataView : {show: false, readOnly: false},
-                          magicType : {show: true, type: ['line', 'bar', 'stack']},
-                          restore : {show: false},
-                          saveAsImage : {show: true},
-                          dataZoom:{show: true}
-                      }
-                  },
-                  dataZoom: {show:true},
-                  calculable : false,
-                  xAxis : [ { type : 'category', data : v.x } ],
-                  yAxis : [ { type : 'value', splitArea : {show:true} } ],
-                  series : [ { name:$scope.show.metric, type:'bar', data:v.y } ]
-                }
-              }
-            ); // add one
-          }, $scope.show.hosts);
+            v.metric = $scop.show.metric
+            this.push( {host:v.host, chartOpt:make_chartOpt(v) }); // add one
+          }, $scope.show.hosts_metric);
         }
       );
     }
 
-    $scope.$watch(function(){return $scope.show.precision;}, onSelect);
-    $scope.$watch(function(){return $scope.show.metric;}, onSelect);
+    $scope.$watch(function(){return $scope.show.precision + $scope.show.metric;}, onSelect);
+    //$scope.$watch(function(){return $scope.show.metric;}, onSelect);
+ 
+    function onSelect2(){
+      console.log('precision:' + $scope.show.precision);
+      console.log('host:' + $scope.show.host);
+      if(!$scope.show.precision || !$scope.show.host) return;
+      $rootScope.myHttp('GET', '/monitorback/show_host_metrics', 
+        {precision:$scope.show.precision, hosts:$scope.show.hosts}, 
+        function(res){
+          $scope.show.host_metrics=[];
+          var d=res['data'];
+
+          angular.forEach(d, function(v, k){
+            this.push( {metric:v.metric, chartOpt:make_chartOpt(v) }); // add one
+          }, $scope.show.host_metrics);
+        }
+      );
+    }
 	}
 
-  $scope.draw=function(host){
-    $timeout(function(){
-        var target = $("#draw_"+host.host).get(0);
-        console.log(target);
-        if(target){
-          var myChart = echarts.init(target,{grid:{x:40,y:30,x2:10,y2:55}});
-          myChart.setOption(host.chartOpt); // ~ setOption
-        }
-      },
-      100
-    );
+  function draw(target, host_metric){
+    if($.isArray(target)) target=target[0]
+    target = target.get();
+    var myChart = echarts.init(target,{grid:{x:40,y:30,x2:10,y2:55}});
+    myChart.setOption(host_metric.chartOpt); // ~ setOption
+  }
+
+  $scope.draw=function(host_metric){
+    $timeout(function(){ draw($("#draw_"+host_metric.host), host_metric); }, 100);
+  }
+
+  $scope.showBig=function(host_metric){
+		$("#bigDrawModal").modal();
+    draw($("#draw_big"),host_metric);
   }
 
   $scope.init();
