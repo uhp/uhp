@@ -1,20 +1,5 @@
-uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
 
-  function myHttp(method, url, params, func){
-		$http({
-	    method: method,
-	    url: url,
-	    params: params || {}
-	  }).success(function(response, status, headers, config){
-      if(response["ret"] != "ok") {
-	  	  $rootScope.alert("服务失败:" + response['msg']);
-        return false;
-      }
-      func(response);
-	  }).error(function(data, status) {
-	  	$rootScope.alert("发送请求失败:" + data + ":" + status);
-	  });
-  }   
+uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
  
 	$scope.init=function(){
 		//初始化service的静态信息
@@ -32,11 +17,22 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
 	  }).error(function(data, status) {
 	  	$rootScope.alert("发送请求失败:" + data + ":" + status);
 	  });
+	}
 
+  $scope.init();
+
+}])
+
+uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+
+}]);
+
+uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+	$scope.init=function(){
     // for show
     $scope.show={};
 
-    myHttp('GET', '/monitorback/show_info', {}, function(res){
+    $rootScope.myHttp('GET', '/monitorback/show_info', {}, function(res){
       $scope.show=res['data'];
     });
 
@@ -44,7 +40,7 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
       console.log('precision:' + $scope.show.precision);
       console.log('metric:' + $scope.show.metric);
       if(!$scope.show.precision || !$scope.show.metric) return;
-      myHttp('GET', '/monitorback/show_metric', 
+      $rootScope.myHttp('GET', '/monitorback/show_metric', 
         {precision:$scope.show.precision, metric:$scope.show.metric}, 
         function(res){
           //$scope.show.hosts=res['data'];
@@ -105,32 +101,20 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
       100
     );
   }
- 
-  $scope.setActiveMonMenu=function(item){
-    if(item == $scope.activeMonMenu) return;
-    if($scope.activeMonMenu) $scope.activeMonMenu.active = '';
-    $scope.activeMonMenu = item;
-    $scope.activeMonMenu.active = 'active';
-    if(item.tabs && !item.activeTab)
-      $scope.setActiveMonMenuTab(item, item.tabs[0]);
-    console.log($scope.activeMonMenu);
-  }
 
-  $scope.setActiveMonMenuTab=function(menuItem, tabItem){
-    if(menuItem.activeTab == tabItem) return;
-    if(menuItem.activeTab) menuItem.activeTab.active = '';
-    menuItem.activeTab = tabItem;
-    tabItem.active = 'active';
-    if(tabItem.func) {
-      try {
-        eval(tabItem.func);
-      } catch (err){
-        $rootScope.alert("eval " + tabItem.func + " error:" + err.message);
-      }
-    }
-    console.log(menuItem.activeTab);
-  }
-  
+  $scope.init();
+
+}]);
+
+uhpApp.controller('MoniServiceCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+
+}]);
+
+uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+
+}]);
+
+uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
   $scope.query=function(is_refresh){
 		if( $scope.sql==null || $scope.sql=="") return;
 		$http({
@@ -313,6 +297,4 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
   $scope.edit_record = [];
   $scope.is_editing = [];
 
-  $scope.init();
-
-}])
+}]);

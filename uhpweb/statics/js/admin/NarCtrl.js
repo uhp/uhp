@@ -7,32 +7,84 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
 	$rootScope.submenus={} //第二菜单
   $rootScope.menu='' //激活的第一菜单项的name, admin使用
   $rootScope.submenu='' //激活的第二菜单项的name, admin使用
+	$rootScope.activedSubMenu={} //激活的第二菜单, monitor使用
   
-  $rootScope.activeMenu = function(menu) {
+  //公共函数
+  $rootScope.myHttp=function(method, url, params, func){
+		$http({
+	    method: method,
+	    url: url,
+	    params: params || {}
+	  }).success(function(response, status, headers, config){
+      if(response["ret"] != "ok") {
+	  	  $rootScope.alert("服务失败:" + response['msg']);
+        return false;
+      }
+      func(response);
+	  }).error(function(data, status) {
+	  	$rootScope.alert("发送请求失败:" + data + ":" + status);
+	  });
+  }   
+  
+  $rootScope.setActiveMenu = function(menu) {
     $rootScope.narmenu = menu;
   }
+ 
+  // 设置监控的ActivedSubMenu的ActiveTab
+  $rootScope.setActiveMonMenuTab=function(tabItem){
+    menuItem = $rootScope.activedSubMenu;
+    if(menuItem.activeTab == tabItem) return;
+    if(menuItem.activeTab) menuItem.activeTab.active = '';
+    menuItem.activeTab = tabItem;
+    tabItem.active = 'active';
+    if(tabItem.func) {
+      try {
+        eval(tabItem.func);
+      } catch (err){
+        $rootScope.alert("eval " + tabItem.func + " error:" + err.message);
+      }
+    }
+    console.log(menuItem.activeTab);
+  }
 
+  function findAndActiveSubMenu(path){
+    if(!path) path = $location.path();
+    var submenu = null;
+    angular.forEach($rootScope.narmenu.submenus, function(v, k){
+      var href = v.href.replace('#', '');
+      if(href == path){
+        submenu = v;
+        return false;
+      }
+    });
+    if(submenu) $rootScope.setActiveSubMenu(submenu);
+  }
+
+  // 根据新的URL Path确定ActivedSubMenu
   $rootScope.$on('$locationChangeSuccess', function(){
     menu = $rootScope.narmenu;
     if(menu.name=='monitor'){ //继续深入子目录
-      path = $location.path();
-      console.log('path:'+path);
-      path = path.replace('/'+menu.name+'/', '');
-      angular.forEach($rootScope.narmenu.submenus, function(v, k){
-        if(v.name == path){
-          v.active = 'active';  
-        }else{
-          v.active = '';
-        }
-      });
+      findAndActiveSubMenu();
     }
   });
 
-  $rootScope.activeSubMenu = function(menu) {
+  $rootScope.setActiveSubMenu = function(menu) {
     angular.forEach($rootScope.narmenu.submenus, function(v, k){
       if(v.active == 'active') v.active = '';
     });
     menu.active = 'active';
+    setActiveMonMenuTab
+    if(menu && menu.tabs){
+      var noActiveTab = true;
+      angular.forEach(menu.tabs, function(v, k){
+        if(v.active == 'active') {
+          noActiveTab = false;
+          return false;
+        }
+      });
+      if(noActiveTab) menu.tabs[0].active='active';
+    }
+    $rootScope.activedSubMenu = menu;
   }
 
 	$http({
@@ -55,14 +107,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
         if(path.slice(0, item.name.length) == item.name){
           $rootScope.narmenu = item;
           if(item.name=='monitor'){ //继续深入子目录
-            path = path.replace(item.name+'/', '');
-            angular.forEach($rootScope.narmenu.submenus, function(v, k){
-              if(v.name == path){
-                v.active = 'active';  
-              }else{
-                v.active = '';
-              }
-            });
+            findAndActiveSubMenu();
           }
           return false;
         }

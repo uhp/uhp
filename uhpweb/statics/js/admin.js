@@ -41,23 +41,23 @@ uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', fu
         })
         .when('/monitor/overview', {
             controller: 'MoniOverviewCtrl',
-            templateUrl: '/statics/partials/monitor/overview.html'
+            templateUrl: '/statics/partials/monitor/monitor.html'
         })
         .when('/monitor/host', {
             controller: 'MoniHostCtrl',
-            templateUrl: '/statics/partials/monitor/host.html'
+            templateUrl: '/statics/partials/monitor/monitor.html'
         })
         .when('/monitor/service', {
             controller: 'MoniServiceCtrl',
-            templateUrl: '/statics/partials/monitor/service.html'
+            templateUrl: '/statics/partials/monitor/monitor.html'
         })
         .when('/monitor/job', {
             controller: 'MoniJobCtrl',
-            templateUrl: '/statics/partials/monitor/job.html'
+            templateUrl: '/statics/partials/monitor/monitor.html'
         })
         .when('/monitor/conf', {
             controller: 'MoniConfCtrl',
-            templateUrl: '/statics/partials/monitor/conf.html'
+            templateUrl: '/statics/partials/monitor/monitor.html'
         })
         .otherwise({ redirectTo: '/admin-service' });
 

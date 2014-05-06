@@ -24,48 +24,75 @@ adminmenus['is_monitor'] = config.install_monitor
 if config.install_monitor:
     adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"#/monitor",
         'submenus':[
-            {"name":"overview", "display":'概况', "href":"#/monitor/overview"},
-            {"name":"host", "display":"机器", "href":"#/monitor/host"},
-            {"name":"service", "display":"服务", "href":"#/monitor/service"},
-            {"name":"job", "display":"作业", "href":"#/monitor/job"},
-            {"name":"conf", "display":"配置", "href":"#/monitor/conf"}
+            {"name":"mOverview", "display":'概况', "href":"#/monitor/overview",
+                "tabs": [
+                    {"name":"当前状态", "href":"/statics/partials/monitor/overview.html"},
+                    {"name":"历史状态", "href":"/statics/partials/monitor/overview.html"},
+                    {"name":"告警列表", "href":"/statics/partials/monitor/overview.html"}
+                ]
+            },
+            {"name":"mHost", "display":"机器", "href":"#/monitor/host",
+                "tabs": [
+                    {"name":"监控指标", "href":"/statics/partials/monitor/host.html"}
+                ]
+            },
+            {"name":"mService", "display":"服务", "href":"#/monitor/service",
+                "tabs": [
+                    {"name":"监控指标", "href":"/statics/partials/monitor/service.html"}
+                ]
+            },
+            {"name":"mJob", "display":"作业", "href":"#/monitor/job",
+                "tabs": [
+                    {"name":"监控指标", "href":"/statics/partials/monitor/job.html"}
+                ]
+            },
+            {"name":"mConf", "display":"配置", "href":"#/monitor/conf",
+                "tabs": [
+                    {"name":"监控项", "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_metric()"},
+                    {"name":"监控组", "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_group()"},
+                    {"name":"监控部署", "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_host()"},
+                    {"name":"监控公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_global_variate()"},
+                    {"name":"告警配置", "href":"/statics/partials/monitor/conf.html", "func":"query_alarm()"},
+                    {"name":"告警公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_alarm_assist()"}
+                ]
+            }
         ]
     })
 
-monitormenus = [
-    {"name":"概况", "href":"/statics/partials/monitor/overview.html",
-        "tabs": [
-            {"name":"当前状态"},
-            {"name":"历史状态"},
-            {"name":"告警列表"}
-        ]
-    },
-    {"name":"机器", "href":"/statics/partials/monitor/host.html",
-        "tabs": [
-            {"name":"监控指标"}
-        ]
-    },
-    {"name":"服务", "href":"/statics/partials/monitor/service.html",
-        "tabs": [
-            {"name":"监控指标"}
-        ]
-    },
-    {"name":"作业", "href":"/statics/partials/monitor/job.html",
-        "tabs": [
-            {"name":"监控指标"}
-        ]
-    },
-    {"name":"配置", "href":"/statics/partials/monitor/conf.html",
-        "tabs": [
-            {"name":"监控项", "func":"query_monitor_metric()"},
-            {"name":"监控组", "func":"query_monitor_group()"},
-            {"name":"监控部署", "func":"query_monitor_host()"},
-            {"name":"监控公共变量", "func":"query_global_variate()"},
-            {"name":"告警配置", "func":"query_alarm()"},
-            {"name":"告警公共变量", "func":"query_alarm_assist()"}
-        ]
-    }
-]
+#monitormenus = [
+#    {"name":"概况", "href":"/statics/partials/monitor/overview.html",
+#        "tabs": [
+#            {"name":"当前状态"},
+#            {"name":"历史状态"},
+#            {"name":"告警列表"}
+#        ]
+#    },
+#    {"name":"机器", "href":"/statics/partials/monitor/host.html",
+#        "tabs": [
+#            {"name":"监控指标"}
+#        ]
+#    },
+#    {"name":"服务", "href":"/statics/partials/monitor/service.html",
+#        "tabs": [
+#            {"name":"监控指标"}
+#        ]
+#    },
+#    {"name":"作业", "href":"/statics/partials/monitor/job.html",
+#        "tabs": [
+#            {"name":"监控指标"}
+#        ]
+#    },
+#    {"name":"配置", "href":"/statics/partials/monitor/conf.html",
+#        "tabs": [
+#            {"name":"监控项", "func":"query_monitor_metric()"},
+#            {"name":"监控组", "func":"query_monitor_group()"},
+#            {"name":"监控部署", "func":"query_monitor_host()"},
+#            {"name":"监控公共变量", "func":"query_global_variate()"},
+#            {"name":"告警配置", "func":"query_alarm()"},
+#            {"name":"告警公共变量", "func":"query_alarm_assist()"}
+#        ]
+#    }
+#]
 
 monitor_show_info = {
         'precisions':[

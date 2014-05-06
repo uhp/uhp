@@ -1,17 +1,19 @@
 <div class="row">
+  <div class="col-md-12">
 
-  <ul class="nav nav-tabs">
-    <li class="[[item2.active]]" ng-click="setActiveMonMenuTab(item, item2)" ng-repeat="item2 in item.tabs">
-    <a href="javascript:void(0)">[[item2.name]]</a>
-    </li>
-  </ul>
+    <ul class="nav nav-tabs">
+      <li class="[[item2.active]]" ng-click="setActiveMonMenuTab(item2)" ng-repeat="item2 in activedSubMenu.tabs">
+      <a href="javascript:void(0)">[[item2.name]]</a>
+      </li>
+    </ul>
 
-  <div class="tab-content" style="margin-top:20px;">
-    <div class="tab-pane fade" ng-class="item2.active && 'in active'" ng-repeat="item2 in item.tabs">
-      <div class="slide-animate-container">
-        <div class="slid-animate" ng-include="item2.href || item.href" autoscroll></div>
+    <div class="tab-content" style="margin-top:20px;">
+      <div class="tab-pane fade" ng-class="item2.active && 'in active'" ng-repeat="item2 in activedSubMenu.tabs">
+        <div class="slide-animate-container">
+          <div class="slid-animate" ng-include="item2.href" autoscroll></div>
+        </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
