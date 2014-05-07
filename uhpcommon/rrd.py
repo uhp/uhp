@@ -254,7 +254,8 @@ if __name__ == '__main__':
     start = '-2h'
     end = 'now'
    
-    data=rrd_wrapper.query('load_one',start, end, hostname='hadoop5', clusterName='test_hadoop')
+    #data=rrd_wrapper.query('load_one',start, end, hostname='hadoop5', clusterName='test_hadoop')
+    data=rrd_wrapper.query('dfs.datanode.HeartbeatsNumOps',start, end, hostname='hadoop5', clusterName='test_hadoop')
     print data
     print convert_to_xy(data)
     #rrdfile_in = rrd_wrapper.get_rrd_file_path('bytes_in', hostname='hadoop5', clusterName='test_hadoop')

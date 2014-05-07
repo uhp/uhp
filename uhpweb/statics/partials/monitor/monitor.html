@@ -3,7 +3,7 @@
 
     <ul class="nav nav-tabs">
       <li class="[[item2.active]]" ng-click="setActiveMonMenuTab(item2)" ng-repeat="item2 in activedSubMenu.tabs">
-      <a href="javascript:void(0)">[[item2.name]]</a>
+      <a href="javascript:void(0)">[[item2.display]]</a>
       </li>
     </ul>
 
@@ -17,3 +17,21 @@
 
   </div>
 </div>
+
+<!-- 大图 -->
+<div id="bigDrawModal" class="modal fade" data-backdrop="static" aria-hidden="true">
+  <div class="modal-dialog" style="width:840px;">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</span></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="draw_big" style="width:800px;height:450px;border:1px solid gray;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ~ modal -->

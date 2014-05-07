@@ -71,7 +71,22 @@ class MonitorBackHandler(BaseHandler):
         finally:
             session.close()
 
+    def _checkout_groups_metrics(self, group_names):
+        all_metric_groups = static_config.monitor_show_info['metrics']
+
+        # 指定组的指标
+        # { name:,metrics:{} }
+        groups_metrics = {} 
+        for group_name in group_names:
+            group_name = self._sure_str(group_name)
+            if group_name in all_metric_groups:
+                group_metrics = all_metric_groups[group_name]
+                group_metrics_map = dict([(m['name'],m) for m in group_metrics])
+                groups_metrics.update(group_metrics_map)
+        return groups_metrics
+
     def show_info(self):
+        group_names = self.get_arguments("groups")
         show_info = {}
         rras = self._query_var('all', 'gmetad_rras')
         precisions = rrd.parse_precision(rras)
@@ -96,15 +111,24 @@ class MonitorBackHandler(BaseHandler):
         
         rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
         cluster_name = self._query_var('all', 'cluster_name')
-        metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+        cluster_name = self._sure_str(cluster_name)
+        all_rrd_metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+
+        # 指定组的指标
+        # { name:,metrics:{} }
+        groups_metrics = self._checkout_groups_metrics(group_names)
+
         show_info['metrics'] = [] 
-        metric_name_map = dict([ (m['name'], m['display']) for m in static_config.monitor_show_info['metrics'] ])
-        for metric in metrics:
-            m = {'name':metric, 'display':metric}
-            if metric in metric_name_map:
-                m['display'] = metric_name_map[metric]
+        #metric_name_map = dict([ (m['name'], m['display']) for m in static_config.monitor_show_info['metrics'] ])
+        for metric in all_rrd_metrics:
+            if metric not in groups_metrics: 
+                app_log.debug("metric %s not in groups_metrics" % metric)
+                continue
+            app_log.debug("metric %s ok" % metric)
+            m = groups_metrics[metric] 
             show_info['metrics'].append(m)
-        show_info['metric'] = static_config.monitor_show_info['metric']
+        
+        show_info['metric'] = show_info['metrics'][0]['name']
         show_info['hosts'] = self._host_list()
         show_info['host'] = show_info['hosts'][0]
 
@@ -126,12 +150,10 @@ class MonitorBackHandler(BaseHandler):
 
     def show_hosts_metric(self):
         precision = self.get_argument("precision")
+        precision = self._sure_str(precision)
         metric = self.get_argument("metric")
+        metric = self._sure_str(metric)
         hosts = self.get_arguments("hosts")
-        if isinstance(precision, unicode): 
-            precision = precision.encode('ascii', 'ignore')
-        if isinstance(metric, unicode): 
-            metric = metric.encode('ascii', 'ignore')
         rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
@@ -144,17 +166,25 @@ class MonitorBackHandler(BaseHandler):
         cluster_name = self._sure_str(cluster_name)
         for host in hosts:
             host = self._sure_str(host)
-            rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
+            try:
+                rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
+            except Exception, e:
+                if 'RRD File not exists' in str(e): continue
+                raise e
             xy = rrd.convert_to_xy(rrd_metric)
             data.append({'host':host, 'x':xy[0], 'y':xy[1]})
         ret = {"data":data}
         self.ret("ok", "", ret);
 
+    # 显示单机的全部指标
     def show_host_metrics(self):
         precision = self.get_argument("precision")
+        precision = self._sure_str(precision)
         host = self.get_argument("host")
-        if isinstance(precision, unicode): 
-            precision = precision.encode('ascii', 'ignore')
+        host = self._sure_str(host)
+        group_names = self.get_arguments("groups")
+        
+        
         rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
@@ -166,9 +196,17 @@ class MonitorBackHandler(BaseHandler):
         cluster_name = self._query_var('all', 'cluster_name')
         cluster_name = self._sure_str(cluster_name)
         metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+        
+        groups_metrics = self._checkout_groups_metrics(group_names)
+
         for metric in metrics:
+            if metric not in groups_metrics: continue
             metric = self._sure_str(metric)
-            rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
+            try:
+                rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
+            except Exception, e:
+                if 'RRD File not exists' in str(e): continue
+                raise e
             xy = rrd.convert_to_xy(rrd_metric)
             data.append({'metric':metric, 'x':xy[0], 'y':xy[1]})
         ret = {"data":data}

@@ -148,6 +148,13 @@ function getZooid(host){
 }
 
 /**
+ * 把值Boolen
+ */
+function bool(v){
+  if($.isArray(v)) return v.length > 0;
+  return !!v;
+}
+/**
  * 和PHP一样的时间戳格式化函数
  * @param  {string} format    格式
  * @param  {int}    timestamp 要格式化的时间 默认为当前时间

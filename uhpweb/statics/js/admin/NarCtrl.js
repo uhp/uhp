@@ -38,6 +38,16 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
     menuItem.activeTab = tabItem;
     tabItem.active = 'active';
   }
+  
+  // 设置监控的ActivedSubMenu的ActiveTab
+  $rootScope.setActiveMonMenuTabByName=function(tabName){
+    angular.forEach($rootScope.activedSubMenu.tabs, function(v, k){
+      if(v.name == tabName){
+        $rootScope.setActiveMonMenuTab(v);
+        return false;
+      }
+    });
+  }
 
   function findAndActiveSubMenu(path){
     if(!path) path = $location.path();
