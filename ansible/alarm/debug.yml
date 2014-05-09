@@ -1,9 +1,0 @@
-
-- hosts:
-  - platform2
-  tasks: 
-  - include:  roles/gmond/tasks/start.yml
-
-
-
-#  - include: roles/gmond/tasks/conf.yml

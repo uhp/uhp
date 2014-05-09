@@ -23,6 +23,10 @@ from model.services import Service
 from model.callback import CallBack
 from model.alarm import *
 from model.monitor import *
+from model.applicationRecord import ApplicationRecord
+from model.nmRecord import NmRecord
+from model.rmRecord import RmRecord
+from model.metricsRecord import MetricsRecord
 
 engine = None
 
@@ -69,7 +73,12 @@ def get_all_models():
     models.append(MonitorMetric)
     models.append(MonitorGroup)
     models.append(MonitorHost)
-    
+
+    models.append(ApplicationRecord)
+    models.append(RmRecord)
+    models.append(NmRecord)
+    models.append(MetricsRecord)
+
     return models
 
 def get_model_from_name(name):

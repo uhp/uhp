@@ -6,7 +6,10 @@ import urllib2
 import json
 import threading
 import re
+import time
 
+def get_local_time():
+    return time.strftime('%Y-%m-%d %X',time.localtime(time.time()))
 
 def get_http(url , timeout = 10):
     try:

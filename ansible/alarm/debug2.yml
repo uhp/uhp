@@ -1,9 +1,0 @@
-
-- hosts:
-  - hadoop5
-  tasks: 
-  - include:  roles/gmond/tasks/setup.yml
-
-
-
-#  - include: roles/gmond/tasks/conf.yml

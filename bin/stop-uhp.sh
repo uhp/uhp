@@ -16,4 +16,5 @@ sh bin/stop-web.sh
 sh bin/stop-worker.sh
 sh bin/stop-monitor.sh
 sh bin/stop-alarm.sh
+sh bin/stop-collect.sh
 

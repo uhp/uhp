@@ -23,9 +23,6 @@ connection = "mysql://uhp:uhp@hadoop2:3306/uhp?charset=utf8"
 mq_host="localhost"
 mq_port=4000
 
-rmhost="vdc21"
-rmport="50888"
-
 #uhpweb dir
 web_log_dir = os.path.join(uhphome,"logs","web")
 web_log_file = "uhpweb.log"
@@ -59,6 +56,8 @@ mail_passwd = None
 mail_send_interval = 600
 mail_interval = 60
 
+#for collect
+collect_interval = 600
 
 #USE FOR DEBUG
 

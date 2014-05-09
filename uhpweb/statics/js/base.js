@@ -68,6 +68,14 @@ function datetime_to_unix(datetime){
     var now = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
     return parseInt(now.getTime()/1000);
 }
+//********
+function toGSize(bytes){
+    return (bytes/(1024*1024*1024)).toFixed(2);
+}
+function toMSize(bytes){
+    return (bytes/(1024*1024)).toFixed(2);
+}
+//时间
 function unix_to_datetime(unix) {
     var now = new Date(parseInt(unix));
     return now.getFullYear()+"-"+padZero(now.getMonth()+1,2)+"-"+padZero(now.getDate(),2)+" "

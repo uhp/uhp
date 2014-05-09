@@ -1,8 +1,8 @@
 
 - hosts: 
   - hadoop2
-  - platform2
   tasks:
-  - include: roles/prepare/tasks/repo.yml
+  - include: roles/regionserver/tasks/setup.yml
+  - include: roles/hbasemaster/tasks/setup.yml
 
 

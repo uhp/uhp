@@ -1364,7 +1364,7 @@ select[multiple].input-hg {
 }
 .form-group {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 .form-horizontal .control-label,
 .form-horizontal .radio,

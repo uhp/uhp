@@ -1,5 +1,86 @@
 <div>
-
-  <label>Job</label>
-
+    <button class="btn btn-default" ng-click="runningQuery()">实时更新</button>
+</div>
+<div ng-show="has_query">
+    <div>
+        <p>正在运行[[ app_state['appsRunning'] ]]个应用，分配了[[ app_state['containersAllocated'] ]]个container，使用了[[ app_state['allocatedMB'] ]]MB内存,剩余[[ app_state['availableMB']-app_state['allocatedMB'] ]]MB内存。存活[[ app_state['activeNodes'] ]]个NodeManager。</p>
+    </div>
+    <div>
+    <b>运行的应用</b>
+    <div class="panel-group" id="running-accordion">
+        <div class="panel panel-default" ng-repeat=" (queuename,applist) in queues">
+            <div class="panel-heading">
+                <h9 class="panel-title">
+                    队列([[ queuename ]]):一共运行了[[ queueMeta[queuename]['apps'] ]]个应用.采集了[[ queueMeta[queuename]['collect_app'] ]]个应用的数据，正在运行[[ queueMeta[queuename]['run_map'] ]]个Map和[[ queueMeta[queuename]['run_reduce'] ]]个Reduce,还需要运行[[ queueMeta[queuename]['todo_map'] ]]个Map和[[ queueMeta[queuename]['todo_reduce'] ]]个Reduce
+                </h9>
+            </div>
+            <div class="panel-collapse  in collapse">
+                <div class="panel-body" style="padding:1px"> 
+                    <table class="table table-bordered table-striped table-hover" style="font-size:14px;margin-bottom:1px">
+                        <thead>
+                            <tr>
+                                <th>应用id</th>
+                                <th>用户</th>
+                                <th>名称</th>
+                                <th>AM机器</th>
+                                <th>提交至今</th>
+                                <th>进度</th>
+                                <th>Am运行</th>
+                                <th colspan="6">Map(总数,待运行,正运行,失败,杀死,成功)</th>
+                                <th colspan="6">Reduce(总数,待运行,正运行,失败,杀死,成功)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="(appid,info) in applist">
+                                <td><a href=http://[[rmhost]]:[[rmport]]/proxy/[[appid]]>[[ info['id'] ]]</a></td>
+                                <td>[[ info['user'] ]]</td>
+                                <td style="width:250px;word-break:break-all;">[[ info['name'] ]]</td>
+                                <td>[[ info['amHostHttpAddress'] ]]</td>
+                                <td>[[ info['elapsedTime'] ]]</td>
+                                <td>[[ info['progress'] ]]</td>
+                                <td>[[ info['amTime'] ]]</td>
+                                <td>[[ info['mapsTotal'] ]]</td>
+                                <td>[[ info['mapsPending'] ]]</td>
+                                <td>[[ info['mapsRunning'] ]]</td>
+                                <td>[[ info['failedMapAttempts'] ]]</td>
+                                <td>[[ info['killedMapAttempts'] ]]</td>
+                                <td>[[ info['successfulMapAttempts'] ]]</td>
+                                <td>[[ info['reducesTotal'] ]]</td>
+                                <td>[[ info['reducesPending'] ]]</td>
+                                <td>[[ info['reducesRunning'] ]]</td>
+                                <td>[[ info['failedReduceAttempts'] ]]</td>
+                                <td>[[ info['killedReduceAttempts'] ]]</td>
+                                <td>[[ info['successfulReduceAttempts'] ]]</td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+    	<div class="span12">
+    		<b>等待的应用</b>
+    		<table class="table table-bordered table-striped table-hover"  style="font-size:14px">
+    			<thead>
+    				<tr>
+    					<th>应用id</th>
+    					<th>用户</th>
+    					<th>名称</th>
+    					<th>队列</th>
+    					<th>提交至今时间</th>
+    				</tr>
+    			</thead>
+    			<tbody>
+                    <tr ng-repeat="app in waitting_app">
+                        <td>[[ app['id'] ]]</td>
+                        <td >[[ app['user'] ]]</td>
+                        <td style="width:350px;word-break:break-all;">[[ app['name'] ]]</td>
+                        <td>[[ app['queue'] ]]</td>
+                        <td>[[ app['elapsedTime'] ]]</td>
+                    </tr>
+    			</tbody>
+    		</table>
+    	</div>
+    </div>
 </div>

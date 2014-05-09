@@ -46,7 +46,10 @@ if config.install_monitor:
             },
             {"name":"mJob", "display":"作业", "href":"#/monitor/job",
                 "tabs": [
-                    {"name":"mtJob", "display":"监控指标", "href":"/statics/partials/monitor/job.html"}
+                    {"name":"mtJobRun", "display":"当前作业", "href":"/statics/partials/monitor/job.html"},
+                    {"name":"mtJobRm", "display":"RM指标", "href":"/statics/partials/monitor/rm.html"},
+                    {"name":"mtJobNm", "display":NM指标", "href":"/statics/partials/monitor/nm.html"},
+                    {"name":"mtJobApp", "display":"应用查询", "href":"/statics/partials/monitor/app.html"}
                 ]
             },
             {"name":"mConf", "display":"配置", "href":"#/monitor/conf",

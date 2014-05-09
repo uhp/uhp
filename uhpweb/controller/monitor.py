@@ -5,6 +5,7 @@ import logging
 import time
 import copy
 import math
+from decimal import Decimal
 
 import tornado
 from sqlalchemy.orm import query,aliased
@@ -303,3 +304,181 @@ class MonitorBackHandler(BaseHandler):
             data.append({'metric':metric, 'x':xy[0], 'y':xy[1]})
         ret = {"data":data}
         self.ret("ok", "", ret);
+
+    def _get_rmhost(self):
+        return "hadoop2"
+
+    def _get_rmport(self):
+        return "50088"
+    #for running job
+
+    def app_running_state(self):
+        url = "http://%s:%s/ws/v1/cluster/metrics" %( self._get_rmhost(),self._get_rmport() )
+        metrics = util.get_http_json(url)
+        self.ret("ok","",metrics)
+
+    def app_running(self):
+        url = "http://%s:%s/ws/v1/cluster/apps?state=RUNNING" %(self._get_rmhost(),self._get_rmport())
+        runningApp = util.get_http_json(url)
+        queues = {}
+        if runningApp != None and runningApp.has_key("apps") and runningApp["apps"]!=None and  runningApp["apps"].has_key("app"):
+            for app in runningApp["apps"]["app"]:
+                queue = app["queue"]
+                appid = app['id']
+                if not queues.has_key(queue):
+                    queues[queue] = {}
+                queues[queue][appid]=app
+        result={"queues":queues,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
+        self.ret("ok","",result)
+
+    def app_waitting(self):
+        url = "http://%s:%s/ws/v1/cluster/apps?state=ACCEPTED" %(self._get_rmhost(),self._get_rmport() )
+        waittingApp = util.get_http_json(url)
+        if waittingApp.has_key("apps") :
+            apps = waittingApp["apps"]
+        else:
+            apps = []
+        result={"waitting":apps,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
+        self.ret("ok","",result) 
+
+    def app_proxy(self):
+        appid = self.get_argument("appid") 
+        url = ("http://%s:%s/proxy/%s/ws/v1/mapreduce/jobs/" %(self._get_rmhost(),self._get_rmport(),appid))
+        jobInfo = util.get_http_json(url)
+        keyList = ["mapsTotal","mapsPending","mapsRunning","failedMapAttempts","killedMapAttempts","successfulMapAttempts",
+                   "reducesTotal","reducesPending","reducesRunning","failedReduceAttempts","killedReduceAttempts","successfulReduceAttempts"]
+        if jobInfo:
+            result = {}
+            temp = jobInfo["jobs"]["job"][0]
+            result["amTime"] = temp["elapsedTime"]
+            for key in keyList:
+                result[key] = temp[key]
+            self.ret("ok","",result)
+        else:
+            result = {}
+            result["amTime"] ="x"
+            for key in keyList:
+                result[key] = "x"
+            self.ret("ok","",result)
+
+    #for rm query
+    def rm_query(self):
+        fields = self.get_argument("fields",""); 
+        fields = fields.split(",")
+        happenTimeMax = self.get_argument("happenTimeMax",0);
+        happenTimeMin = self.get_argument("happenTimeMin",0);
+        happenTimeSplit = self.get_argument("happenTimeSplit",600);
+        if len(fields)!=0 :
+            where = "1" 
+            if happenTimeMax != 0:
+                where = where + " and happenTime < "+str(happenTimeMax)
+            if happenTimeMin != 0:
+                where = where + " and happenTime > "+str(happenTimeMin)
+        
+            sqlFields=""
+            for field in fields:
+                sqlFields = sqlFields+" , sum("+field+") as " + field
+        
+            sql = ("select (happenTime/%s)*%s as printTime  %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
+            session = database.getSession()
+            cursor = session.execute(sql)
+            queryResult = []
+            for record in cursor:
+                temp = []
+                for value in record:
+                    app_log.info(type(value))
+                    if isinstance(value,Decimal):
+                        app_log.info("into deci")
+                        temp.append(float(value))    
+                    else:
+                        temp.append(value)
+                queryResult.append(temp)
+            app_log.info(queryResult)
+        
+            #特殊处理mapTime和reduceTime
+            #由于前面有一个printTime的查询，所以偏移一位
+            fieldOffset = 1 
+            if "mapTime" in fields and "mapNum"  in fields :
+                timeIndex = fields.index("mapTime") + fieldOffset
+                numIndex = fields.index("mapNum") + fieldOffset
+                for record in queryResult:
+                    if record[numIndex] != None and record[numIndex] != 0:
+                        record[timeIndex] = record[timeIndex] / record[numIndex] 
+        
+            if "reduceTime" in fields and "reduceNum"  in fields :
+                timeIndex = fields.index("reduceTime") + fieldOffset
+                numIndex = fields.index("reduceNum") + fieldOffset
+                for record in queryResult:
+                    if record[numIndex] != None and record[numIndex] != 0:
+                        record[timeIndex] = record[timeIndex] / record[numIndex]
+        else:
+            sql = ""
+            queryResult = []
+
+        result= {"result":queryResult,"sql":sql}
+        self.ret("ok","",result)               
+                    
+    #for nm query
+
+    
+    #for app query
+    def app_sum(self):
+        where = self.get_argument("where","1").replace("o|o","%")
+        session = database.getSession()
+        sumKey=["mapsTotal","mapsCompleted","successfulMapAttempts","killedMapAttempts","failedMapAttempts",
+                "localMap","rackMap",
+                "reducesTotal","reducesCompleted","successfulReduceAttempts","killedReduceAttempts",
+                "failedReduceAttempts",
+                "fileRead","fileWrite","hdfsRead","hdfsWrite"]
+        select = "count(appid) as appidCount"
+        for key in sumKey:
+            select = select +" , sum("+key+") as "+key+"Sum "
+        sql = (("select "+select+" from app where %s ") % (where))
+        app_log.info(sql)
+        cursor = session.execute(sql)
+        resultRecord = {}
+        temp = []
+        for record in cursor:
+            app_log.info(record)
+            for value in record:
+                temp.append(value)
+                app_log.info(value)
+        for (key,value) in zip(cursor.keys(),temp):
+            if value != None:
+                resultRecord[key]=int(value)
+            else:
+                resultRecord[key]=0
+        session.close()
+        result={"resultRecord":resultRecord}
+        
+        self.ret("ok","",result)
+
+    def app_list(self):
+        where = self.get_argument("where","1").replace("o|o","%")
+        offset = self.get_argument("offset",0)
+        limit = self.get_argument("limit",50)
+        orderField = self.get_argument("orderField","appid")
+        orderDirection = self.get_argument("orderDirection","desc")
+        session = database.getSession()
+        selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
+                   "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",
+                   "fileRead","fileWrite","hdfsRead","hdfsWrite"]
+        if orderField=="appid" :
+            selectKeyArray.append("CAST(SUBSTR(appid,27 ) AS SIGNED) as appnum")
+            orderby = "appnum "+orderDirection
+        else:
+            orderby = orderField+" "+orderDirection 
+        selectKey = ",".join(selectKeyArray)
+        sql = ("select "+selectKey+" from app where %s order by %s LIMIT %s OFFSET %s " % (where,orderby,limit,offset))
+        cursor = session.execute(sql)
+        queryResult = []
+        for record in cursor:
+            temp = []
+            for v in record:
+                temp.append(v)
+            queryResult.append(temp)
+        #queryResult = cursor.fetchall()
+        session.close()
+        result={"applist":queryResult,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
+        self.ret("ok","",result)
+
