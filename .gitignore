@@ -11,7 +11,7 @@ uhpcommon/config.py
 vpy/
 logs/
 pids/
-build/
+#build/
 develop-eggs/
 dist/
 eggs/
