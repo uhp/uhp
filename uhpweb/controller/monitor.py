@@ -134,7 +134,99 @@ class MonitorBackHandler(BaseHandler):
 
         ret = {"data":show_info}
         self.ret("ok", "", ret);
-   
+  
+    # [{name:, roles:{role:[instance]}}]
+    def _query_active_services(self):
+        session = database.getSession()
+        try:
+            active = []
+            for service in session.query(Service):
+                if service.status != Service.STATUS_ACTIVE : continue
+                instances = session.query(Instance).filter(Instance.service == service.service)
+                service = {'name':service.service, 'roles':{}}
+                for ins in instances:
+                    if ins.role not in service['roles']:
+                        service['roles'][ins.role] = []
+                    service['roles'][ins.role].append(ins.host)
+                    
+                active.append(service)
+            return active
+        finally:
+            session.close()
+
+    # services overview
+    def services_metrics(self):
+        # [{name:, roles:{role:[instance]}}]
+        services = self._query_active_services()
+        services_metrics = copy.deepcopy(static_config.services_metrics)
+        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
+
+        for service in services:
+            service_shows = None
+            for item in services_metrics:
+                if item['name'] == service['name']:
+                    service_shows = item['show']
+            if  service_shows is None: continue
+
+            for show in service_shows:
+                hosts = service['roles'][show['role']]
+                if show['type'] == 'instance-status':
+                    instance_status =  []
+                    #找到实体
+                    metric = show['metric']
+                    metric = self._sure_str(metric)
+                    for host in hosts:
+                        host = self._sure_str(host)
+                        (ts, value) = (None, None)
+                        try:
+                            (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
+                            if value is None: continue
+                            instance_status.append([host,value])
+                        except Exception, e:
+                            pass
+                    if instance_status:
+                        show['instance-status'] = instance_status
+                    else:
+                        show.clear()
+                    continue
+
+                if show['type'] == 'list':
+                    show['list'] =  []
+                    metrics = []
+                    if 'metric-groups' in show:
+                        for group in show['metric-groups']:
+                            metrics.extend(static_config.monitor_show_info['metrics'][group])
+                    for metric in metrics:
+                        metric_name = self._sure_str(metric['name'])
+                        for host in hosts: 
+                            host = self._sure_str(host)
+                            (ts, value) = (None, None)
+                            try:
+                                (ts, value) = rrd_wrapper.query_last(metric_name, hostname=host, clusterName=cluster_name)
+                                if value is None: continue
+                                show['list'].append([metric, value])
+                            except Exception, e:
+                                pass
+                            break
+                    if not show['list']:
+                        show.clear()
+                    continue
+            
+            # 清理空值
+            for i in range(len(service_shows) - 1, -1, -1):
+                if not service_shows[i]:
+                    service_shows.pop(i)
+
+        # 清理空值
+        for i in range(len(services_metrics) - 1, -1, -1):
+            if not services_metrics[i]['show']:
+                services_metrics.pop(i)
+        
+        ret = {"data":services_metrics}
+        self.ret("ok", "", ret);
+
     # 获取所有的机器
     def _host_list(self):
         session = database.getSession()

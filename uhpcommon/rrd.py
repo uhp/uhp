@@ -19,6 +19,11 @@ class RrdWrapper(object):
         self.image_rootdir = image_rootdir
         self.cluster_name = cluster_name
 
+    # see get_last
+    def query_last(self, metricName, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        rrdfile_in = self.get_rrd_file_path(metricName, hostname=hostname, clusterName=clusterName)
+        return self.get_last(rrdfile_in)
+
     def query(self, metricName, startTime, endTime='now', hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
         """ Get dictionary with proper data from given period of time and for given node
 
