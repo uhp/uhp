@@ -5,5 +5,8 @@
   sudo: yes
   yum: name={{item}} state=installed
   with_items: 
+   - hadoop-hdfs
+   - hbase
+   - hive
    - hue
    - hue-server
