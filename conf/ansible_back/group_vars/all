@@ -90,6 +90,9 @@ hdfs__dfs_namenode_shared_edits_dir: "journalhdfs1"
 hdfs__dfs_datanode_data_dir:
     - /uhp/all_data_dir
         
+#FOR httpfs port
+hdfs__httpfs_http_port: 14000
+hdfs__httpfs_admin_port: 14001
 
 yarn__YARN_RESOURCEMANAGER_OPTS: " -Xmx1024m "
 yarn__YARN_NODEMANAGER_OPTS: " -Xmx1024m "
@@ -196,5 +199,28 @@ impala__impala_server_web_port: 25000
 impala__impala_server_beeswax_port: 21000
 impala__impala_server_hs2_port: 21050
 impala__impala_server_mem_limit: 2G
+
+
+#FOR HUE
+hue__web_port: 8888
+hue__time_zone: Asia/Shanghai
+
+hue__smtp_host: mail.ucweb.com
+hue__smtp_port: 587
+hue__smtp_user: hadoop
+hue__smtp_passwd: Ucweb5527604
+hue__smtp_from: hadoop@ucweb.com
+
+
+hue__beeswax_server_port: 8002
+hue__beeswax_meta_server_port: 8003
+
+#postgresql_psycopg2, mysql, or sqlite3
+hue__database_type: mysql
+hue__database_host: hadoop2
+hue__database_port: 3306
+hue__database_user: hue
+hue__database_password: hue
+hue__database_db: hue
 
 

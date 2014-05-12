@@ -1,0 +1,10 @@
+---
+# Playbook for  Hadoop master servers
+
+- name: remove the hue sever
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - hue
+   - hue-server
+

@@ -1,0 +1,5 @@
+---
+
+- name: init the httpfs 
+  shell: echo "nothing to do"
+

@@ -1,0 +1,7 @@
+---
+
+- name: init the database 
+  sudo: yes
+  shell: cd /tmp; sudo -u hue /usr/share/hue/build/env/bin/hue syncdb --noinput
+
+

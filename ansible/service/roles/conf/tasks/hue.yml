@@ -1,0 +1,10 @@
+
+- name: copy hue conf
+  sudo: yes
+  template: src=hue/{{item}}.j2 dest=/etc/hue/{{item}}
+  with_items:
+    - hue.ini
+    - log4j.properties
+    - log.conf
+
+    

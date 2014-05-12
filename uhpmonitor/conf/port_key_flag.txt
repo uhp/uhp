@@ -21,6 +21,9 @@
         "qjm": {
             "qjournal_port": true,
             "qjournal_http_port": false
+        },
+        "httpfs":{
+            "httpfs_http_port" : true
         }
     },
     "yarn": {
@@ -74,5 +77,11 @@
             "impala_server_beeswax_port": false,
             "impala_server_web_port": true
         }
+    },
+    "hue": {
+        "hueserver": {
+            "web_port": true
+        }
     }
+
 }

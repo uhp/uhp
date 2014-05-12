@@ -37,7 +37,7 @@ services = [
      "dependence" : []
      },
     {"name":"hdfs", 
-     "role": ["qjm","namenode","datanode"],
+     "role": ["qjm","namenode","datanode","httpfs"],
      "actions":[{"name":"format","display":"格式化","tooptip":"格式化所有组件。谨慎执行！"},
                 {"name":"init","display":"初始化","tooptip":"创建角色需要的目录"},
                 {"name":"start","display":"启动","tooptip":""},
@@ -112,6 +112,21 @@ services = [
      "dependence" : ["hdfs","hive"],
      "web" : [{"role":"impalastatestore","port":"impala_state_store_web_port"}]
      },     
+     {"name":"hue",
+     "role":["hueserver"],
+     "actions":[{"name":"initdb","display":"初始化数据库","tooptip":""},
+                {"name":"start","display":"启动","tooptip":""},
+                {"name":"stop","display":"停止","tooptip":""},
+                {"name":"restart","display":"重启","tooptip":""},
+                {"name":"check","display":"检查","tooptip":"执行简单查询,检查impala是否可用。"}
+                ], 
+     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
+                        {"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : ["hive"],
+     "web" : [{"role":"hueserver","port":"web_port"}]
+     },
      {"name":"client",
      "role":["zookeeper-client","hadoop-client","hbase-client","hive-client","impala-client"],
      "actions":[], 
