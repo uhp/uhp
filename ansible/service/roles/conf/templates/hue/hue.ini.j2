@@ -234,7 +234,11 @@
       # This should be the web service root URL, such as
       # http://namenode:50070/webhdfs/v1
       #webhdfs_url= http://hadoop2:50070/webhdfs/v1/
+{% if groups.has_key('HTTPFS') %}
       webhdfs_url= http://{{groups.HTTPFS[0]}}:{{hdfs__httpfs_http_port}}/webhdfs/v1/
+{% else %}
+      webhdfs_url= http://localhost:{{hdfs__httpfs_http_port}}/webhdfs/v1/
+{% endif %}
 
       # Settings about this HDFS cluster. If you install HDFS in a
       # different location, you need to set the following.
@@ -283,7 +287,11 @@
 
     [[[default]]]
       # Enter the host on which you are running the ResourceManager
+{% if groups.has_key('RESOURCEMANAGER') %}
       resourcemanager_host={{ groups.RESOURCEMANAGER[0] }}
+{% else %}
+      resourcemanager_host=localhost
+{% endif %}
       # The port where the ResourceManager IPC listens on
       resourcemanager_port={{ yarn__yarn_rm_port }}
       # Whether to submit jobs to this cluster
@@ -305,13 +313,21 @@
       hadoop_conf_dir=/etc/hadoop/conf
 
       # URL of the ResourceManager API
+{% if groups.has_key('RESOURCEMANAGER') %}
       resourcemanager_api_url=http://{{ groups.RESOURCEMANAGER[0] }}:{{ yarn__yarn_rm_webapp_port }}
+{% else %}
+      resourcemanager_api_url=http://localhost:{{ yarn__yarn_rm_webapp_port }}
+{% endif %} 
 
       # URL of the ProxyServer API
       ## proxy_api_url=http://localhost:8088
 
       # URL of the HistoryServer API
+{% if groups.has_key('HISTORYSERVER') %}
       history_server_api_url=http://{{ groups.HISTORYSERVER[0] }}:{{ yarn__mapreduce_jobhistory_webapp_port }}
+{% else %}
+      history_server_api_url=http://localhost:{{ yarn__mapreduce_jobhistory_webapp_port }}
+{% endif %}
 
 
 ###########################################################################
@@ -405,7 +421,11 @@
 [impala]
 
    # Host of the Impala Server
+{% if groups.has_key('IMPALASERVER') %}
    server_host={{ groups.IMPALASERVER[0] }}
+{% else %}
+   server_host=localhost
+{% endif %}
 
    # Port of the Impala Server
    server_port={{ impala__impala_server_beeswax_port }}
