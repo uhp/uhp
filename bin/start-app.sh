@@ -18,6 +18,21 @@ app=${app#*-}
 
 mkdir -p logs/$app pids/$app
 
+# check pid file
+pidfile=$(ls ./pids/${app}/*.pid 2>/dev/null)
+[ -n "$pidfile" ] && {
+    echo "WARN: pidfile[$pidfile] exists!" 
+    pid=$(cat ./pids/${app}/*.pid 2>/dev/null)
+    exists=`ps u|awk '{print $2}'|grep ^$pid$|wc -l`
+    if [ "$exists" != "0" ]; then
+        echo "ERROR: Progress is exists!" 
+        exit $exists
+    fi
+    # 删除不存在的PID
+    echo "WARN: try run it"
+    rm -f $pidfile
+}
+
 chmod a+x ./uhp$app/$app.py
 ./uhp$app/$app.py
 
