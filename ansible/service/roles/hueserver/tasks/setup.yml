@@ -10,3 +10,5 @@
    - hive
    - hue
    - hue-server
+
+- include: ../../jar/tasks/hive.yml
