@@ -18,11 +18,11 @@ from model.instance import Instance
 #将ansible的变量转换为数据库的变量和组关系
 def conf_to_db(file):
     print "import %s into db" % file
-    return
     
     session=database.getSession()
     stream=open(file,"r")
     vars=yaml.load(stream)
+    group="all"
     for name in vars:
         value = vars[name]
         
