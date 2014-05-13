@@ -248,7 +248,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 		var instanceList = [] ; 
 		for(var host in $scope.chosenHost){
 			if( $scope.chosenHost[host]) {
-				instanceList.push(host+"-prepare");
+				instanceList.push(host+"(prepare)");
 			}
 		}
 		$http({
