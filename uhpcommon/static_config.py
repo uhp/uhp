@@ -41,8 +41,8 @@ if config.install_monitor:
             {"name":"mService", "display":"服务", "href":"#/monitor/service",
                 "tabs": [
                     {"name":"mtServiceOverview",    "display":"服务概览", "href":"/statics/partials/monitor/service_overview.html"},
-                    {"name":"mtServiceHostsMetric", "display":"服务指标", "href":"/statics/partials/monitor/service.html"},
-                    {"name":"mtServiceHostMetrics", "display":"服务实体", "href":"/statics/partials/monitor/service_host.html"}
+                    {"name":"mtServiceHostsMetric", "display":"服务指标", "href":"/statics/partials/monitor/host.html"},
+                    {"name":"mtServiceHostMetrics", "display":"服务实体", "href":"/statics/partials/monitor/host_host.html"}
                 ]
             },
             {"name":"mJob", "display":"作业", "href":"#/monitor/job",

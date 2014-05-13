@@ -1,37 +1,39 @@
-<div class="row" style="margin-top:20px;">
-  <div class="col-md-12">
-    <h6>机器负载</h6>
-    <div id="all_host_load" style="width:800px;height:250px;"></div>
-    <div ng-init="draw_1()"></div>
+<div class="row" style="margin-bottom:20px;">
+  <div class="col-md-3">
+    <div class="input-group">
+      <span class="input-group-addon">时间</span>
+      <select class="form-control" ng-model="show.precision" required ng-options="v.name as v.display for v in show.precisions"></select>
+    </div>
   </div>
 </div>
 
-<div class="row" style="margin-top:20px;">
-  <div class="col-md-12">
-    <h6>磁盘使用率</h6>
-    <div id="all_disk_use" style="width:800px;height:250px;"></div>
-    <div ng-init="draw_2()"></div>
+<!-- 健康度历史  -->
+<div class="row" ng-repeat="host_metric in show.all_health_history" ng-init="iA=$index">
+  <div ng-switch='host_metric.type'>
+    <!-- single -->
+    <div class="col-md-12" ng-switch-when='single'>
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">[[host_metric.metric]]</h3></div>
+        <div class="panel-body">
+          <div id="health_history_[[iA]]"></div>
+          <div ng-init="draw('#health_history_'+iA,host_metric)"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ~single -->
+    <!-- multi -->
+    <div class="col-md-12" ng-switch-default>
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">[[host_metric.metric]]</h3></div>
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="one_host_metric in host_metric.group" ng-init="iB=$index">
+            <h3 class="panel-title">[[one_host_metric.metric]]</h3>
+            <div id="health_history_[[iA]]_[[iB]]"></div>
+            <div ng-init="draw('#health_history_'+iA+'_'+iB,one_host_metric)"></div>
+          </li> 
+        </ul>
+      </div>
+    </div>
+    <!-- ~multi -->
   </div>
 </div>
-
-<div class="row" style="margin-top:20px;">
-  <div class="col-md-12">
-    <h6>资源使用率</h6>
-    <div id="all_resource_use" style="width:800px;height:250px;"></div>
-    <div ng-init="draw_3()"></div>
-  </div>
-</div>
-
-<div class="row" style="margin-top:20px;">
-  <div class="col-md-12">
-    <h6>健康度</h6>
-    <table class="table">
-      <tr ng-repeat="c in show.healths.row" ng-init="ia=$index+1">
-        <td style="width:30px;height:30px;" ng-repeat="r in show.healths.col" ng-init="ib=$index">
-          <div style="background-color:rgb([[ show.healths.y[ia*ib] ]],[[ 255-show.healths.y[ia*ib] ]],0);">[[ show.healths.x[ia*ib] ]]</div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
-

@@ -129,7 +129,8 @@ class MonitorBackHandler(BaseHandler):
             m = groups_metrics[metric] 
             show_info['metrics'].append(m)
         
-        show_info['metric'] = show_info['metrics'][0]['name']
+        if show_info['metrics']:
+            show_info['metric'] = show_info['metrics'][0]['name']
         show_info['hosts'] = self._host_list()
         show_info['host'] = show_info['hosts'][0]
 

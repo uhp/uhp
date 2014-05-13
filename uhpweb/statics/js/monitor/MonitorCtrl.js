@@ -1,4 +1,9 @@
 function MonitorBaseController($scope, $rootScope, $timeout) {
+  // 数据结构
+  // 注意绘图使用的数据结构
+  // host_metric:{host:,metric:{name:,dispaly:,unit:,chartType:},x:,y:}
+  // group_metric:{metric:,x:,y:}
+
   // 公共变量
   // 公共函数
   $rootScope.formatIdName=function(name){
@@ -42,7 +47,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   $scope.show={};
 
   // scope函数
-  $scope.init=function(){
+  $scope.showInfo = function(){
     /**
      * for show  
      * { precisions:[{name:,display:}], precision:'',
@@ -57,15 +62,19 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     $rootScope.myHttp('GET', '/monitorback/show_info', 
       {groups:$scope.groups}, 
       function(res){
-        $scope.show=res['data'];
+        $.extend($scope.show, res['data']);
       }
     );
-    
     $scope.$watch(function(){return $scope.show.precision + $scope.show.metric;}, $rootScope.showHostsMetric);
     $scope.$watch(function(){return $scope.show.precision + $scope.show.host;}, $rootScope.showHostMetrics);
-    $scope.$watch(function(){return $scope.show.precision;},function(){$scope.show.precisionSec=parseInt($scope.show.precision.substr(1));});
+    $scope.$watch(function(){return $scope.show.precision;},function(){
+      if(!$scope.show.precision) return;
+      $scope.show.precisionSec=parseInt($scope.show.precision.substr(1));
+    });
 
-	} // ~ init
+  }
+
+  // scope函数
  
   $scope.default_xfunc=function(n){
     //时间转换，从时间戳转为可读
@@ -80,6 +89,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   // host_metric:{metric:,x:,y:}
   $scope.make_chartOpt=function(host_metric){
     //x轴转换  
+    console.debug(host_metric);
     xfunc = host_metric.xfunc || $scope.default_xfunc;
     if(xfunc != $scope.NO_XFUNC){
       host_metric.x = $.map(host_metric.x, xfunc);
@@ -117,6 +127,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   }
   
   // host_metric
+  // @target : jquery object[s]
   function draw(target, host_metric){
     target=target.get();
     console.debug(target);
@@ -125,75 +136,136 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     myChart.setOption($scope.make_chartOpt(host_metric)); // ~ setOption
   }
   
-  $scope.draw=function(id, host_metric){
-    console.debug('id:'+id);
-    var t = $(id);
-    var w = t.width();
-    var h = w * 0.382;
-    t.height(h);
-    $timeout(function(){ draw(t, host_metric); }, 100);
+  $scope.draw=function(id, host_metric, limit){
+    if(angular.isUndefined(limit)) {
+      limit = 20;
+    }
+    if(limit < 0) return false;
+    // 等待界面target元素绘制完成
+    $timeout(function(){ 
+      var t = $(id);
+      var w = t.width();
+      if(w == 0) return $scope.draw(id, host_metric, limit-1);
+      var h = t.height();
+      if(h < 10){
+        h = w * 0.4;
+        t.height(h);
+      }
+      console.debug('id:'+id);
+      console.debug(t);
+      console.debug(t.width());
+      console.debug(t.height());
+      draw(t, host_metric); 
+    }, 500);
   }
   
   $scope.showBig=function(host_metric){
 		$("#bigDrawModal").modal();
     draw($("#draw_big"), host_metric);
   }
+ 
+  // 绘制玫瑰图 
+  // @rose_group_metric:{name:,data:[{value:,name:}]}
+  function drawRose(target, rose_group_metric){
+    target=target.get();
+    console.debug(target);
+    if(!bool(target)) return;
+    chartOpt = { 
+      tooltip : { trigger: 'item', formatter: "{a} <br/>{b} : {c} ({d}%)" },
+      toolbox: {
+          show : true,
+          feature : {
+              mark : {show: false},
+              dataView : {show: true, readOnly: true},
+              restore : {show: false},
+              saveAsImage : {show: true}
+          }
+      },
+      calculable : true,
+      series : [        
+          {
+              name:rose_group_metric.name,
+              type:'pie',
+              radius : ['20%', '75%'],
+              roseType : 'area',
+              data:rose_group_metric.data
+          }
+      ]
+    }; 
+    var myChart = echarts.init(target,{grid:{x:40,y:30,x2:10,y2:55}});
+    myChart.setOption(chartOpt);
+  }
+
+  $scope.drawRose=function(id, rose_group_metric, limit){
+    if(angular.isUndefined(limit)) {
+      limit = 20;
+    }
+    if(limit < 0) return false;
+    // 等待界面target元素绘制完成
+    $timeout(function(){ 
+      var t = $(id);
+      var w = t.width();
+      if(w == 0) return $scope.drawRose(id, rose_group_metric, limit-1);
+      var h = t.height();
+      if(h < 10){
+        h = w;
+        t.height(h);
+      }
+      console.debug('id:'+id);
+      drawRose(t, rose_group_metric); 
+    }, 500);
+  }; 
 }
 
+// @dep
 uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
 }]);
 
-// TODO draw 相关函数需要优化
+// 概览
 uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
   MonitorBaseController($scope, $rootScope, $timeout);
-  
-  // host_metric:{metric:,x:,y:}
-  $scope.make_chartOpt=function(host_metric){
-    //转换null值为echart要求格式
-    host_metric.y = $.map(host_metric.y, function(n){
-      return (n===null)?'-':n;
-    });
 
-    chartOpt = {
-        tooltip : { trigger: 'axis' },
-        legend: { x:'left', data:[host_metric.metric] },
-        toolbox: {
-            show : true,
-            feature : {
-                mark : {show: false},
-                dataView : {show: false, readOnly: false},
-                magicType : {show: true, type: ['line', 'bar', 'stack']},
-                restore : {show: false},
-                saveAsImage : {show: true},
-                dataZoom:{show: true}
-            }
+  $scope.init = function(){
+    $scope.showInfo();
+    $scope.show.healths={
+      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+      y:[0,28,98,178,255]
+    };
+    
+    var host_health_history = {
+      type:'single',
+      metric:'机器健康度历史',
+      x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
+      y:[100,90,95,100,100,90,80,60,80,100]
+    };
+    
+    var service_health_history = {
+      type:'multi',
+      metric:'服务健康度历史',
+      group:[
+        {
+          metric:'Zookeeper',
+          x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
+          y:[100,90,95,100,100,90,80,60,80,100]
         },
-        dataZoom: {show:true},
-        calculable : false,
-        xAxis : [ { type : 'category', boundaryGap : true, data : host_metric.x } ],
-        yAxis : [ { type : 'value', splitArea : {show:true} } ],
-        series : [ { name:$scope.show.metric, type:'bar', data:host_metric.y } ]
-    }
-    if(bool(host_metric.metric.unit)){
-      chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+host_metric.metric.unit }
-    }
-    return chartOpt;
+        {
+          metric:'Hdfs',
+          x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
+          y:[100,90,95,100,100,90,80,60,80,100]
+        },
+        {
+          metric:'Yarn',
+          x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
+          y:[100,90,95,100,100,90,80,60,80,100]
+        }
+      ]
+    };
+    
+    $scope.show.all_health_history = [host_health_history,service_health_history];
+    
   }
 
-  $scope.init2 = function(){
-    $scope.init();
-    // group_metric = {metric:{},x:,y:}
-    $scope.show.all_host_load = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[2.5,3.0,2.2,3.4,4]};
-    $scope.show.all_disk_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[3.3,5.3,3.2,4.4,5]};
-    $scope.show.all_resource_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[20,30,22,34,40]};
-    $scope.show.healths={x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[0,28,98,178,255]};
-  }
-
-  $scope.draw_1=function(){$scope.draw('#all_host_load', $scope.show.all_host_load);}
-  $scope.draw_2=function(){$scope.draw('#all_disk_use', $scope.show.all_disk_use);}
-  $scope.draw_3=function(){$scope.draw('#all_resource_use', $scope.show.all_resource_use);}
-
-  $scope.init2();
+  $scope.init();
 
 }]);
 
@@ -214,19 +286,86 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
   }
  
   $scope.init = function(){
+    $scope.showInfo();
+    console.debug($scope.show);
     // group_metric = {metric:{},x:,y:}
-    $scope.show.all_host_load = {metric:'负载',chartType:'bar',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[2.5,3.0,2.2,3.4,4]};
-    $scope.show.all_net_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[3.3,5.3,3.2,4.4,5]};
-    $scope.show.all_disk_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[3.3,5.3,3.2,4.4,5]};
-    $scope.show.all_resource_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[20,30,22,34,40]};
-  }
 
-  $scope.draw_1=function(){
-    host_metric=$scope.show.all_host_load;
-    host_metric.xfunc=$scope.NO_XFUNC;
-    $scope.draw('#all_host_load',host_metric);
-  }
+    var all_load = {
+      metric:'负载',
+      chartType:'bar',
+      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+      y:[2.5,3.0,2.2,3.4,4]
+    };
+    
+    var all_net = {
+      metric:'网络',
+      chartType:'bar',
+      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+      y:[3.3,5.3,3.2,4.4,5]
+    };
 
+    var all_disk = {
+      metric:'存储',
+      chartType:'bar',
+      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+      y:[3.3,5.3,3.2,4.4,5]
+    };
+
+    var all_mem = {
+      metric:'内存',
+      chartType:'bar',
+      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+      y:[20,30,22,34,40]
+    };
+
+    $scope.show.all_host_overview = [all_load, all_net, all_mem, all_disk];
+
+    //$scope.draw_1();
+    //$scope.drawAllHostLoadDistribution();
+  }
+  
+  $scope.drawAllHost=function(targetSelect, group_metric){
+    //var host_metric=$scope.show.all_host_load;
+    console.debug(targetSelect);
+    console.debug(group_metric);
+    var host_metric=group_metric;
+    if(!bool(host_metric.xfunc)){
+      host_metric.xfunc=$scope.NO_XFUNC;
+    }
+    $scope.draw(targetSelect,host_metric);
+  }
+ 
+  $scope.drawAllHostDistribution = function(targetSelect, group_metric){
+    var host_metric = group_metric;
+    // 计算分布
+    var rose_group_metric = {name:host_metric.metric, data:[]};
+    
+    function rangeLoad(n){
+      var H = 10.0;
+      var h = n/H;
+      var r = parseInt(h * 100);
+      if(r<0) return -1;
+      if(r==0) return 0;
+      if(r<=100) return parseInt((r-1)/25);
+      return 4;
+    } 
+    var data = [0,0,0,0,0,0];
+    $.each(host_metric.y, function(i,n){
+      r = rangeLoad(n);
+      r = r+1;
+      data[r] = data[r] + 1; 
+    });
+    var dataNames = ["Down","0-25%","25-50%","50-75%","75-100%","100%+"];
+    $.each(data, function(i,n){
+      rose_group_metric.data.push({value:n,name:dataNames[i]});
+    });
+    //过滤掉0值
+    rose_group_metric.data = $.map(rose_group_metric.data, function(n){
+      return n.value<=0?null:n;
+    });
+    $scope.drawRose(targetSelect,rose_group_metric);
+  }
+  
   //$scope.draw_2=function(){$scope.draw('#all_disk_use', $scope.show.all_disk_use);}
   //$scope.draw_3=function(){$scope.draw('#all_resource_use', $scope.show.all_resource_use);}
   //$scope.draw_4=function(){$scope.draw('#all_net_use', $scope.show.all_net_use);}
@@ -242,8 +381,9 @@ uhpApp.controller('MoniServiceCtrl', ['$scope', '$rootScope', '$http', '$sce','$
     'hbase-master', 'hbase-regionserver'];
 
   // services
-  $scope.init2=function(){
-    $scope.init();
+  $scope.init=function(){
+    console.debug("----------------------");
+    $scope.showInfo();
     /**
      * show.services_metrics = [
      *   { name:,metrics:[{name:,display:,value:}] }  
@@ -272,7 +412,7 @@ uhpApp.controller('MoniServiceCtrl', ['$scope', '$rootScope', '$http', '$sce','$
     $rootScope.setActiveMonMenuTabByName('mtServiceHostsMetric');
   }
 
-  $scope.init2();
+  $scope.init();
 
 }]);
 

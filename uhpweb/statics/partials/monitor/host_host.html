@@ -15,10 +15,14 @@
 
 <div class="row" style="margin-top:20px;">
   <div class="col-md-12">
-    <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.host_metrics">
-      <button type="button" class="btn btn-primary btn-xs" ng-click="showMetric(host_metric)">[[host_metric.metric]]</button>
-      <div id="draw2_[[host_metric.metric]]" style="width:450px;height:250px;border:1px solid black;"></div>
-      <div ng-init="draw('#draw2_'+host_metric.metric, host_metric)" class="hide"></div>
+    <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.host_metrics" ng-init="ID=formatIdName('draw2_' + host_metric.metric)">
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">[[host_metric.metric]]</h3></div>
+        <div class="panel-body">
+          <div id="[[ID]]" style="width:420px;"></div>
+          <div ng-init="draw('#'+ID, host_metric)" class="hide"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

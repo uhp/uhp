@@ -16,9 +16,13 @@
 <div class="row" style="margin-top:20px;">
   <div class="col-md-12">
     <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.hosts_metric">
-      <button type="button" class="btn btn-primary btn-xs" ng-click="showHost(host_metric)">[[host_metric.host]]</button>
-      <div id="draw_[[host_metric.host]]" style="width:450px;height:250px;border:1px solid black;"></div>
-      <div ng-init="draw('#draw_'+host_metric.host, host_metric)" class="hide"></div>
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">[[host_metric.host]]</h3></div>
+        <div class="panel-body">
+          <div id="draw_[[host_metric.host]]" style="width:420px;"></div>
+          <div ng-init="draw('#draw_'+host_metric.host, host_metric)" class="hide"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
