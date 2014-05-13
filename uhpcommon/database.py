@@ -180,8 +180,9 @@ def del_instance(session,host,role):
 
 if __name__ == "__main__":
     
-    drop_db()
+    #drop_db()
     create_db()
+    sys.exit(0)
     #默认的admin
     insert(User("admin","admin","admin@ucweb.com",0));
     #默认分组

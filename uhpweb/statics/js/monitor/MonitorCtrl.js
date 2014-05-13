@@ -63,20 +63,28 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     
     $scope.$watch(function(){return $scope.show.precision + $scope.show.metric;}, $rootScope.showHostsMetric);
     $scope.$watch(function(){return $scope.show.precision + $scope.show.host;}, $rootScope.showHostMetrics);
+    $scope.$watch(function(){return $scope.show.precision;},function(){$scope.show.precisionSec=parseInt($scope.show.precision.substr(1));});
 
 	} // ~ init
-  
-  // host_metric:{metric:,x:,y:}
-  $scope.make_chartOpt=function(host_metric,xfunc){
+ 
+  $scope.default_xfunc=function(n){
     //时间转换，从时间戳转为可读
-    if(xfunc){
+    sec = $scope.show.precisionSec; 
+    return sec>86400 ? date('n-j/H:i', n): date('H:i', n);
+  }
+
+  $scope.NO_XFUNC=function(n){
+    return n;
+  }
+
+  // host_metric:{metric:,x:,y:}
+  $scope.make_chartOpt=function(host_metric){
+    //x轴转换  
+    xfunc = host_metric.xfunc || $scope.default_xfunc;
+    if(xfunc != $scope.NO_XFUNC){
       host_metric.x = $.map(host_metric.x, xfunc);
-    }else{
-      sec = parseInt($scope.show.precision.substr(1));
-      host_metric.x = $.map(host_metric.x, xfunc || function(n){
-        return sec>86400 ? date('n-j/H:i', n): date('H:i', n);
-      });
     }
+    
     //转换null值为echart要求格式
     host_metric.y = $.map(host_metric.y, function(n){
       return (n===null)?'-':n;
@@ -98,9 +106,9 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
         },
         dataZoom: {show:true},
         calculable : false,
-        xAxis : [ { type : 'category', boundaryGap : false, data : host_metric.x } ],
+        xAxis : [ { type : 'category', boundaryGap : true, data : host_metric.x } ],
         yAxis : [ { type : 'value', splitArea : {show:true} } ],
-        series : [ { name:$scope.show.metric, type:'line', data:host_metric.y } ]
+        series : [ { name:$scope.show.metric, type:host_metric.chartType||'line', data:host_metric.y } ]
     }
     if(bool(host_metric.metric.unit)){
       chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+host_metric.metric.unit }
@@ -119,7 +127,11 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   
   $scope.draw=function(id, host_metric){
     console.debug('id:'+id);
-    $timeout(function(){ draw($(id), host_metric); }, 100);
+    var t = $(id);
+    var w = t.width();
+    var h = w * 0.382;
+    t.height(h);
+    $timeout(function(){ draw(t, host_metric); }, 100);
   }
   
   $scope.showBig=function(host_metric){
@@ -131,6 +143,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
 uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
 }]);
 
+// TODO draw 相关函数需要优化
 uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
   MonitorBaseController($scope, $rootScope, $timeout);
   
@@ -167,19 +180,20 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     return chartOpt;
   }
 
-  $scope.init = function(){
+  $scope.init2 = function(){
+    $scope.init();
     // group_metric = {metric:{},x:,y:}
     $scope.show.all_host_load = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[2.5,3.0,2.2,3.4,4]};
     $scope.show.all_disk_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[3.3,5.3,3.2,4.4,5]};
     $scope.show.all_resource_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[20,30,22,34,40]};
-    $scope.show.healths={col:[1,2,3,4,5,6,7,8,9,10],row:[1], x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[0,28,98,178,255]};
+    $scope.show.healths={x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[0,28,98,178,255]};
   }
 
   $scope.draw_1=function(){$scope.draw('#all_host_load', $scope.show.all_host_load);}
   $scope.draw_2=function(){$scope.draw('#all_disk_use', $scope.show.all_disk_use);}
   $scope.draw_3=function(){$scope.draw('#all_resource_use', $scope.show.all_resource_use);}
 
-  $scope.init();
+  $scope.init2();
 
 }]);
 
@@ -198,6 +212,24 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     $scope.show.metric=host_metric.metric;
     $rootScope.setActiveMonMenuTabByName('mtHostsMetric');
   }
+ 
+  $scope.init = function(){
+    // group_metric = {metric:{},x:,y:}
+    $scope.show.all_host_load = {metric:'负载',chartType:'bar',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[2.5,3.0,2.2,3.4,4]};
+    $scope.show.all_net_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[3.3,5.3,3.2,4.4,5]};
+    $scope.show.all_disk_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[3.3,5.3,3.2,4.4,5]};
+    $scope.show.all_resource_use = {metric:'负载',x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],y:[20,30,22,34,40]};
+  }
+
+  $scope.draw_1=function(){
+    host_metric=$scope.show.all_host_load;
+    host_metric.xfunc=$scope.NO_XFUNC;
+    $scope.draw('#all_host_load',host_metric);
+  }
+
+  //$scope.draw_2=function(){$scope.draw('#all_disk_use', $scope.show.all_disk_use);}
+  //$scope.draw_3=function(){$scope.draw('#all_resource_use', $scope.show.all_resource_use);}
+  //$scope.draw_4=function(){$scope.draw('#all_net_use', $scope.show.all_net_use);}
 
   $scope.init();
 

@@ -24,7 +24,7 @@ adminmenus['is_monitor'] = config.install_monitor
 if config.install_monitor:
     adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"#/monitor",
         'submenus':[
-            {"name":"mOverview", "display":'概况', "href":"#/monitor/overview",
+            {"name":"mOverview", "display":'概览', "href":"#/monitor/overview",
                 "tabs": [
                     {"name":"mtCurent", "display":"当前状态", "href":"/statics/partials/monitor/overview.html"},
                     {"name":"mtHistory", "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
@@ -33,13 +33,14 @@ if config.install_monitor:
             },
             {"name":"mHost", "display":"机器", "href":"#/monitor/host",
                 "tabs": [
+                    {"name":"mtHostsOverview", "display":"概览", "href":"/statics/partials/monitor/host_overview.html"},
                     {"name":"mtHostsMetric", "display":"监控指标", "href":"/statics/partials/monitor/host.html"},
                     {"name":"mtHostMetrics", "display":"监控机器", "href":"/statics/partials/monitor/host_host.html"}
                 ]
             },
             {"name":"mService", "display":"服务", "href":"#/monitor/service",
                 "tabs": [
-                    {"name":"mtServiceOverview",    "display":"服务概况", "href":"/statics/partials/monitor/service_overview.html"},
+                    {"name":"mtServiceOverview",    "display":"服务概览", "href":"/statics/partials/monitor/service_overview.html"},
                     {"name":"mtServiceHostsMetric", "display":"服务指标", "href":"/statics/partials/monitor/service.html"},
                     {"name":"mtServiceHostMetrics", "display":"服务实体", "href":"/statics/partials/monitor/service_host.html"}
                 ]
