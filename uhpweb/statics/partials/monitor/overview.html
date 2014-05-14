@@ -1,76 +1,54 @@
 <!-- 整体状态 -->
 <div class="row">
-  <div class="col-md-4">
-    <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">机器</h3></div>
-      <div class="panel-body">
-        <span class="center-block text-center" style="font-size:500%;color:RGB(26,188,156);">90</span>
+  <div class="col-md-4" ng-repeat="health in show.healths">
+    <div class="panel panel-info" ng-switch="health.type">
+      <div class="panel-heading"><h3 class="panel-title">[[health.display]]</h3></div>
+      
+      <div class="panel-body" ng-switch-when="single">
+        <span class="center-block text-center" style="font-size:500%;color:RGB(26,188,156);">[[health.value]]</span>
       </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">服务</h3></div>
-      <div class="panel-body">
+      
+      <div class="panel-body" ng-switch-default>
         <ul class="list-group">
-          <li class="list-group-item">Zookeeper<span class="badge">90</span></li>
-          <li class="list-group-item">Zookeeper<span class="badge">90</span></li>
-          <li class="list-group-item">Zookeeper<span class="badge">90</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">作业</h3></div>
-      <div class="panel-body">
-        <ul class="list-group">
-          <li class="list-group-item">运行作业<span class="badge">23/30</span></li>
-          <li class="list-group-item">资源占用<span class="badge">40/40G</span></li>
+          <li class="list-group-item" ng-repeat="item in health.group">[[item.display]]<span class="badge">[[item.value]]</span></li>
         </ul>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 机器信息  -->
-<div class="row" style="margin-top:20px;">
+<!-- 实体健康度  -->
+<div class="row" style="margin-top:20px;" ng-show="health.type == 'single' || health.group[0].x" ng-repeat="health in show.healths">
   <div class="col-md-12">
-    <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">机器健康度</h3></div>
-      <div class="panel-body">
+    <div class="panel panel-info" ng-switch="health.type">
+      <div class="panel-heading"><h3 class="panel-title">[[health.display]]</h3></div>
+      
+      <!-- single -->
+      <div class="panel-body" ng-switch-when="single">
         <ul class="list-inline">
-          <li ng-repeat="h in show.healths.x">
-            <div style="width:30px;height:30px;background-color:rgb([[ show.healths.y[$index] ]],[[ 255-show.healths.y[$index] ]],0);" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover=""></div>
+          <li ng-repeat="h in health.x">
+            <span class="label" ng-class="mapColor(health.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
           </li>
         </ul>
       </div>
+      <!-- ~single -->
+
+      <!-- multi -->
+      <ul class="list-group" ng-switch-default>
+        <li class="list-group-item" ng-repeat="item in health.group">
+        <h6>[[item.display]]</h6>
+        <ul class="list-inline">
+          <li ng-repeat="h in item.x">
+            <span class="label" ng-class="mapColor(item.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
+          </li>
+        </ul>
+        </li>
+      </ul>
+      <!-- ~multi -->
     </div>
   </div>
 </div>
 
-<!-- 服务信息  -->
-<div class="row">
-  <div class="col-md-12">
-    <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">服务健康度</h3></div>
-      <div class="panel-body">
-        <h6>zookeeper</h6>
-        <ul class="list-inline">
-          <li ng-repeat="h in show.healths.x">
-            <div style="width:30px;height:30px;background-color:rgb([[ show.healths.y[$index] ]],[[ 255-show.healths.y[$index] ]],0);" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover=""></div>
-          </li>
-        </ul>
-        <h6>Hdfs</h6>
-        <ul class="list-inline">
-          <li ng-repeat="h in show.healths.x">
-            <div style="width:30px;height:30px;background-color:rgb([[ show.healths.y[$index] ]],[[ 255-show.healths.y[$index] ]],0);" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover=""></div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
   $(function(){

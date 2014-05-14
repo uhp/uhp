@@ -1,7 +1,7 @@
 function MonitorBaseController($scope, $rootScope, $timeout) {
   // 数据结构
   // 注意绘图使用的数据结构
-  // host_metric:{host:,metric:{name:,dispaly:,unit:,chartType:},x:,y:}
+  // host_metric:{host:,metric:{name:,display:,unit:,chartType:},x:,y:}
   // group_metric:{metric:,x:,y:}
 
   // 公共变量
@@ -136,27 +136,26 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     myChart.setOption($scope.make_chartOpt(host_metric)); // ~ setOption
   }
   
-  $scope.draw=function(id, host_metric, limit){
-    if(angular.isUndefined(limit)) {
-      limit = 20;
-    }
-    if(limit < 0) return false;
+  $scope.draw=function(id, host_metric){
+    console.debug("draw ...")
     // 等待界面target元素绘制完成
     $timeout(function(){ 
       var t = $(id);
-      var w = t.width();
-      if(w == 0) return $scope.draw(id, host_metric, limit-1);
-      var h = t.height();
-      if(h < 10){
-        h = w * 0.4;
-        t.height(h);
-      }
-      console.debug('id:'+id);
-      console.debug(t);
-      console.debug(t.width());
-      console.debug(t.height());
-      draw(t, host_metric); 
-    }, 500);
+      $scope.$watch(function(){return t.width();}, function(newValue, oldValue){
+        if(newValue <= 0) return;
+        var w = newValue;
+        var h = t.height();
+        if(h < 10){
+          h = w * 0.4;
+          t.height(h);
+        }
+        console.debug('id:'+id);
+        console.debug(t);
+        console.debug(t.width());
+        console.debug(t.height());
+        draw(t, host_metric); 
+      });
+    }, 300);
   }
   
   $scope.showBig=function(host_metric){
@@ -224,13 +223,70 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
 // 概览
 uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
   MonitorBaseController($scope, $rootScope, $timeout);
+ 
+  var labelColor = ['label-danger','label-warning','label-success'];
 
-  $scope.init = function(){
-    $scope.showInfo();
-    $scope.show.healths={
-      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-      y:[0,28,98,178,255]
-    };
+  $scope.mapColor = function(v){
+    return labelColor[parseInt(v/34)]; 
+  }
+
+  $scope.fetch_current_healths = function(){
+    // healths: [ {name:,display:,x:[],y:[]} ]
+    $scope.show.healths = [
+      {
+        type:'single',
+        name:'host',
+        display:'机器健康度',
+        value:90,
+        x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+        y:[100,81,98,17,0]
+      },
+      {
+        type:'multi',
+        name:'service',
+        display:'服务健康度',
+        group:[
+          {
+            name:'zookeeper',
+            display:'Zookeeper',
+            value:80,
+            x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+            y:[100,81,98,17,0]
+          },
+          {
+            name:'hdfs',
+            display:'hdfs',
+            value:80,
+            x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+            y:[100,81,98,17,0]
+          },
+          {
+            name:'yarn',
+            display:'yarn',
+            value:80,
+            x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
+            y:[100,81,98,17,0]
+          }
+        ]
+      },
+      {
+        type:'multi',
+        name:'job',
+        display:'作业状况',
+        group: [
+          {
+            name:'',
+            display:'运行作业',
+            value:"23/30"
+          },
+          {
+            name:'',
+            display:'资源占用',
+            value:"40/40G"
+          }
+        ]
+      }
+    ];
     
     var host_health_history = {
       type:'single',
@@ -262,7 +318,12 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     };
     
     $scope.show.all_health_history = [host_health_history,service_health_history];
-    
+
+  }
+
+  $scope.init = function(){
+    $scope.showInfo();
+    $scope.fetch_current_healths();
   }
 
   $scope.init();
