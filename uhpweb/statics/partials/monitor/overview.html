@@ -18,7 +18,7 @@
 </div>
 
 <!-- 实体健康度  -->
-<div class="row" style="margin-top:20px;" ng-show="health.type == 'single' || health.group[0].x" ng-repeat="health in show.healths">
+<div class="row" style="margin-top:20px;" ng-show="health.type == 'single' || health.group[0].roles" ng-repeat="health in show.healths">
   <div class="col-md-12">
     <div class="panel panel-info" ng-switch="health.type">
       <div class="panel-heading"><h3 class="panel-title">[[health.display]]</h3></div>
@@ -36,13 +36,29 @@
       <!-- multi -->
       <ul class="list-group" ng-switch-default>
         <li class="list-group-item" ng-repeat="item in health.group">
+        <!-- service -->
         <h6>[[item.display]]</h6>
+          <!-- roles -->
+          <div class="panel panel-info" ng-repeat="role in item.roles">
+            <div class="panel-heading"><h3 class="panel-title">[[role.display]]</h3></div>
+            <div class="panel-body">
+              <ul class="list-inline">
+                <li ng-repeat="h in role.x">
+                  <span class="label" ng-class="mapColor(role.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- ~roles -->
+        <!--
         <ul class="list-inline">
           <li ng-repeat="h in item.x">
             <span class="label" ng-class="mapColor(item.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
           </li>
         </ul>
+        -->
         </li>
+        <!-- ~service -->
       </ul>
       <!-- ~multi -->
     </div>

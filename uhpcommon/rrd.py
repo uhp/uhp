@@ -282,9 +282,3 @@ if __name__ == '__main__':
 
     #rrd_wrapper.draw(image_path, "网络流量", rrd_lines, '-1h')
     #print rrd_wrapper.get_last(rrdfile_in)
-
-
-
-
-
-

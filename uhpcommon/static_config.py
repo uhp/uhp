@@ -66,6 +66,148 @@ if config.install_monitor:
         ]
     })
 
+
+
+usermenus = {"name":"user", "display":"用户", "href":"/user",
+        "submenus":[
+            #{"name":"info", "display":"概况", "href":"#user-info"},
+            {"name":"hdfs", "display":"存储", "href":"#user-hdfs"},
+            {"name":"yarn", "display":"作业", "href":"#user-yarn"}
+            ]    
+         }
+
+
+#由于基本不修改，所以不存放在数据库
+#保存了所有的素服和角色
+services = [
+    {"name":"ganglia", 
+     "role": ["gmond","gmetad"],
+     "actions":[{"name":"start","display":"启动","tooptip":"启动集群"},
+                {"name":"stop","display":"停止","tooptip":"关闭集群"},
+                {"name":"restart","display":"重启","tooptip":"重启集群"}], 
+     "instanceActions":[{"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : []
+     },
+    {"name":"zookeeper", 
+     "role": ["zookeeper"],
+     "actions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始化myid"},
+                {"name":"start","display":"启动","tooptip":"启动集群"},
+                {"name":"stop","display":"停止","tooptip":"关闭集群"},
+                {"name":"restart","display":"重启","tooptip":"重启集群"}], 
+     "instanceActions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始化myid"},
+                        {"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : []
+     },
+    {"name":"hdfs", 
+     "role": ["qjm","namenode","datanode"],
+     "actions":[{"name":"format","display":"格式化","tooptip":"格式化所有组件。谨慎执行！"},
+                {"name":"init","display":"初始化","tooptip":"创建角色需要的目录"},
+                {"name":"start","display":"启动","tooptip":""},
+                {"name":"stop","display":"停止","tooptip":""},
+                {"name":"restart","display":"重启","tooptip":""},
+                {"name":"rollrestart","display":"滚动重启","tooptip":"滚动重启所有的datanode."},
+                {"name":"initha","display":"重置HA","tooptip":"分发hdfs的SSH，重置在ZK的HA状态。"},
+                {"name":"check","display":"检查","tooptip":"执行读写操作，检查是否可用。"}], 
+     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
+                        {"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : ["zookeeper"],
+     "web" : [{"role":"namenode","port":"dfs_namenode_http_address_port"}]
+     },
+    {"name":"yarn", 
+     "role": ["resourcemanager","nodemanager","historyserver"],
+     "actions":[{"name":"init","display":"初始化","tooptip":"创建必要的hdfs目录和NM的本地目录"},
+                {"name":"start","display":"启动","tooptip":""},
+                {"name":"stop","display":"停止","tooptip":""},
+                {"name":"restart","display":"重启","tooptip":""},
+                {"name":"rollrestart","display":"滚动重启","tooptip":"滚动重启所有的nodemanager。"},
+                {"name":"check","display":"检查","tooptip":"提交一个YARN作业并运行。"},
+                {"name":"scheduler","display":"刷新调度器","tooptip":"刷新调度器配置"}],
+     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
+                        {"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : ["zookeeper","hdfs"],
+     "web" : [{"role":"resourcemanager","port":"yarn_rm_webapp_port"},
+              {"role":"historyserver","port":"mapreduce_jobhistory_webapp_port"}]
+     },
+    {"name":"hbase",
+     "role":["hbasemaster","regionserver"],
+     "actions":[{"name":"init","display":"初始化","tooptip":"创建hbase所需要的hdfs目录。"},
+                {"name":"start","display":"启动","tooptip":""},
+                {"name":"stop","display":"停止","tooptip":""},
+                {"name":"restart","display":"重启","tooptip":""},
+                {"name":"check","display":"检查","tooptip":"执行hbase的基本操作，检查hbase是否可用。"}], 
+     "instanceActions":[{"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : ["zookeeper","hdfs"],
+     "web" : [{"role":"hbasemaster","port":"hbase_master_info_port"},
+              {"role":"regionserver","port":"hbase_resigionserver_info_port"}]
+     },
+    {"name":"hive",
+     "role":["hiveserver","hiveserver2","hivemetastore"],
+     "actions":[{"name":"initmysql","display":"格式化数据库","tooptip":"初始化hive的元数据库。"},
+                {"name":"init","display":"初始化","tooptip":"创建HDFS目录。"},
+                {"name":"start","display":"启动","tooptip":""},
+                {"name":"stop","display":"停止","tooptip":""},
+                {"name":"restart","display":"重启","tooptip":""},
+                {"name":"check","display":"检查","tooptip":"执行hive的sql语句，检查hive是否可用。"}], 
+     "instanceActions":[{"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : ["hdfs","yarn"]
+     },   
+     {"name":"impala",
+     "role":["impalastatestore","impalaserver"],
+     "actions":[{"name":"init","display":"初始化","tooptip":""},
+                {"name":"start","display":"启动","tooptip":""},
+                {"name":"stop","display":"停止","tooptip":""},
+                {"name":"restart","display":"重启","tooptip":""},
+                {"name":"check","display":"检查","tooptip":"执行简单查询,检查impala是否可用。"}
+                ], 
+     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
+                        {"name":"start","display":"启动","tooptip":""},
+                        {"name":"stop","display":"停止","tooptip":""},
+                        {"name":"restart","display":"重启","tooptip":""}],
+     "dependence" : ["hdfs","hive"],
+     "web" : [{"role":"impalastatestore","port":"impala_state_store_web_port"}]
+     },     
+     {"name":"client",
+     "role":["zookeeper-client","hadoop-client","hbase-client","hive-client","impala-client"],
+     "actions":[], 
+     "instanceActions":[{"name":"config","display":"分发配置","tooptip":"分发配置文件"}],
+     "dependence" : []
+     },       
+    ]   
+
+role_check_map = { 
+    "zookeeper" : { "min" : 1 },
+    "qjm" : { "min" : 1 },
+    "namenode" : { "equal" : 2 },
+    "datanode" : { "min" : 1 },
+    "resourcemanager" : { "equal" : 1 }, 
+    "nodemanager" : { "min" : 1 }, 
+    "historyserver" : { "equal" : 1 }, 
+    }
+
+def get_service_from_role(role):
+    for service in services:
+        if role in service['role']:
+            return service['name']
+
+def get_role_from_service(now):
+    for service in services:
+        if service['name'] == now:
+            return service['role']
+
+# 监控的配置项母本
+
 monitor_show_info={
     'metrics':{
         'default':[
@@ -76,9 +218,9 @@ monitor_show_info={
             {'name':'mem_cached', 'display':'缓存内存大小'},
             {'name':'mem_free', 'display':'空闲内存大小'},
             {'name':'mem_buffers', 'display':'内核缓存的内存总量'},
+            {'name':'mem_shared', 'display':'共享内存大小'},
             {'name':'swap_total', 'display':'交换分区总量（KBs显示）'},
             {'name':'swap_free', 'display':'空闲交换分区大小'},
-            {'name':'mem_shared', 'display':'共享内存大小'},
             {'name':'proc_run', 'display':'运行的进程总数'},
             {'name':'proc_total', 'display':'进程总数'},
             {'name':'cpu_idle', 'display':'空闲CPU百分比'},
@@ -554,140 +696,10 @@ services_metrics = [
 ]
 # ~ services_metrics
 
-usermenus = {"name":"user", "display":"用户", "href":"/user",
-        "submenus":[
-            #{"name":"info", "display":"概况", "href":"#user-info"},
-            {"name":"hdfs", "display":"存储", "href":"#user-hdfs"},
-            {"name":"yarn", "display":"作业", "href":"#user-yarn"}
-            ]    
-         }
+# 为网卡上限设置一个值
+bytes_top = 1024 * 1024 * 128 # 128M  for 1G
+host_load_percent_expression = "load_one*100/cpu_num"
+host_mem_percent_expression  = "(mem_total - mem_free - mem_cached - mem_buffers)*100/mem_total"
+host_net_percent_expression  = "(bytes_in + bytes_out)*100 / %d" % bytes_top
+host_disk_percent_expression = "(disk_total - disk_free)*100/disk_total"
 
-
-#由于基本不修改，所以不存放在数据库
-#保存了所有的素服和角色
-services = [
-    {"name":"ganglia", 
-     "role": ["gmond","gmetad"],
-     "actions":[{"name":"start","display":"启动","tooptip":"启动集群"},
-                {"name":"stop","display":"停止","tooptip":"关闭集群"},
-                {"name":"restart","display":"重启","tooptip":"重启集群"}], 
-     "instanceActions":[{"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : []
-     },
-    {"name":"zookeeper", 
-     "role": ["zookeeper"],
-     "actions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始化myid"},
-                {"name":"start","display":"启动","tooptip":"启动集群"},
-                {"name":"stop","display":"停止","tooptip":"关闭集群"},
-                {"name":"restart","display":"重启","tooptip":"重启集群"}], 
-     "instanceActions":[{"name":"init","display":"初始化","tooptip":"创建目录，初始化myid"},
-                        {"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : []
-     },
-    {"name":"hdfs", 
-     "role": ["qjm","namenode","datanode"],
-     "actions":[{"name":"format","display":"格式化","tooptip":"格式化所有组件。谨慎执行！"},
-                {"name":"init","display":"初始化","tooptip":"创建角色需要的目录"},
-                {"name":"start","display":"启动","tooptip":""},
-                {"name":"stop","display":"停止","tooptip":""},
-                {"name":"restart","display":"重启","tooptip":""},
-                {"name":"rollrestart","display":"滚动重启","tooptip":"滚动重启所有的datanode."},
-                {"name":"initha","display":"重置HA","tooptip":"分发hdfs的SSH，重置在ZK的HA状态。"},
-                {"name":"check","display":"检查","tooptip":"执行读写操作，检查是否可用。"}], 
-     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
-                        {"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : ["zookeeper"],
-     "web" : [{"role":"namenode","port":"dfs_namenode_http_address_port"}]
-     },
-    {"name":"yarn", 
-     "role": ["resourcemanager","nodemanager","historyserver"],
-     "actions":[{"name":"init","display":"初始化","tooptip":"创建必要的hdfs目录和NM的本地目录"},
-                {"name":"start","display":"启动","tooptip":""},
-                {"name":"stop","display":"停止","tooptip":""},
-                {"name":"restart","display":"重启","tooptip":""},
-                {"name":"rollrestart","display":"滚动重启","tooptip":"滚动重启所有的nodemanager。"},
-                {"name":"check","display":"检查","tooptip":"提交一个YARN作业并运行。"},
-                {"name":"scheduler","display":"刷新调度器","tooptip":"刷新调度器配置"}],
-     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
-                        {"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : ["zookeeper","hdfs"],
-     "web" : [{"role":"resourcemanager","port":"yarn_rm_webapp_port"},
-              {"role":"historyserver","port":"mapreduce_jobhistory_webapp_port"}]
-     },
-    {"name":"hbase",
-     "role":["hbasemaster","regionserver"],
-     "actions":[{"name":"init","display":"初始化","tooptip":"创建hbase所需要的hdfs目录。"},
-                {"name":"start","display":"启动","tooptip":""},
-                {"name":"stop","display":"停止","tooptip":""},
-                {"name":"restart","display":"重启","tooptip":""},
-                {"name":"check","display":"检查","tooptip":"执行hbase的基本操作，检查hbase是否可用。"}], 
-     "instanceActions":[{"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : ["zookeeper","hdfs"],
-     "web" : [{"role":"hbasemaster","port":"hbase_master_info_port"},
-              {"role":"regionserver","port":"hbase_resigionserver_info_port"}]
-     },
-    {"name":"hive",
-     "role":["hiveserver","hiveserver2","hivemetastore"],
-     "actions":[{"name":"initmysql","display":"格式化数据库","tooptip":"初始化hive的元数据库。"},
-                {"name":"init","display":"初始化","tooptip":"创建HDFS目录。"},
-                {"name":"start","display":"启动","tooptip":""},
-                {"name":"stop","display":"停止","tooptip":""},
-                {"name":"restart","display":"重启","tooptip":""},
-                {"name":"check","display":"检查","tooptip":"执行hive的sql语句，检查hive是否可用。"}], 
-     "instanceActions":[{"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : ["hdfs","yarn"]
-     },   
-     {"name":"impala",
-     "role":["impalastatestore","impalaserver"],
-     "actions":[{"name":"init","display":"初始化","tooptip":""},
-                {"name":"start","display":"启动","tooptip":""},
-                {"name":"stop","display":"停止","tooptip":""},
-                {"name":"restart","display":"重启","tooptip":""},
-                {"name":"check","display":"检查","tooptip":"执行简单查询,检查impala是否可用。"}
-                ], 
-     "instanceActions":[{"name":"init","display":"初始化","tooptip":""},
-                        {"name":"start","display":"启动","tooptip":""},
-                        {"name":"stop","display":"停止","tooptip":""},
-                        {"name":"restart","display":"重启","tooptip":""}],
-     "dependence" : ["hdfs","hive"],
-     "web" : [{"role":"impalastatestore","port":"impala_state_store_web_port"}]
-     },     
-     {"name":"client",
-     "role":["zookeeper-client","hadoop-client","hbase-client","hive-client","impala-client"],
-     "actions":[], 
-     "instanceActions":[{"name":"config","display":"分发配置","tooptip":"分发配置文件"}],
-     "dependence" : []
-     },       
-    ]   
-
-role_check_map = { 
-    "zookeeper" : { "min" : 1 },
-    "qjm" : { "min" : 1 },
-    "namenode" : { "equal" : 2 },
-    "datanode" : { "min" : 1 },
-    "resourcemanager" : { "equal" : 1 }, 
-    "nodemanager" : { "min" : 1 }, 
-    "historyserver" : { "equal" : 1 }, 
-    }
-
-def get_service_from_role(role):
-    for service in services:
-        if role in service['role']:
-            return service['name']
-
-def get_role_from_service(now):
-    for service in services:
-        if service['name'] == now:
-            return service['role']

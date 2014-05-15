@@ -230,100 +230,26 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     return labelColor[parseInt(v/34)]; 
   }
 
-  $scope.fetch_current_healths = function(){
-    // healths: [ {name:,display:,x:[],y:[]} ]
-    $scope.show.healths = [
-      {
-        type:'single',
-        name:'host',
-        display:'机器健康度',
-        value:90,
-        x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-        y:[100,81,98,17,0]
-      },
-      {
-        type:'multi',
-        name:'service',
-        display:'服务健康度',
-        group:[
-          {
-            name:'zookeeper',
-            display:'Zookeeper',
-            value:80,
-            x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-            y:[100,81,98,17,0]
-          },
-          {
-            name:'hdfs',
-            display:'hdfs',
-            value:80,
-            x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-            y:[100,81,98,17,0]
-          },
-          {
-            name:'yarn',
-            display:'yarn',
-            value:80,
-            x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-            y:[100,81,98,17,0]
-          }
-        ]
-      },
-      {
-        type:'multi',
-        name:'job',
-        display:'作业状况',
-        group: [
-          {
-            name:'',
-            display:'运行作业',
-            value:"23/30"
-          },
-          {
-            name:'',
-            display:'资源占用',
-            value:"40/40G"
-          }
-        ]
+  $scope.fetchCurrentHealths = function(){
+    $rootScope.myHttp('GET', '/monitorback/fetch_current_healths', 
+    //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_current_healths', 
+      {}, 
+      function(res){
+        $scope.show.healths=res['data'];
       }
-    ];
+    );
     
-    var host_health_history = {
-      type:'single',
-      metric:'机器健康度历史',
-      x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
-      y:[100,90,95,100,100,90,80,60,80,100]
-    };
-    
-    var service_health_history = {
-      type:'multi',
-      metric:'服务健康度历史',
-      group:[
-        {
-          metric:'Zookeeper',
-          x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
-          y:[100,90,95,100,100,90,80,60,80,100]
-        },
-        {
-          metric:'Hdfs',
-          x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
-          y:[100,90,95,100,100,90,80,60,80,100]
-        },
-        {
-          metric:'Yarn',
-          x:[1399973996, 1399973936, 1399973876, 1399973816,1399973756,1399973696,1399973636,1399973576,1399973516,1399973456],
-          y:[100,90,95,100,100,90,80,60,80,100]
-        }
-      ]
-    };
-    
-    $scope.show.all_health_history = [host_health_history,service_health_history];
-
+    $rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_history_healths', 
+      {}, 
+      function(res){
+        $scope.show.all_health_history = res['data'];
+      }
+    );
   }
 
   $scope.init = function(){
     $scope.showInfo();
-    $scope.fetch_current_healths();
+    $scope.fetchCurrentHealths();
   }
 
   $scope.init();

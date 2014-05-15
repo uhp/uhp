@@ -5,6 +5,7 @@ import logging
 import time
 import copy
 import math
+import re
 from decimal import Decimal
 
 import tornado
@@ -33,7 +34,10 @@ from model.callback import CallBack
 app_log = logging.getLogger("tornado.application")
         
 class MonitorBackHandler(BaseHandler):
-    
+
+    def __init__(self, application, request, **kwargs):
+        super(MonitorBackHandler, self).__init__(application, request, **kwargs)
+
     @tornado.web.authenticated
     def get(self , path):
         user = self.get_current_user();
@@ -88,6 +92,11 @@ class MonitorBackHandler(BaseHandler):
 
     def show_info(self):
         group_names = self.get_arguments("groups")
+    
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
+        rrd_wrapper  = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+
         show_info = {}
         rras = self._query_var('all', 'gmetad_rras')
         precisions = rrd.parse_precision(rras)
@@ -110,14 +119,12 @@ class MonitorBackHandler(BaseHandler):
             show_info['precisions'].append({'name':'p%d'%sec, 'display':precision})
         show_info['precision'] = show_info['precisions'][0]['name'] # default
         
-        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
-        cluster_name = self._query_var('all', 'cluster_name')
-        cluster_name = self._sure_str(cluster_name)
-        all_rrd_metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
 
         # 指定组的指标
         # { name:,metrics:{} }
         groups_metrics = self._checkout_groups_metrics(group_names)
+    
+        all_rrd_metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
 
         show_info['metrics'] = [] 
         #metric_name_map = dict([ (m['name'], m['display']) for m in static_config.monitor_show_info['metrics'] ])
@@ -159,11 +166,12 @@ class MonitorBackHandler(BaseHandler):
     # services overview
     def services_metrics(self):
         # [{name:, roles:{role:[instance]}}]
-        services = self._query_active_services()
+        services         = self._query_active_services()
         services_metrics = copy.deepcopy(static_config.services_metrics)
-        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
-        cluster_name = self._query_var('all', 'cluster_name')
-        cluster_name = self._sure_str(cluster_name)
+        cluster_name     = self._query_var('all', 'cluster_name')
+        cluster_name     = self._sure_str(cluster_name)
+    
+        rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         for service in services:
             service_shows = None
@@ -248,7 +256,8 @@ class MonitorBackHandler(BaseHandler):
         metric = self.get_argument("metric")
         metric = self._sure_str(metric)
         hosts = self.get_arguments("hosts")
-        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        
+        rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
         start = "-%ds" % sec
@@ -256,8 +265,6 @@ class MonitorBackHandler(BaseHandler):
 
         data = []
         
-        cluster_name = self._query_var('all', 'cluster_name')
-        cluster_name = self._sure_str(cluster_name)
         for host in hosts:
             host = self._sure_str(host)
             try:
@@ -272,14 +279,15 @@ class MonitorBackHandler(BaseHandler):
 
     # 显示单机的全部指标
     def show_host_metrics(self):
-        precision = self.get_argument("precision")
-        precision = self._sure_str(precision)
-        host = self.get_argument("host")
-        host = self._sure_str(host)
-        group_names = self.get_arguments("groups")
+        group_names  = self.get_arguments("groups")
+        precision    = self.get_argument("precision")
+        host         = self.get_argument("host")
+        precision    = self._sure_str(precision)
+        host         = self._sure_str(host)
         
-        
-        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
+        rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
         start = "-%ds" % sec
@@ -287,8 +295,6 @@ class MonitorBackHandler(BaseHandler):
 
         data = []
         
-        cluster_name = self._query_var('all', 'cluster_name')
-        cluster_name = self._sure_str(cluster_name)
         metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
         
         groups_metrics = self._checkout_groups_metrics(group_names)
@@ -303,6 +309,130 @@ class MonitorBackHandler(BaseHandler):
                 raise e
             xy = rrd.convert_to_xy(rrd_metric)
             data.append({'metric':metric, 'x':xy[0], 'y':xy[1]})
+        ret = {"data":data}
+        self.ret("ok", "", ret);
+
+    def _fetch_host_last_metric(self, rrd_wrapper, cluster_name, host, metric):
+        host   = self._sure_str(host)
+        metric = self._sure_str(metric)
+        (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
+        return value
+
+    
+    # 计算表达式
+    # -1: 未获取
+    def _eval_rrd_expression(self, rrd_wrapper, cluster_name, host, expression):
+        # total - free = use
+        # use - buffer - cached
+        # expression = "(mem_total - mem_free - mem_cached - mem_buffers)*100/mem_total" 
+        p = re.compile(r'[a-zA-Z_][\w\.]*')
+        expr_vars = p.findall(expression)
+        # metrics = ['mem_total','mem_free','mem_cached','mem_buffers']
+        i = 0;
+        for metric in expr_vars:
+            value = self._fetch_host_last_metric(rrd_wrapper,cluster_name, host, metric)
+            if value is None: return -1
+            # 为了变量安全，进行替换
+            new_var = 'loc_pvar_%d' % i
+            expression = re.sub(r'\b%s\b'%metric.replace('.',r'\.'), new_var, expression)
+            locals()[new_var] = value
+            i += 1
+        value = eval(expression)
+        return value
+    
+    # 指定机器的当前健康度
+    def _host_current_health(self, rrd_wrapper, cluster_name, host):
+        host_load_percent = self._eval_rrd_expression(rrd_wrapper, cluster_name, host, static_config.host_load_percent_expression)
+        if host_load_percent < 0: return -1
+        host_mem_percent = self._eval_rrd_expression(rrd_wrapper, cluster_name, host, static_config.host_mem_percent_expression)
+        if host_mem_percent < 0: return -1
+        host_net_percent = self._eval_rrd_expression(rrd_wrapper, cluster_name, host, static_config.host_net_percent_expression)
+        if host_net_percent < 0: return -1
+        host_disk_percent = self._eval_rrd_expression(rrd_wrapper, cluster_name, host, static_config.host_disk_percent_expression)
+        if host_disk_percent < 0: return -1
+
+        health = 100
+        if host_disk_percent > 80:
+            health -= 20 
+        if host_net_percent > 80:
+            health -= 20 
+        if host_mem_percent > 80:
+            health -= 20 
+        if host_load_percent > 80:
+            health -= 20
+
+        if health < 0: health = 0
+        return health
+   
+    # 服务单实例的健康度
+    # 服务健康度：进程，端口，响应，性能
+    def _service_instance_current_health(self, rrd_wrapper, cluster_name, service, role, host):
+        session = database.getSession()
+        for instance in session.query(Instance).filter(and_(Instance.service==service, Instance.role==role,
+            Instance.host==host)):
+            if instance.health == Instance.HEALTH_HEALTHY:
+                return 100
+            if instance.health == Instance.HEALTH_UNKNOW:
+                return -1
+        return 0
+
+    # 当前的监控指标
+    # healths:[{type:,name:,display:,value:,
+    #   x:[],y:[],
+    #   group:[{name:,display:,value:,x:[],y:[]}]}]
+    def fetch_current_healths(self):
+        data = []
+        
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
+        rrd_wrapper  = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+
+        # host
+        host_healths = {'type':'single','name':'host','display':'机器健康度'}
+        hosts = self._host_list()
+        y = []
+        for host in hosts:
+            y.append(self._host_current_health(rrd_wrapper, cluster_name, host))
+        health = int(reduce(lambda x,y:x+y,y,0)/len(y))
+        host_healths['value'] = health
+        host_healths['x']     = hosts
+        host_healths['y']     = y
+       
+        data.append(host_healths)
+
+        # Service
+        # [{name:, roles:{role:[instance]}}]
+        services         = self._query_active_services()
+        services_healths =  {'type':'multi', 'name':'service','display':'服务健康度', 'group':[]}
+        for service in services:
+            # group
+            service_health = {'name':service['name'], 'display':service['name'],'roles':[]}
+            service_health_value = 100 # 各个角色的乘积
+            for role, hosts in service['roles'].items():
+                role_health = {'name':role, 'display':role}
+                y = []
+                for host in hosts:
+                    ins_health = self._service_instance_current_health(rrd_wrapper, cluster_name, service['name'], role, host) 
+                    y.append(ins_health)
+                role_health['x'] = hosts
+                role_health['y'] = y
+                role_health_value = int(reduce(lambda x,y:x+y,y,0)/len(y)) # 平均值
+                service_health_value *= role_health_value/100.0
+                service_health['roles'].append(role_health)
+            service_health['value'] = int(service_health_value)
+            services_healths['group'].append(service_health)
+       
+        data.append(services_healths)
+       
+        # Job : 最近失败比率
+        jobs_healths =  {'type':'multi', 'name':'job','display':'作业健康度', 'group':[]}
+        jobs_healths['group'].append({'name':'','display':'作业健康度',"value":"90"})
+        jobs_healths['group'].append({'name':'','display':'作业运行数',"value":"30"})
+        jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"3"})
+        jobs_healths['group'].append({'name':'','display':'资源使用数',"value":"40/40G"})
+        
+        data.append(jobs_healths)
+
         ret = {"data":data}
         self.ret("ok", "", ret);
 
