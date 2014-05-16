@@ -231,18 +231,11 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
   }
 
   $scope.fetchCurrentHealths = function(){
-    $rootScope.myHttp('GET', '/monitorback/fetch_current_healths', 
     //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_current_healths', 
+    $rootScope.myHttp('GET', '/monitorback/fetch_current_healths', 
       {}, 
       function(res){
         $scope.show.healths=res['data'];
-      }
-    );
-    
-    $rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_history_healths', 
-      {}, 
-      function(res){
-        $scope.show.all_health_history = res['data'];
       }
     );
   }
@@ -250,11 +243,50 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
   $scope.init = function(){
     $scope.showInfo();
     $scope.fetchCurrentHealths();
+    
+    //当前状态标签被激活 定时事件
+    $.each($rootScope.menus.menus, function(i, menu){
+      if(menu.name != 'monitor') return true;
+      $.each(menu.submenus, function(j, submenu){
+        if(submenu.name != 'mOverview') return true;
+        $.each(submenu.tabs, function(k,tab){
+            if(tab.name != 'mtCurent') return true;
+            var stop;
+            $scope.$watch(function(){return menu.active+'|'+submenu.active+'|'+tab.active;}, 
+              function(newValue, oldValue){
+                if(newValue == oldValue) return;
+                if(newValue == 'active|active|active'){
+                  stop = $interval(function(){
+                    $scope.fetchCurrentHealths();
+                  },60000);
+                }else {
+                  $interval.cancel(stop);
+                }
+              }
+            );
+            return false;
+        });
+        return false;
+      });
+      return false;
+    });
+
+    $scope.$watch(function(){return $scope.show.precision;},function(){
+      if(!$scope.show.precision) return;
+      //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_history_healths', 
+      $rootScope.myHttp('GET', '/monitorback/fetch_history_healths', 
+        {precision:$scope.show.precision}, 
+        function(res){
+          $scope.show.all_health_history = res['data'];
+        }
+      );
+    });
   }
 
   $scope.init();
 
 }]);
+
 
 uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
   MonitorBaseController($scope, $rootScope, $timeout);

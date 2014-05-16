@@ -1,0 +1,89 @@
+{
+  "msg":"",
+  "ret":"ok", 
+  "data": [
+    {
+      "type"    : "single",
+      "name"    : "host",
+      "display" : "机器健康度",
+      "value"   : 90,
+      "x"       : ["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+      "y"       : [100,81,98,17,0]
+    },
+    {
+      "type":"multi",
+      "name":"service",
+      "display":"service health",
+      "group":[
+        {
+          "name":"zookeeper",
+          "display":"Zookeeper",
+          "value":80,
+          "roles":[
+            {
+              "name":"node",
+              "display":"node",
+              "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+              "y":[100,81,98,17,0]
+            }
+          ]
+        },
+        {
+          "name":"hdfs",
+          "display":"hdfs",
+          "value":80,
+          "roles":[
+            {
+              "name":"namenode",
+              "display":"namenode",
+              "x":["hadoop1","hadoop2"],
+              "y":[100,81]
+            },
+            {
+              "name":"datanode",
+              "display":"datanode",
+              "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+              "y":[100,81,98,17,0]
+            }
+          ]
+        },
+        {
+          "name":"yarn",
+          "display":"yarn",
+          "value":80,
+          "roles":[
+            {
+              "name":"resourcemanager",
+              "display":"resourcemanager",
+              "x":["hadoop1","hadoop2"],
+              "y":[100,81]
+            },
+            {
+              "name":"nodemanager",
+              "display":"nodemanager",
+              "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+              "y":[100,81,98,17,0]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type":"multi",
+      "name":"job",
+      "display":"作业状况",
+      "group": [
+        {
+          "name":"",
+          "display":"运行作业",
+          "value":"23/30"
+        },
+        {
+          "name":"",
+          "display":"资源占用",
+          "value":"40/40G"
+        }
+      ]
+    }
+  ]
+}

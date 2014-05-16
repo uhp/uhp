@@ -130,9 +130,9 @@ class MonitorBackHandler(BaseHandler):
         #metric_name_map = dict([ (m['name'], m['display']) for m in static_config.monitor_show_info['metrics'] ])
         for metric in all_rrd_metrics:
             if metric not in groups_metrics: 
-                app_log.debug("metric %s not in groups_metrics" % metric)
+                #app_log.debug("metric %s not in groups_metrics" % metric)
                 continue
-            app_log.debug("metric %s ok" % metric)
+            #app_log.debug("metric %s ok" % metric)
             m = groups_metrics[metric] 
             show_info['metrics'].append(m)
         
@@ -390,6 +390,7 @@ class MonitorBackHandler(BaseHandler):
         # host
         host_healths = {'type':'single','name':'host','display':'机器健康度'}
         hosts = self._host_list()
+        
         y = []
         for host in hosts:
             y.append(self._host_current_health(rrd_wrapper, cluster_name, host))
@@ -432,6 +433,154 @@ class MonitorBackHandler(BaseHandler):
         jobs_healths['group'].append({'name':'','display':'资源使用数',"value":"40/40G"})
         
         data.append(jobs_healths)
+
+        ret = {"data":data}
+        self.ret("ok", "", ret);
+
+    # 计算表达式，指定时间的一组值: 机器的合成指标
+    # @return: [(ts,value)]
+    # None: 未获取
+    def _eval_host_rrd_history_expression(self, rrd_wrapper, cluster_name, host, start, end, expression):
+        # total - free = use
+        # use - buffer - cached
+        # expression = "(mem_total - mem_free - mem_cached - mem_buffers)*100/mem_total" 
+        p = re.compile(r'[a-zA-Z_][\w\.]*')
+        # ['mem_total','mem_free','mem_cached','mem_buffers']
+        expr_vars = p.findall(expression)
+       
+        data = {} # {ts:{metric:value}}
+
+        i = 0;
+        for metric in expr_vars:
+            try:
+                rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
+            except Exception, e:
+                return None
+            x,y = rrd.convert_to_xy(rrd_metric)
+           
+            for ts,value in zip(x,y):
+                if ts not in data:
+                    data[ts] = {}
+                data[ts][metric] = value
+
+            # 变量替换 
+            new_var = 'loc_pvar_%d' % i
+            expression = re.sub(r'\b%s\b'%metric.replace('.',r'\.'), new_var, expression)
+            i += 1
+
+        #app_log.debug(data)
+
+        ts = data.keys()
+        ts = sorted(ts)
+        
+        retu = []
+        for t in ts:
+            i = 0;
+            for metric in expr_vars:
+                # 重新赋值
+                if metric not in data[t]: break
+                value = data[t][metric]
+                if value is None: break
+                # 为了变量安全，进行替换
+                new_var = 'loc_pvar_%d' % i
+                locals()[new_var] = value
+                i += 1
+            value = None 
+            if i == len(expr_vars):
+                value = eval(expression)
+            retu.append((t,value))
+        return retu
+    
+    # 指定机器的当前健康度
+    # @return: [(ts,value)]
+    def _host_history_health(self, rrd_wrapper, cluster_name, host, start, end):
+        host_load_percents = self._eval_host_rrd_history_expression(rrd_wrapper, cluster_name, host, start, end, static_config.host_load_percent_expression)
+        #app_log.debug("host_load_percents")
+        #app_log.debug(host_load_percents)
+        if host_load_percents is None: return None 
+        host_mem_percents = self._eval_host_rrd_history_expression(rrd_wrapper, cluster_name, host, start, end, static_config.host_mem_percent_expression)
+        #app_log.debug("host_mem_percents")
+        #app_log.debug(host_mem_percents)
+        if host_mem_percents is None: return None 
+        host_net_percents = self._eval_host_rrd_history_expression(rrd_wrapper, cluster_name, host, start, end, static_config.host_net_percent_expression)
+        #app_log.debug("host_net_percents")
+        #app_log.debug(host_net_percents)
+        if host_net_percents is None: return None 
+        host_disk_percents = self._eval_host_rrd_history_expression(rrd_wrapper, cluster_name, host, start, end, static_config.host_disk_percent_expression)
+        #app_log.debug("host_disk_percents")
+        #app_log.debug(host_disk_percents)
+        if host_disk_percents is None: return None
+
+        retu = []
+        ilen = min(map(len,[host_load_percents,host_disk_percents,host_net_percents,host_mem_percents]))
+        for i in xrange(ilen): 
+            ts = host_load_percents[i][0]
+           
+            host_load_percent=host_load_percents[i][1]
+            host_disk_percent=host_disk_percents[i][1]
+            host_net_percent=host_net_percents[i][1]
+            host_mem_percent=host_mem_percents[i][1]
+
+            health = 100
+            if host_disk_percent > 80:
+                health -= 20 
+            if host_net_percent > 80:
+                health -= 20 
+            if host_mem_percent > 80:
+                health -= 20 
+            if host_load_percent > 80:
+                health -= 20
+
+            if health < 0: health = 0
+            retu.append((ts, health))
+        
+        return retu
+
+    # 历史的健康指标
+    # healths:[{type:,metric:,x:[],y:[],
+    #   group:[{name:,display:,value:,x:[],y:[]}]}]
+    def fetch_history_healths(self):
+        precision = self.get_argument("precision")
+        precision = self._sure_str(precision)
+        
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
+        rrd_wrapper  = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        
+        sec = int(precision[1:])
+        start = "-%ds" % sec
+        end = "now" 
+        
+        data = []
+
+        # host
+        host_healths = {'type':'single','metric':'机器健康度历史'}
+        
+        # 计算需要: 时间范围，机器，表达式
+        hosts = self._host_list()
+        
+        healths = [] # [[(ts,health)]]
+        for host in hosts:
+            #app_log.debug(host)
+            host = self._sure_str(host)
+            health = self._host_history_health(rrd_wrapper, cluster_name, host, start, end)
+            #app_log.debug(health)
+            if health is None: continue
+            healths.append(health)
+        
+        x = []
+        y = []
+        if healths:
+            jlen = min(map(len,healths)) 
+            for j in xrange(jlen): # for ts
+                x.append(healths[0][j][0])
+                health = int(reduce(lambda xx,yy:xx+yy[j][1],healths,0)/len(healths))
+                y.append(health)
+        
+        host_healths['x'] = x 
+        host_healths['y'] = y
+        
+        data.append(host_healths)
 
         ret = {"data":data}
         self.ret("ok", "", ret);
