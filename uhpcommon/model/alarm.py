@@ -7,7 +7,7 @@ from models import UHPBase
 
 BASE = declarative_base()
 
-__all__ =  ['Alarm', 'AlarmAssist']
+__all__ =  ['Alarm', 'AlarmAssist', 'AlarmList']
 
 class Alarm(BASE, UHPBase):
     
@@ -45,3 +45,22 @@ class AlarmAssist(BASE, UHPBase):
         self.name = name
         self.value = value
         
+class AlarmList(BASE, UHPBase):
+    """报警信息列表，用于页面浏览"""
+
+    __tablename__ = 'alarm_list'
+
+    id    = Column(Integer, primary_key  = True)
+    level = Column(String(10), nullable  = False)
+    title = Column(String(255), nullable = False)
+    msg   = Column(Text, nullable        = False)
+    ctime = Column(Integer)
+    
+    LEVEL_WARN     = "WARN"
+    LEVEL_ERROR    = "ERROR"
+
+    def __init__(self, title, msg, level, ctime):
+        self.title = title
+        self.msg   = msg
+        self.level = level
+        self.ctime = ctime

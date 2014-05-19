@@ -221,7 +221,7 @@ uhpApp.controller('MonitorCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
 }]);
 
 // 概览
-uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', '$interval', function($scope, $rootScope, $http, $sce, $timeout, $interval){
   MonitorBaseController($scope, $rootScope, $timeout);
  
   var labelColor = ['label-danger','label-warning','label-success'];
@@ -244,23 +244,24 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     $scope.showInfo();
     $scope.fetchCurrentHealths();
     
-    //当前状态标签被激活 定时事件
+    // 根据时间触发定时任务，动态刷新当前健康度数据，
+    // 当前状态标签被激活 定时事件
     $.each($rootScope.menus.menus, function(i, menu){
       if(menu.name != 'monitor') return true;
       $.each(menu.submenus, function(j, submenu){
         if(submenu.name != 'mOverview') return true;
         $.each(submenu.tabs, function(k,tab){
             if(tab.name != 'mtCurent') return true;
-            var stop;
-            $scope.$watch(function(){return menu.active+'|'+submenu.active+'|'+tab.active;}, 
+            var stop = null;
+            $scope.$watch(function(){return submenu.active+'|'+tab.active;}, 
               function(newValue, oldValue){
-                if(newValue == oldValue) return;
-                if(newValue == 'active|active|active'){
+                if(newValue == 'active|active' && stop == null){
                   stop = $interval(function(){
                     $scope.fetchCurrentHealths();
                   },60000);
-                }else {
+                }else if(newValue != 'active|active' && stop != null){
                   $interval.cancel(stop);
+                  stop = null;
                 }
               }
             );
@@ -271,6 +272,7 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
       return false;
     });
 
+    // 监察精度，响应精度选择
     $scope.$watch(function(){return $scope.show.precision;},function(){
       if(!$scope.show.precision) return;
       //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_history_healths', 
@@ -281,6 +283,15 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
         }
       );
     });
+
+    // 加载最新的告警列表，最多显示前100条, 不需要定时任务
+    //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_last_alarm_list', 
+    $rootScope.myHttp('GET', '/monitorback/fetch_last_alarm_list', 
+      {}, 
+      function(res){
+        $scope.alarms = res['data'];
+      }
+    );
   }
 
   $scope.init();

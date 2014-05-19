@@ -2,10 +2,10 @@
   <div class="col-md-12">
     <div class="panel panel-danger">
       <div class="panel-heading">最新告警列表</div>
-      <table class="table table-striped table-hover">
+      <table class="table table-bordered table-striped table-hover">
         <thead>
           <tr>
-            <th ng-repeat="col in column">[[col]]</th>
+            <th ng-repeat="col in alarms.columns">[[col]]</th>
             <!--
             <th>ID</th>
             <th>等级</th>
@@ -16,7 +16,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="record in rows">
+          <tr ng-repeat="record in alarms.rows">
             <td style="max-width:500px;overflow:auto;" ng-repeat="v in record">[[v]]</td>
             <!--
             <td style="max-width:500px;overflow:auto;">1</td>

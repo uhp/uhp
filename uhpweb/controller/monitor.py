@@ -9,7 +9,7 @@ import re
 from decimal import Decimal
 
 import tornado
-from sqlalchemy.orm import query,aliased
+from sqlalchemy.orm import query,aliased,defer
 from sqlalchemy import and_,or_,desc,asc
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
@@ -30,6 +30,7 @@ from model.host_group_var import Host,Group,GroupHost,HostVar,GroupVar
 from model.task import Task
 from model.services import Service
 from model.callback import CallBack
+from model.alarm import *
 
 app_log = logging.getLogger("tornado.application")
         
@@ -257,6 +258,8 @@ class MonitorBackHandler(BaseHandler):
         metric = self._sure_str(metric)
         hosts = self.get_arguments("hosts")
         
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
         rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
@@ -426,6 +429,7 @@ class MonitorBackHandler(BaseHandler):
         data.append(services_healths)
        
         # Job : 最近失败比率
+        # TODO 数据后续确定
         jobs_healths =  {'type':'multi', 'name':'job','display':'作业健康度', 'group':[]}
         jobs_healths['group'].append({'name':'','display':'作业健康度',"value":"90"})
         jobs_healths['group'].append({'name':'','display':'作业运行数',"value":"30"})
@@ -584,6 +588,24 @@ class MonitorBackHandler(BaseHandler):
 
         ret = {"data":data}
         self.ret("ok", "", ret);
+
+    # 获取最新报警列表数据
+    def fetch_last_alarm_list(self):
+        session = database.getSession()
+        try:
+            query = session.query(AlarmList).order_by(desc(AlarmList.id)).limit(100)
+            columns = []
+            columns = [col.name for col in AlarmList.__table__.columns]
+            data = []
+            for record in query:
+                temp = []
+                for col in columns:
+                    temp.append(str(getattr(record,col)))
+                data.append(temp);
+            alarms = {'columns':columns, 'rows':data}
+            self.ret("ok", "", {"data": alarms})
+        finally:
+            session.close()
 
     def _get_rmhost(self):
         return "hadoop2"
