@@ -1,0 +1,14 @@
+---
+
+- include: ../../rpm/tasks/bigtop.yml
+
+- name: Install the hbase-solr-indexer packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - hbase-solr-indexer
+   - hbase-solr-doc
+
+- name: replace the init sh as there is an bug for the indexer
+  sudo: yes
+  copy: src=hbase-solr-indexer dest=/etc/init.d/hbase-solr-indexer mode=0755 owner=root group=root

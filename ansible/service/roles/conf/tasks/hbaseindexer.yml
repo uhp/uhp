@@ -1,0 +1,12 @@
+---
+
+- name: copy hbaseindexer conf
+  sudo: yes
+  template: src=hbaseindexer/{{item}}.j2 dest=/etc/hbase-solr/conf/{{item}}
+  with_items:
+    - hbase-indexer-site.xml
+    - hbase-indexer-env.sh
+    - log4j.properties  
+
+
+    

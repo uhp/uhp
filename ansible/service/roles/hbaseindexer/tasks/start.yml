@@ -1,0 +1,9 @@
+---
+
+- include: ../../conf/tasks/hbaseindexer.yml
+
+- name: start hbaseindexer server
+  sudo: yes
+  service: name=hbase-solr-indexer  state=started
+
+

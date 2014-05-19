@@ -1,0 +1,7 @@
+
+
+- include: ../../conf/tasks/solr.yml
+
+- name: start solr
+  sudo: yes
+  service: name=solr-server state=started

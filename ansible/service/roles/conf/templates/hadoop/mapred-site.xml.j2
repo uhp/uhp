@@ -72,12 +72,10 @@
     <name>mapreduce.job.reduce.slowstart.completedmaps</name>
     <value>0.8</value>
   </property>
-  <!--
   <property>
     <name>mapred.job.tracker</name>
     <value>neededForHive:999999</value>
   </property>
-  -->
   <property>
     <name>mapreduce.jobhistory.address</name>
     <value>{{groups.HISTORYSERVER[0]}}:{{yarn__mapreduce_jobhistory_port}}</value>
@@ -136,4 +134,3 @@
   </property>
 
 </configuration>
-

@@ -1,0 +1,13 @@
+
+- name: copy solr conf
+  sudo: yes
+  template: src=solr/{{item}}.j2 dest=/etc/solr/conf/{{item}}
+  with_items:
+    - solr-env.sh
+    - log4j.properties  
+
+- name: copy solr default
+  sudo: yes
+  template: src=solr/solr-env.sh.j2 dest=/etc/default/solr
+
+    

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration>
+<property>
+   <name>hbase.zookeeper.quorum</name>
+   <value>{{groups.ZOOKEEPER | join(",") }}</value>
+</property> 
+  <property>
+    <name>hbase.zookeeper.property.clientPort</name>
+    <value>{{zookeeper__zookeeper_client_port}}</value>
+  </property>
+<property>
+   <name>hbaseindexer.zookeeper.connectstring</name>
+   <value>{{groups.ZOOKEEPER | join(':' ~ zookeeper__zookeeper_client_port + ',')}}:{{zookeeper__zookeeper_client_port}}</value>
+</property> 
+</configuration>

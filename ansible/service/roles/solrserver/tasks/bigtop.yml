@@ -1,0 +1,16 @@
+---
+
+- name: send the bigtop-util rpm
+  sudo: yes
+  copy: src=rpm/6/bigtop-utils-0.6.0+73-1.cdh4.3.0.p0.17.el6.noarch.rpm dest=/tmp/bigtop.rpm
+  when: ansible_lsb.major_release|int==6
+
+
+- name: send the bigtop-util rpm
+  sudo: yes
+  copy: src=rpm/5/bigtop-utils-0.6.0+73-1.cdh4.3.0.p0.17.el5.noarch.rpm  dest=/tmp/bigtop.rpm
+  when: ansible_lsb.major_release|int==5
+
+- name: install the bigtop-util 0.6 rpm
+  sudo: yes
+  shell: rpm -ivh --force  /tmp/bigtop.rpm 

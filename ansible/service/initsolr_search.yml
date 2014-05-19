@@ -1,0 +1,10 @@
+
+- hosts: 
+    - SOLRSERVER[0]
+  tasks:
+  - include: roles/solrserver/tasks/initzk.yml
+
+- hosts: SOLRSERVER
+  tasks:
+  - include: roles/solrserver/tasks/init.yml
+

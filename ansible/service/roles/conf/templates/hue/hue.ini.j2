@@ -455,7 +455,14 @@
   # submitted jobs are visible only to the owner and administrators.
   ## share_jobs=true
 
+###########################################################################
+# Settings to configure the Shell application
+###########################################################################
+{% if hue__hue_search == "true" %}
+[search]
 
+    solr_url=http://{{groups.SOLRSERVER[0]}}:{{search__solr_port}}/solr/
+{% endif %}
 ###########################################################################
 # Settings to configure the Shell application
 ###########################################################################

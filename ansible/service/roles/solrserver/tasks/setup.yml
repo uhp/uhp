@@ -1,0 +1,9 @@
+---
+
+- include: ../../rpm/tasks/bigtop.yml 
+
+- name: Install the solr packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - solr-server

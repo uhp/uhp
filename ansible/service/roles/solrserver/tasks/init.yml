@@ -1,0 +1,5 @@
+---
+
+- name: init solr
+  sudo: yes
+  shell: /etc/init.d/solr-server init

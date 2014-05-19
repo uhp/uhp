@@ -1,0 +1,8 @@
+---
+
+- name: remove hbaseindexer packages
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - hbase-solr-indexer 
+

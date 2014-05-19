@@ -1,0 +1,7 @@
+#!/bin/bash
+
+solrctl instancedir --generate $HOME/hbase-collection1
+
+solrctl instancedir --create hbase-collection1 $HOME/hbase-collection1
+solrctl collection --create hbase-collection1
+

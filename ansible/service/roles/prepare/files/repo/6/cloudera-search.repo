@@ -1,0 +1,7 @@
+[cloudera-search]
+# Packages for Cloudera Search version 1.x, on RedHat	or CentOS 6 x86_64
+name=Cloudera Search version 1.x
+baseurl=http://archive.cloudera.com/search/redhat/6/x86_64/search/1.0.0/
+#gpgkey = http://archive.cloudera.com/search/redhat/6/x86_64/search/RPM-GPG-KEY-cloudera    
+gpgcheck = 0
+

@@ -1,0 +1,18 @@
+---
+
+- include: ../../rpm/tasks/bigtop.yml 
+
+- name: Install the solr client packages
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - solr
+   - solr-mapreduce
+   - solr-doc
+   - search
+   - hbase-solr-doc
+
+- include: config.yml
+
+
+

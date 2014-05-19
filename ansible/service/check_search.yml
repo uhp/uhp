@@ -1,0 +1,6 @@
+
+
+- hosts: 
+  - SOLRSERVER[0]
+  tasks:
+  - include: roles/solrserver/tasks/check.yml

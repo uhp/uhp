@@ -210,4 +210,19 @@
     <name>hbase.zookeeper.property.clientPort</name>
     <value>{{zookeeper__zookeeper_client_port}}</value>
   </property>
+  <property>
+    <name>hbase.replication</name>
+    <value>{{hbase__hbase_replication}}</value>
+  </property>
+  <property>
+    <name>replication.source.ratio</name>
+    <value>{{hbase__hbase_replication_source_ratio}}</value>
+  </property>
+  <!-- Maximum number of hlog entries to replicate in one go. If this is
+       large, and a consumer takes a while to process the events, the
+       HBase rpc call will time out. -->
+  <property>
+    <name>replication.source.nb.capacity</name>
+    <value>{{hbase__replication_source_nb_capacity}}</value>
+  </property>
 </configuration>

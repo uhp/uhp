@@ -1,0 +1,4 @@
+
+- name: install the hue search
+  sudo: yes
+  yum: name=hue-search state=installed

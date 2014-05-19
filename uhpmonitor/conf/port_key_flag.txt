@@ -82,6 +82,12 @@
         "hueserver": {
             "web_port": true
         }
+    },
+    "search": {
+        "solrserver": {
+            "solr_port": true,
+            "solr_admin_port": false
+        }
     }
 
 }
