@@ -17,7 +17,6 @@
     <value>root-region-server</value>
   </property>
   <property>
-  <property>
    <name>hbaseindexer.zookeeper.connectstring</name>
    <value>{{groups.ZOOKEEPER | join(':' ~ zookeeper__zookeeper_client_port + ',')}}:{{zookeeper__zookeeper_client_port}}</value>
   </property> 
