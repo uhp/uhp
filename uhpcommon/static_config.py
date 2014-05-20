@@ -134,6 +134,7 @@ services = [
                 {"name":"start","display":"启动","tooptip":""},
                 {"name":"stop","display":"停止","tooptip":""},
                 {"name":"restart","display":"重启","tooptip":""},
+                {"name":"morphlines","display":"同步morphlines","tooptip":"发送morphlines配置文件"},
                 ], 
      "instanceActions":[{"name":"start","display":"启动","tooptip":""},
                         {"name":"stop","display":"停止","tooptip":""},

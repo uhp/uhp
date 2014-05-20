@@ -1,0 +1,4 @@
+
+- hosts: HBASEINDEXER
+  tasks:
+  - include: roles/conf/tasks/morphlines.yml
