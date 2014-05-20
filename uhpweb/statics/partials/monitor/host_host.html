@@ -16,6 +16,8 @@
 <div class="row" style="margin-top:20px;">
   <div class="col-md-12">
     <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.host_metrics" ng-init="ID=formatIdName('draw2_' + host_metric.metric)">
+
+      <!-- panel -->
       <div class="panel panel-info">
         <div class="panel-heading"><h3 class="panel-title">[[host_metric.metric]]</h3></div>
         <div class="panel-body">
@@ -23,6 +25,8 @@
           <div ng-init="draw('#'+ID, host_metric)" class="hide"></div>
         </div>
       </div>
+      <!-- ~panel -->
+
     </div>
   </div>
 </div>

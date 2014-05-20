@@ -1,5 +1,6 @@
 
-uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
+uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$timeout', '$interval', function($scope, $rootScope, $http, $sce, $timeout, $interval){
+    MonitorBaseController($scope, $rootScope, $timeout);
  
     $scope.loadRunningState=function(){
         $http({
@@ -11,6 +12,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
             $rootScope.alert("发送app_running_state请求失败");
         });
     }
+
     $scope.loadRunningApp=function(){
         $http({
             method: 'GET',
@@ -134,29 +136,60 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         });
        
     }
+
     $scope.runningQuery=function(){
         $scope.loadRunningState()
         $scope.loadRunningApp()
         $scope.loadWaittingApp()
         $scope.has_query=true
     }
+
+    function convertResult(fields, result){
+      // [ [time, value,...] ]
+      // [ {metric:,x:[],y:[]} ]
+      metrics = [];
+      $.each(fields, function(i, n){
+          metrics.push({metric:n,x:[],y:[]});
+      });
+
+      $.each(result, function(i, n){
+          $.each(n, function(j, v){
+              if(j == 0){
+                  v = parseInt(v);
+                  $.each(metrics, function(k, z){
+                      z.x.push(v);
+                  });
+              } else {
+                  metrics[j-1].y.push(v);
+              }
+          });
+      });
+      return metrics;
+    }
+
     //for rm query
     $scope.rmQuery=function(){
+        var fields = $scope.getRmFieldParams();
         $http({
             method: 'GET',
             url: '/monitorback/rm_query',
             params:{
-                "fields":$scope.getRmFieldParams(),
-                "happenTimeSplit": $scope.rm_split,
-                "happenTimeMin" :  get_unix_time() - parseInt($scope.rm_time) ,
-                "happenTimeMax" :  get_unix_time()
+                "fields"          : fields,
+                "happenTimeSplit" : $scope.rm_split,
+                "happenTimeMin"   : get_unix_time() - (parseInt($scope.rm_time)*60),
+                "happenTimeMax"   : get_unix_time()
             }
         }).success(function(response, status, headers, config){
             console.log("todo print rm data")
+            $scope.rm = response
+            // 数据格式转换 [[]] => [{}]
+            $scope.rm.metrics = convertResult(fields, $scope.rm.result);
+            console.debug($scope.rm.metrics);
         }).error(function(data, status) {
             $rootScope.alert("发送app_running请求失败");
         });
     }
+
     $scope.getRmFieldParams=function(){
         var temp = []
         for(var index in $scope.rm_fields){
@@ -192,6 +225,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         }   
         return temp;
     }
+
     //for nm query
     $scope.nmQuery=function(){
         $http({
@@ -209,8 +243,8 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         }).error(function(data, status) {
             $rootScope.alert("发送app_nmquery请求失败");
         });
-
     }
+
     $scope.getNmFieldParams=function(){
         var temp = []
         for(var index in $scope.nm_fields){ 
@@ -239,12 +273,14 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         }  
         return temp;
     }
+
     //for apps query
     $scope.appQuery=function(){
         $scope.loadAppSum()
         $scope.nowPage = 1
         $scope.loadAppList()
     }
+
     $scope.loadAppSum=function(){
         $http({
             method: 'GET',
@@ -259,6 +295,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
             $rootScope.alert("发送app_sum请求失败");
         });
     }
+
     $scope.loadAppList=function(){
         $http({
             method: 'GET',
@@ -278,12 +315,15 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
             $rootScope.alert("发送app_list请求失败");
         });
     }
+
     $scope.rate=function(small,big){
         return (small*100/big).toFixed(1)
     }
+
     $scope.toGSize=function(value){
         return toGSize(value)
     }
+
     $scope.formatApplist=function(applist){
         var re=[]
         for(var index in applist){
@@ -312,6 +352,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         }
         return re
     }
+
     $scope.getWhere=function(){
         //获取where
         var likeParams = {}
@@ -351,6 +392,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         }
         return where
     }
+
     $scope.changeOrder=function(key){
         if($scope.orderField == key){
             if($scope.orderDirection=="asc"){
@@ -365,17 +407,21 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         }
         $scope.loadAppList()
     }
+
     $scope.setMaxPage=function(sum){
         $scope.maxPage = Math.floor((parseInt(sum)-1)/50)+1
     }
+
     $scope.prePage=function(){
         if($scope.nowPage == 1) return;
         $scope.setPage($scope.nowPage - 1)
     }
+
     $scope.nextPage=function(){
         if( $scope.nowPage == $scope.maxPage) return;
         $scope.setPage($scope.nowPage + 1)  
     }
+
     $scope.setPage=function(want){
         if(want<1 || want>$scope.maxPage) return;
         $scope.nowPage=want;
@@ -385,7 +431,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         else $scope.next=true
         $scope.loadAppList()
     }
-    
 
     //init var below
     $scope.appkeyList = ["mapsTotal","mapsPending","mapsRunning","failedMapAttempts","killedMapAttempts","successfulMapAttempts","reducesTotal","reducesPending","reducesRunning","failedReduceAttempts","killedReduceAttempts","successfulReduceAttempts"];
@@ -449,7 +494,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$time
         {"value":"4320","dis":"最近3天"},
         {"value":"10080","dis":"最近7天"}
     ]
-    $scope.rmQuery()
-    $scope.nmQuery()
-    $scope.appQuery()
+    $scope.rmQuery();
+    $scope.nmQuery();
+    $scope.appQuery();
 }]);

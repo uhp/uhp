@@ -62,9 +62,9 @@ class Collector:
         默认从数据库中获取,由于可能只使用监控
         所以本函数可以直接修改为固定值
         '''
-        self.rmhost="hadoop2"
+        self.rmhost="hadoop5"
         self.rmport="50088"
-        self.hshost="hadoop2"
+        self.hshost="hadoop5"
         self.hsport="50888"
 
     def collect(self, recordTime):
@@ -386,9 +386,12 @@ if __name__ == "__main__":
         files_preserve=[logging.root.handlers[1].stream.fileno()]
         dmn = daemon.DaemonContext(None, os.getcwd(), pidfile=pidfile, files_preserve=files_preserve)
         dmn.open()
-        #start collect loop
-        main = CollectorMain()
-        main.run()
+        try:
+            #start collect loop
+            main = CollectorMain()
+            main.run()
+        finally:
+            dmn.close()
     except Exception as e:
         log.exception(e)
     log.info("end!")

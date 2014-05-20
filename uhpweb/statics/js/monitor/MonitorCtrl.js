@@ -90,7 +90,10 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   $scope.make_chartOpt=function(host_metric){
     //x轴转换  
     console.debug(host_metric);
-    xfunc = host_metric.xfunc || $scope.default_xfunc;
+    xfunc = $scope.default_xfunc;
+    if('xfunc' in host_metric){
+      xfunc = host_metric.xfunc;
+    }
     if(xfunc != $scope.NO_XFUNC){
       host_metric.x = $.map(host_metric.x, xfunc);
     }
@@ -137,6 +140,11 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   }
   
   $scope.draw=function(id, host_metric){
+    if(!bool(host_metric)) {
+      console.debug('$scope.draw null metric');
+      console.debug(host_metric);
+      return false;
+    }
     console.debug("draw ...")
     // 等待界面target元素绘制完成
     $timeout(function(){ 

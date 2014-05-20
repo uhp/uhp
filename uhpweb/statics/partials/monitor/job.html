@@ -12,11 +12,11 @@
         <div class="panel-heading"><h3 class="panel-title">基本信息</h3></div>
         <div class="panel-body">
           <ul class="list-inline">
-            <li>正在运行应用：<strong>[[ app_state['appsRunning'] ]]</strong></li>
-            <li>分配的Container：<strong>[[ app_state['containersAllocated'] ]]</strong></li>
-            <li>使用的内存: <strong>[[ app_state['allocatedMB'] ]]MB</strong></li>
-            <li>剩余的内存：<strong>[[ app_state['availableMB']-app_state['allocatedMB'] ]]MB</strong></li>
-            <li>存活的NodeManager：<strong>[[ app_state['activeNodes'] ]]</strong></li>
+            <li style="min-width:300px;">正在运行应用：<strong>[[ app_state['appsRunning'] ]]</strong></li>
+            <li style="min-width:300px;">分配的Container：<strong>[[ app_state['containersAllocated'] ]]</strong></li>
+            <li style="min-width:300px;">使用的内存: <strong>[[ app_state['allocatedMB'] ]]MB</strong></li>
+            <li style="min-width:300px;">剩余的内存：<strong>[[ app_state['availableMB']-app_state['allocatedMB'] ]]MB</strong></li>
+            <li style="min-width:300px;">存活的NodeManager：<strong>[[ app_state['activeNodes'] ]]</strong></li>
           </ul>
         </div>
       </div>
@@ -25,59 +25,67 @@
 
   <div class="panel panel-success">
     <div class="panel-heading"><h3 class="panel-title">运行的应用</h3></div>
-    <div class="panel-body" style="padding:1px"> 
+    <div class="panel-body" style="padding-top:0px"> 
 
       <div class="panel-group" id="running-accordion">
-        <div class="panel panel-success" ng-repeat=" (queuename,applist) in queues">
+
+        <!-- inner pannel -->
+        <div class="panel panel-success" ng-repeat="(queuename,applist) in queues" style="margin-top:10px;">
+
           <div class="panel-heading">
             <h3 class="panel-title">
               队列([[ queuename ]]):一共运行了[[ queueMeta[queuename]['apps'] ]]个应用.采集了[[ queueMeta[queuename]['collect_app'] ]]个应用的数据，正在运行[[ queueMeta[queuename]['run_map'] ]]个Map和[[ queueMeta[queuename]['run_reduce'] ]]个Reduce,还需要运行[[ queueMeta[queuename]['todo_map'] ]]个Map和[[ queueMeta[queuename]['todo_reduce'] ]]个Reduce
             </h3>
           </div>
-          <div class="panel-collapse  in collapse">
-            <div class="panel-body" style="padding:1px"> 
-              <table class="table table-bordered table-striped table-hover" style="font-size:14px;margin-bottom:1px">
-                <thead>
-                  <tr>
-                    <th>应用id</th>
-                    <th>用户</th>
-                    <th>名称</th>
-                    <th>AM机器</th>
-                    <th>提交至今</th>
-                    <th>进度</th>
-                    <th>Am运行</th>
-                    <th colspan="6">Map(总数,待运行,正运行,失败,杀死,成功)</th>
-                    <th colspan="6">Reduce(总数,待运行,正运行,失败,杀死,成功)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="(appid,info) in applist">
-                    <td><a href=http://[[rmhost]]:[[rmport]]/proxy/[[appid]]>[[ info['id'] ]]</a></td>
-                    <td>[[ info['user'] ]]</td>
-                    <td style="width:250px;word-break:break-all;">[[ info['name'] ]]</td>
-                    <td>[[ info['amHostHttpAddress'] ]]</td>
-                    <td>[[ info['elapsedTime'] ]]</td>
-                    <td>[[ info['progress'] ]]</td>
-                    <td>[[ info['amTime'] ]]</td>
-                    <td>[[ info['mapsTotal'] ]]</td>
-                    <td>[[ info['mapsPending'] ]]</td>
-                    <td>[[ info['mapsRunning'] ]]</td>
-                    <td>[[ info['failedMapAttempts'] ]]</td>
-                    <td>[[ info['killedMapAttempts'] ]]</td>
-                    <td>[[ info['successfulMapAttempts'] ]]</td>
-                    <td>[[ info['reducesTotal'] ]]</td>
-                    <td>[[ info['reducesPending'] ]]</td>
-                    <td>[[ info['reducesRunning'] ]]</td>
-                    <td>[[ info['failedReduceAttempts'] ]]</td>
-                    <td>[[ info['killedReduceAttempts'] ]]</td>
-                    <td>[[ info['successfulReduceAttempts'] ]]</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+
+          <div class="panel-collapse in collapse">
+
+            <table class="table table-bordered table-striped table-hover" style="font-size:14px;">
+              <thead>
+                <tr>
+                  <th>应用Id</th>
+                  <th>用户</th>
+                  <th>名称</th>
+                  <th>AM机器</th>
+                  <th>提交至今</th>
+                  <th>进度</th>
+                  <th>Am运行</th>
+                  <th colspan="6">Map(总数,待运行,正运行,失败,杀死,成功)</th>
+                  <th colspan="6">Reduce(总数,待运行,正运行,失败,杀死,成功)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(appid,info) in applist">
+                  <td><a href=http://[[rmhost]]:[[rmport]]/proxy/[[appid]]>[[ info['id'] ]]</a></td>
+                  <td>[[ info['user'] ]]</td>
+                  <td style="width:250px;word-break:break-all;">[[ info['name'] ]]</td>
+                  <td>[[ info['amHostHttpAddress'] ]]</td>
+                  <td>[[ info['elapsedTime'] ]]</td>
+                  <td>[[ info['progress'] ]]</td>
+                  <td>[[ info['amTime'] ]]</td>
+                  <td>[[ info['mapsTotal'] ]]</td>
+                  <td>[[ info['mapsPending'] ]]</td>
+                  <td>[[ info['mapsRunning'] ]]</td>
+                  <td>[[ info['failedMapAttempts'] ]]</td>
+                  <td>[[ info['killedMapAttempts'] ]]</td>
+                  <td>[[ info['successfulMapAttempts'] ]]</td>
+                  <td>[[ info['reducesTotal'] ]]</td>
+                  <td>[[ info['reducesPending'] ]]</td>
+                  <td>[[ info['reducesRunning'] ]]</td>
+                  <td>[[ info['failedReduceAttempts'] ]]</td>
+                  <td>[[ info['killedReduceAttempts'] ]]</td>
+                  <td>[[ info['successfulReduceAttempts'] ]]</td>
+                </tr>
+              </tbody>
+            </table>
+
           </div>
         </div>
+        <!-- inner pannel -->
+
       </div>
+      <!-- panel-group -->
+
     </div>
     <!-- panel-body -->
   </div>
@@ -86,7 +94,7 @@
   <div class="panel panel-success">
     <div class="panel-heading"><h3 class="panel-title">等待的应用</h3></div>
 
-    <table class="table table-bordered table-striped table-hover"  style="font-size:14px">
+    <table class="table table-bordered table-striped table-hover" style="font-size:14px">
       <thead>
         <tr>
           <th>应用id</th>

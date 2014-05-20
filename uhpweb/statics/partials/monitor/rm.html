@@ -3,11 +3,11 @@
 
     <div class="col-md-10">
 
-      <!-- 第一行  -->
+      <!-- 第一行 -->
       <div class="row">
         <div class="col-md-12">
 
-          <div class="input-group">
+          <div class="input-group imput-group-sm">
             <span class="input-group-addon">展示指标</span>
             <select class="form-control" chosen  multiple ng-model="rm_fields">
               <option value="app">App状况</option>
@@ -22,12 +22,12 @@
       </div>
 
       <!-- 第二行 -->
-      <div class="row" style="padding-top:10px"> 
+      <div class="row" style="margin-top:10px"> 
         <div class="col-md-6">
 
-          <div class="input-group">
+          <div class="input-group imput-group-sm">
             <span class="input-group-addon">统计时间</span>
-            <select class="form-control" style="width:120px;" ng-model="rm_time">
+            <select class="form-control" ng-model="rm_time">
               <!-- <option selected="selected" value ="-1">无</option>  -->
               <option value ="10">最近10分钟</option>
               <option value ="60">最近1小时</option>
@@ -42,9 +42,9 @@
         </div>
 
         <div class="col-md-6">
-          <div class="input-group">
+          <div class="input-group imput-group-sm">
             <span class="input-group-addon">统计间隔</span>
-            <select class="form-control" style="width:120px;" ng-model="rm_split">
+            <select class="form-control" ng-model="rm_split">
               <option value ="10">10分钟</option>
               <option value ="60">1小时</option>
               <option value ="180">3小时</option>
@@ -65,14 +65,14 @@
 
   <div class="row" style="margin-top:20px;">
     <div class="col-md-12">
-      <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metrics)" ng-repeat="metrics in getRmFieldParams()">
+      <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metric)" ng-repeat="metric in rm.metrics" ng-init="ID=formatIdName('draw3_' + metric.metric)">
 
         <!-- panel -->
         <div class="panel panel-info">
-          <div class="panel-heading"><h3 class="panel-title">[[metrics]]</h3></div>
+          <div class="panel-heading"><h3 class="panel-title">[[metric.metric]]</h3></div>
           <div class="panel-body">
-            <div id="draw_[[ metrics ]]" style="width:420px;height:250px;"></div>
-            <div ng-init="draw(metrics)" class="hide"></div>
+            <div id="[[ID]]" style="width:420px;"></div>
+            <div ng-init="draw('#'+ID, metric)" class="hide"></div>
           </div>
         </div>
         <!-- ~panel -->

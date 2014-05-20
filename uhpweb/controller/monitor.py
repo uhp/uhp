@@ -607,17 +607,31 @@ class MonitorBackHandler(BaseHandler):
         finally:
             session.close()
 
+    def _query_special_hosts(self, service_name, role_name):
+        # [{name:, roles:{role:[instance]}}]
+        services = self._query_active_services()
+        for service in services:
+            if service['name'] == service_name:
+                for role, instances in service['roles'].iteritems():
+                    if role == 'resourcemanager': 
+                        return instances
+        return []
+
     def _get_rmhost(self):
-        return "hadoop2"
+        instances = self._query_special_hosts('yarn', 'resourcemanager')
+        if instances: return instances[0]
+        raise Exception('can not get rm host')
 
     def _get_rmport(self):
-        return "50088"
-    #for running job
+        rm_port = self._query_var('all', config.collect_yarn_rm_webapp_port_varname)
+        return str(rm_port)
 
     def app_running_state(self):
-        url = "http://%s:%s/ws/v1/cluster/metrics" %( self._get_rmhost(),self._get_rmport() )
+        url = "http://%s:%s/ws/v1/cluster/metrics" % (self._get_rmhost(),self._get_rmport())
         metrics = util.get_http_json(url)
         self.ret("ok","",metrics)
+        #retu = {'data':{'url':url, 'metrics':metrics}}
+        #self.ret("ok","",retu)
 
     def app_running(self):
         url = "http://%s:%s/ws/v1/cluster/apps?state=RUNNING" %(self._get_rmhost(),self._get_rmport())
@@ -665,12 +679,15 @@ class MonitorBackHandler(BaseHandler):
 
     #for rm query
     def rm_query(self):
-        fields = self.get_argument("fields",""); 
-        fields = fields.split(",")
-        happenTimeMax = self.get_argument("happenTimeMax",0);
-        happenTimeMin = self.get_argument("happenTimeMin",0);
-        happenTimeSplit = self.get_argument("happenTimeSplit",600);
-        if len(fields)!=0 :
+        fields          = self.get_arguments("fields",['appNum','finishedApp','failedApp'])
+        happenTimeMax   = self.get_argument("happenTimeMax",0)
+        happenTimeMin   = self.get_argument("happenTimeMin",0)
+        happenTimeSplit = self.get_argument("happenTimeSplit",600)
+
+        sql = ""
+        queryResult = []
+
+        if fields:
             where = "1" 
             if happenTimeMax != 0:
                 where = where + " and happenTime < "+str(happenTimeMax)
@@ -681,10 +698,10 @@ class MonitorBackHandler(BaseHandler):
             for field in fields:
                 sqlFields = sqlFields+" , sum("+field+") as " + field
         
-            sql = ("select (happenTime/%s)*%s as printTime  %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
+            sql = ("select (happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
+
             session = database.getSession()
             cursor = session.execute(sql)
-            queryResult = []
             for record in cursor:
                 temp = []
                 for value in record:
@@ -700,7 +717,7 @@ class MonitorBackHandler(BaseHandler):
             #特殊处理mapTime和reduceTime
             #由于前面有一个printTime的查询，所以偏移一位
             fieldOffset = 1 
-            if "mapTime" in fields and "mapNum"  in fields :
+            if "mapTime" in fields and "mapNum" in fields :
                 timeIndex = fields.index("mapTime") + fieldOffset
                 numIndex = fields.index("mapNum") + fieldOffset
                 for record in queryResult:
@@ -713,11 +730,9 @@ class MonitorBackHandler(BaseHandler):
                 for record in queryResult:
                     if record[numIndex] != None and record[numIndex] != 0:
                         record[timeIndex] = record[timeIndex] / record[numIndex]
-        else:
-            sql = ""
-            queryResult = []
 
-        result= {"result":queryResult,"sql":sql}
+        result= {"result":queryResult, "sql":sql}
+
         self.ret("ok","",result)               
                     
     #for nm query

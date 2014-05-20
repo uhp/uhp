@@ -58,6 +58,7 @@ mail_interval = 60
 
 #for collect
 collect_interval = 600
+collect_yarn_rm_webapp_port_varname = 'yarn_rm_webapp_port'
 
 #USE FOR DEBUG
 

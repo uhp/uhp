@@ -1,117 +1,206 @@
-<div ng-controller="MoniJobCtrl"> 
-<div>
-    <button class="btn btn-info" ng-click="appQuery()">查询</button>
-</div>
-<div style="font-size:14px;padding-top:10px;">
-    <div class="row">
-        <span class="col-md-1">appid</span>
-        <input type="text" class="col-md-4"  placeholder="应用ID" ng-model="filterId">
-        <span class="col-md-1">user</span>
-        <input class="col-md-4"  placeholder="用户名" ng-model="filterUser">
-    </div>
-    <div class="row" style="padding-top:10px;">
-        <span class="col-md-1">name</span>
-        <input class="col-md-4" placeholder="应用名称" ng-model="filterName">
-        <span class="col-md-1">queue</span>
-        <input class="col-md-4" placeholder="队列" ng-model="filterQueue">
-    </div>
-    <div class="row" style="padding-top:10px;">
-        <span class="col-md-1" >state</span>
-        <select class="col-md-2" style="height:30px; ng-model="filterState">
-            <option></option>
-            <option>FINISHED</option>
-        </select>
-        <div class="col-md-2"></div>
-        <span class="col-md-1" >finalStatus</span>
-        <select class="col-md-2" style="height:30px" ng-model="filterFinalStatus">
-            <option></option>
-            <option>SUCCEEDED</option>
-            <option>KILLED</option>
-            <option>FAILED</option>
-        </select>
-    </div>
-    <div class="row" style="padding-top:10px;"> 
-        <span  class="col-md-1">startTime</span>
-        <select class="col-md-2" style="height:30px;" ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict">
-        </select>
-        <div class="col-md-2"></div>
-        <span class="col-md-1">endTime</span>
-        <select class="col-md-2" style="height:30px;" ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict">
-        </select>
-    </div>
-</div>
-<div style="padding-top:10px;">
-    <b>汇总信息</b>
-    <p style="font-size:14px;margin-bottom:0px;">一共有 <blue>[[ appsum['appidCount'] ]]</blue> 个Appid符合筛选。</p>
-    <p style="font-size:14px;margin-bottom:0px;">产生 <blue>[[ appsum['mapsTotalSum'] ]]</blue> 个map任务 ,完成了 <blue>[[ appsum['mapsCompletedSum'] ]]</blue> 个，完成率 <blue>[[ rate(appsum['mapsCompletedSum'],appsum['mapsTotalSum']) ]]</blue> %。进行了 <blue>[[ appsum['successfulMapAttemptsSum']+appsum['failedMapAttemptsSum']+appsum['killedMapAttemptsSum'] ]]</blue> 次map的尝试，成功了 <blue>[[ appsum['successfulMapAttemptsSum'] ]]</blue> 次，失败了 <blue>[[ appsum['failedMapAttemptsSum'] ]]</blue> 次, 终止了 <blue>[[ appsum['killedMapAttemptsSum'] ]]</blue> 次。</p>
+<div style="font-size:14px;padding-top:0px;" ng-controller="MoniJobCtrl"> 
 
-    <p style="font-size:14px;margin-bottom:0px;">本地map调度 <blue>[[ appsum['localMapSum'] ]]</blue> 次，调度率占 <blue>[[ rate(appsum['localMapSum'],appsum['mapsTotalSum']) ]]</blue> %。 机架map调度 <blue>[[ appsum['rackMapSum'] ]]</blue> 次，调度率占 <blue>[[ rate(appsum['rackMapSum'],appsum['mapsTotalSum']) ]]</blue> %</p>
-    <p style="font-size:14px;margin-bottom:0px;">产生 <blue>[[ appsum['reducesTotalSum'] ]]</blue> 个reduce任务 ,完成了 <blue>[[ appsum['reducesCompletedSum'] ]]</blue> 个，完成率 <blue>[[ rate(appsum['reducesCompletedSum'],appsum['reducesTotalSum']) ]]</blue> %。进行了 <blue>[[ appsum['successfulReduceAttemptsSum']+appsum['failedReduceAttemptsSum']+appsum['killedReduceAttemptsSum'] ]]</blue> 次reduce的尝试，成功了 <blue>[[ appsum['successfulReduceAttemptsSum'] ]]</blue> 次，失败了 <blue>[[ appsum['failedReduceAttemptsSum'] ]]</blue> 次, 终止了 <blue>[[ appsum['killedReduceAttemptsSum'] ]]</blue> 次。</p>
-    <p style="font-size:14px;margin-bottom:0px;">读了 <blue>[[ toGSize(appsum['hdfsReadSum']) ]]</blue> G,写了 <blue>[[ toGSize(appsum['hdfsWriteSum']) ]]</blue> HDFS的文件, 读了 <blue>[[ toGSize(appsum['fileReadSum']) ]]</blue> G,写了 <blue>[[ toGSize(appsum['fileWriteSum']) ]]</blue> G 的本地中间文件。</p>
-</div>
-<div>
-    <div class="pull-right">
-       排序: [[ fieldDict[orderField] ]]([[ orderDict[orderDirection] ]]) 一共[[ maxPage ]]页,当前第[[ nowPage ]]页
-       <div class="btn-group">
-         <button type="button" class="btn" ng-click="setPage(1)"><span class="glyphicon glyphicon-step-backward"></span></button>
-         <button type="button" class="btn [[isDisable('pre')]] " ng-click="prePage()"><span class="glyphicon glyphicon-chevron-left"></span></button>
-         <button type="button" class="btn [[isDisable('next')]] " ng-click="nextPage()"><span class="glyphicon glyphicon-chevron-right"></span></button>
-         <button type="button" class="btn" ng-click="setPage(maxPage)"><span class="glyphicon glyphicon-step-forward"></span></button>
-       </div>
+  <div class="row">
+
+    <!-- col-md-10 -->
+    <div class="col-md-10">
+
+      <!-- row 1 -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">AppID</span>
+            <input type="text" class="form-control" placeholder="应用ID" ng-model="filterId">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">USER</span>
+            <input type="text" class="form-control" placeholder="用户名" ng-model="filterUser">
+          </div>
+        </div>
+      </div>
+
+      <!-- row 2 -->
+      <div class="row" style="margin-top:10px;">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">Name</span>
+            <input type="text" class="form-control" placeholder="应用名称" ng-model="filterName">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">Queue</span>
+            <input type="text" class="form-control" placeholder="队列" ng-model="filterQueue">
+          </div>
+        </div>
+      </div>
+
+      <!-- row 3 -->
+      <div class="row" style="margin-top:10px;">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">State</span>
+            <select class="form-control" ng-model="filterState">
+              <option></option>
+              <option>FINISHED</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">FinalStatus</span>
+            <select class="form-control" ng-model="filterFinalStatus">
+              <option></option>
+              <option>SUCCEEDED</option>
+              <option>KILLED</option>
+              <option>FAILED</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- row 4 -->
+      <div class="row" style="margin-top:10px;">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">startTime</span>
+            <select class="form-control" ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict"></select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon">endTime</span>
+            <select class="form-control" ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict"></select>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div>
+    <!-- ~col-md-10 -->
+
+    <div class="col-md-2">
+      <button class="btn btn-info btn-block" ng-click="appQuery()">查询</button>
+    </div>
+
+  </div>
+  <!-- ~row -->
+
+  <div class="row" style="margin-top:20px;">
+    <div class="col-md-12">
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">汇总信息</h3></div>
+
+        <div class="panel-body">
+          <ul class="list-inline">
+            <li style="min-width:300px">一共有<blue>[[ appsum['appidCount'] ]]</blue>个Appid符合筛选</li>
+            <li style="min-width:300px">产生<blue>[[ appsum['mapsTotalSum'] ]]</blue>个map任务</li>
+            <li style="min-width:300px">完成了<blue>[[ appsum['mapsCompletedSum'] ]]</blue>个</li>
+            <li style="min-width:300px">完成率<blue>[[ rate(appsum['mapsCompletedSum'],appsum['mapsTotalSum']) ]]</blue>%</li>
+            <li style="min-width:300px">进行了<blue>[[ appsum['successfulMapAttemptsSum']+appsum['failedMapAttemptsSum']+appsum['killedMapAttemptsSum'] ]]</blue>次map的尝试</li>
+            <li style="min-width:300px">成功了<blue>[[ appsum['successfulMapAttemptsSum'] ]]</blue>次</li>
+            <li style="min-width:300px">失败了<blue>[[ appsum['failedMapAttemptsSum'] ]]</blue>次</li>
+            <li style="min-width:300px">终止了<blue>[[ appsum['killedMapAttemptsSum'] ]]</blue>次</li>
+            <li style="min-width:300px">本地map调度<blue>[[ appsum['localMapSum'] ]]</blue>次</li>
+            <li style="min-width:300px">调度率占<blue>[[ rate(appsum['localMapSum'],appsum['mapsTotalSum']) ]]</blue>%</li>
+            <li style="min-width:300px">机架map调度<blue>[[ appsum['rackMapSum'] ]]</blue>次</li>
+            <li style="min-width:300px">调度率占<blue>[[ rate(appsum['rackMapSum'],appsum['mapsTotalSum']) ]]</blue>%</li>
+            <li style="min-width:300px">产生<blue>[[ appsum['reducesTotalSum'] ]]</blue>个reduce任务</li>
+            <li style="min-width:300px">完成了<blue>[[ appsum['reducesCompletedSum'] ]]</blue>个</li>
+            <li style="min-width:300px">完成率<blue>[[ rate(appsum['reducesCompletedSum'],appsum['reducesTotalSum']) ]]</blue>%</li>
+            <li style="min-width:300px">进行了<blue>[[ appsum['successfulReduceAttemptsSum']+appsum['failedReduceAttemptsSum']+appsum['killedReduceAttemptsSum'] ]]</blue>次reduce的尝试</li>
+            <li style="min-width:300px">成功了<blue>[[ appsum['successfulReduceAttemptsSum'] ]]</blue>次</li>
+            <li style="min-width:300px">失败了<blue>[[ appsum['failedReduceAttemptsSum'] ]]</blue>次</li>
+            <li style="min-width:300px">终止了<blue>[[ appsum['killedReduceAttemptsSum'] ]]</blue>次</li>
+            <li style="min-width:300px">读了<blue>[[ toGSize(appsum['hdfsReadSum']) ]]</blue>G</li>
+            <li style="min-width:300px">写了<blue>[[ toGSize(appsum['hdfsWriteSum']) ]]</blue>HDFS的文件</li>
+            <li style="min-width:300px">读了<blue>[[ toGSize(appsum['fileReadSum']) ]]</blue>G</li>
+            <li style="min-width:300px">写了<blue>[[ toGSize(appsum['fileWriteSum']) ]]</blue>G的本地中间文件</li>
+          </ul>
+        </div>
+
+      </div>
+      <!-- ~panel -->
+
+    </div>
+  </div>
+  <!-- ~row -->
+
+  <div class="row">
+    <div class="col-md-12">
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">应用列表</h3></div>
+        <div class="panel-body">
+          <div class="pull-right">
+            排序: [[ fieldDict[orderField] ]]([[ orderDict[orderDirection] ]]) 一共[[ maxPage ]]页,当前第[[ nowPage ]]页
+            <div class="btn-group">
+              <button type="button" class="btn" ng-click="setPage(1)"><span class="glyphicon glyphicon-step-backward"></span></button>
+              <button type="button" class="btn [[isDisable('pre')]] " ng-click="prePage()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+              <button type="button" class="btn [[isDisable('next')]] " ng-click="nextPage()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+              <button type="button" class="btn" ng-click="setPage(maxPage)"><span class="glyphicon glyphicon-step-forward"></span></button>
+            </div>
+          </div>
+        </div>
         <table class="table table-bordered table-striped table-hover" style="font-size:14px;margin-bottom:1px">
-            <thead>
-                <tr>
-                    <th ng-click="changeOrder('appid')" rowspan="2" >应用id</th>
-                    <th ng-click="changeOrder('user')" rowspan="2" >用户</th>
-                    <th ng-click="changeOrder('name')" rowspan="2" >名称</th>
-                    <th ng-click="changeOrder('queue')" rowspan="2"  >队列</th>
-                    <th ng-click="changeOrder('startedTime')" rowspan="2" >开始时间</th>
-                    <th ng-click="changeOrder('finishedTime')" rowspan="2" >结束时间</th>
-                    <th ng-click="changeOrder('state')" rowspan="2" >状态</th>
-                    <th ng-click="changeOrder('finalStatus')" rowspan="2" >结果</th>
-                    <th ng-click="changeOrder('attemptNumber')" rowspan="2"  >重试</th>
-                    <th ng-click="changeOrder('mapsTotal')"  colspan="3"  >map</th>
-                    <th ng-click="changeOrder('reducesTotal')"  colspan="2"  >reduce</th>
-                    <th ng-click="changeOrder('fileRead')"  colspan="2" >本地读写MB</th>
-                    <th ng-click="changeOrder('hdfsRead')"  colspan="2" >HDFS读写MB</th>
-                </tr>
-                <tr>
-                    <th ng-click="changeOrder('mapsTotal')" >全部</th>
-                    <th ng-click="changeOrder('mapsCompleted')" >完成</th>
-                    <th ng-click="changeOrder('localMap')" >本地</th>
-                    <th ng-click="changeOrder('reducesTotal')" >全部</th>
-                    <th ng-click="changeOrder('reducesCompleted')" >完成</th>
-                    <th ng-click="changeOrder('fileRead')"  >读</th>
-                    <th ng-click="changeOrder('fileWrite')"  >写</th>
-                    <th ng-click="changeOrder('hdfsRead')"  >读</th>
-                    <th ng-click="changeOrder('hdfsWrite')"  >写</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="app in applist">
-                    <td class="smalltd"><a href=http://[[rmhost]]:[[rmport]]/proxy/[[ app['appid']] ]]>[[ app['id'] ]]</a></td>
-                    <td class="smalltd">[[ app['user'] ]]</td>
-                    <td class="smalltd"  style="width:250px;word-break:break-all;">[[ app['name'] ]]</td>
-                    <td class="smalltd" >[[ app['queue'] ]]</td>
-                    <td style="width:80px;" >[[ app['start'] ]]</td>
-                    <td style="width:80px;" >[[ app['end'] ]]</td>
-                    <td class="smalltd" >[[ app['state'] ]]</td>
-                    <td class="smalltd" >[[ app['finalState'] ]]</td>
-                    <td class="smalltd" >[[ app['retry'] ]]</td>
-                    <td class="smalltd" >[[ app['map_total'] ]]</td>
-                    <td class="smalltd" >[[ app['map_fini'] ]]</td>
-                    <td class="smalltd" >[[ app['map_local'] ]]</td>
-                    <td class="smalltd" >[[ app['reduce_total'] ]]</td>
-                    <td class="smalltd" >[[ app['reduce_fini'] ]]</td>
-                    <td class="smalltd" >[[ app['local_read'] ]]</td>
-                    <td class="smalltd" >[[ app['local_write'] ]]</td>
-                    <td class="smalltd" >[[ app['hdfs_read'] ]]</td>
-                    <td class="smalltd" >[[ app['hdfs_write'] ]]</td>
-                </tr>
-            </tbody>
+          <thead>
+            <tr>
+              <th ng-click="changeOrder('appid')" rowspan="2" >应用id</th>
+              <th ng-click="changeOrder('user')" rowspan="2" >用户</th>
+              <th ng-click="changeOrder('name')" rowspan="2" >名称</th>
+              <th ng-click="changeOrder('queue')" rowspan="2"  >队列</th>
+              <th ng-click="changeOrder('startedTime')" rowspan="2" >开始时间</th>
+              <th ng-click="changeOrder('finishedTime')" rowspan="2" >结束时间</th>
+              <th ng-click="changeOrder('state')" rowspan="2" >状态</th>
+              <th ng-click="changeOrder('finalStatus')" rowspan="2" >结果</th>
+              <th ng-click="changeOrder('attemptNumber')" rowspan="2"  >重试</th>
+              <th ng-click="changeOrder('mapsTotal')"  colspan="3"  >map</th>
+              <th ng-click="changeOrder('reducesTotal')"  colspan="2"  >reduce</th>
+              <th ng-click="changeOrder('fileRead')"  colspan="2" >本地读写MB</th>
+              <th ng-click="changeOrder('hdfsRead')"  colspan="2" >HDFS读写MB</th>
+            </tr>
+            <tr>
+              <th ng-click="changeOrder('mapsTotal')" >全部</th>
+              <th ng-click="changeOrder('mapsCompleted')" >完成</th>
+              <th ng-click="changeOrder('localMap')" >本地</th>
+              <th ng-click="changeOrder('reducesTotal')" >全部</th>
+              <th ng-click="changeOrder('reducesCompleted')" >完成</th>
+              <th ng-click="changeOrder('fileRead')"  >读</th>
+              <th ng-click="changeOrder('fileWrite')"  >写</th>
+              <th ng-click="changeOrder('hdfsRead')"  >读</th>
+              <th ng-click="changeOrder('hdfsWrite')"  >写</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="app in applist">
+              <td class="smalltd"><a href=http://[[rmhost]]:[[rmport]]/proxy/[[ app['appid']] ]]>[[ app['id'] ]]</a></td>
+              <td class="smalltd">[[ app['user'] ]]</td>
+              <td class="smalltd"  style="width:250px;word-break:break-all;">[[ app['name'] ]]</td>
+              <td class="smalltd" >[[ app['queue'] ]]</td>
+              <td style="width:80px;" >[[ app['start'] ]]</td>
+              <td style="width:80px;" >[[ app['end'] ]]</td>
+              <td class="smalltd" >[[ app['state'] ]]</td>
+              <td class="smalltd" >[[ app['finalState'] ]]</td>
+              <td class="smalltd" >[[ app['retry'] ]]</td>
+              <td class="smalltd" >[[ app['map_total'] ]]</td>
+              <td class="smalltd" >[[ app['map_fini'] ]]</td>
+              <td class="smalltd" >[[ app['map_local'] ]]</td>
+              <td class="smalltd" >[[ app['reduce_total'] ]]</td>
+              <td class="smalltd" >[[ app['reduce_fini'] ]]</td>
+              <td class="smalltd" >[[ app['local_read'] ]]</td>
+              <td class="smalltd" >[[ app['local_write'] ]]</td>
+              <td class="smalltd" >[[ app['hdfs_read'] ]]</td>
+              <td class="smalltd" >[[ app['hdfs_write'] ]]</td>
+            </tr>
+          </tbody>
         </table>
+
+      </div>
     </div>
-</div>
+
+  </div>
+  <!-- ~row -->
+
 </div>

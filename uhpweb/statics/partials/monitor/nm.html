@@ -76,14 +76,14 @@
   <!-- draw -->
   <div class="row" style="margin-top:20px;">
     <div class="col-md-12">
-      <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metrics)" ng-repeat="metrics in getNmFieldParams()">
+      <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metrics)" ng-repeat="metrics in getNmFieldParams()" ng-init="ID=formatIdName('draw3_' + host_metric.metric)">
 
         <!-- panel -->
         <div class="panel panel-info">
           <div class="panel-heading"><h3 class="panel-title">[[metrics]]</h3></div>
           <div class="panel-body">
-            <div id="draw_[[ metrics ]]" style="width:420px;height:250px;"></div>
-            <div ng-init="draw(metrics)" class="hide"></div>
+            <div id="[[ID]]" style="width:420px;"></div>
+            <div ng-init="draw('#'+ID, metric)" class="hide"></div>
           </div>
         </div>
         <!-- ~panel -->
