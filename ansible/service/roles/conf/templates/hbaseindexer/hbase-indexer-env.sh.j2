@@ -7,3 +7,7 @@ export HBASE_INDEXER_OPTS="{{ SERVER_OPTS }}"
 export HBASE_INDEXER_PID_DIR=/var/hbase-indexer/pids
 
 export HBASE_INDEXER_CLI_ZK="{{groups.ZOOKEEPER | join(':' ~ zookeeper__zookeeper_client_port + ',')}}:{{zookeeper__zookeeper_client_port}}"
+
+export HBASE_INDEXER_ROOT_LOGGER="INFO,RFA"
+
+export HBASE_INDEXER_LOG_DIR="/var/log/hbase-solr"

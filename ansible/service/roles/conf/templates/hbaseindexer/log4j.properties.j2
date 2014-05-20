@@ -1,6 +1,6 @@
 # Define some default values that can be overridden by system properties
-hbaseindexer.root.logger=INFO,console
-hbaseindexer.security.logger=INFO,console
+hbaseindexer.root.logger=INFO,RFA
+hbaseindexer.security.logger=INFO,RFA
 hbaseindexer.log.dir=.
 hbaseindexer.log.file=hbase-indexer.log
 
@@ -28,7 +28,7 @@ log4j.appender.DRFA.layout.ConversionPattern=%d{ISO8601} %p %c: %m%n
 
 # Rolling File Appender properties
 hbaseindexer.log.maxfilesize=256MB
-hbaseindexer.log.maxbackupindex=20
+hbaseindexer.log.maxbackupindex=10
 
 # Rolling File Appender
 log4j.appender.RFA=org.apache.log4j.RollingFileAppender
