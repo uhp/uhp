@@ -84,10 +84,9 @@ start() {
 
   su -s /bin/bash $SVC_USER  -c "/bin/bash -c ' $EXEC_PATH --config '$CONF_DIR' server $DAEMON_FLAGS >> $OUTFILE 2>&1 </dev/null' &"
 
-  /usr/java/default/bin/jps -ml|grep "com.ngdata.hbaseindexer.Main"|awk '{print $1}' > ${PIDFILE}
-  
   # Some processes are slow to start
   sleep $SLEEP_TIME
+  /usr/java/default/bin/jps -ml|grep "com.ngdata.hbaseindexer.Main"|awk '{print $1}' > ${PIDFILE}
   checkstatusofproc
   RETVAL=$?
 
