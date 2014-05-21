@@ -24,9 +24,9 @@
       <!-- 第二行 -->
       <div class="row" style="padding-top:10px">
         <div class="col-md-12">
-          <div class="input-group">
+          <div class="input-group input-group-sm">
           <span class="input-group-addon">选择机器</span>
-          <select class="form-control" chosen id="nm-params-host-select" multiple ng-model="nm_hosts" ng-options="host for host in hosts" data-placeholder="选择要显示的机器">
+          <select class="form-control" chosen id="nm-params-host-select" multiple ng-model="selected_nm_hosts" ng-options="host for host in nm_hosts" data-placeholder="选择要显示的机器">
           </select>
           </div>
         </div>
@@ -76,11 +76,11 @@
   <!-- draw -->
   <div class="row" style="margin-top:20px;">
     <div class="col-md-12">
-      <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metrics)" ng-repeat="metrics in getNmFieldParams()" ng-init="ID=formatIdName('draw3_' + host_metric.metric)">
+      <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metric)" ng-repeat="metric in nm.metrics" ng-init="ID=formatIdName('draw6_' + metric.metric)">
 
         <!-- panel -->
         <div class="panel panel-info">
-          <div class="panel-heading"><h3 class="panel-title">[[metrics]]</h3></div>
+          <div class="panel-heading"><h3 class="panel-title">[[metric.metric]]</h3></div>
           <div class="panel-body">
             <div id="[[ID]]" style="width:420px;"></div>
             <div ng-init="draw('#'+ID, metric)" class="hide"></div>

@@ -613,7 +613,7 @@ class MonitorBackHandler(BaseHandler):
         for service in services:
             if service['name'] == service_name:
                 for role, instances in service['roles'].iteritems():
-                    if role == 'resourcemanager': 
+                    if role == role_name: 
                         return instances
         return []
 
@@ -621,6 +621,9 @@ class MonitorBackHandler(BaseHandler):
         instances = self._query_special_hosts('yarn', 'resourcemanager')
         if instances: return instances[0]
         raise Exception('can not get rm host')
+    
+    def _get_nmhosts(self):
+        return self._query_special_hosts('yarn', 'nodemanager')
 
     def _get_rmport(self):
         rm_port = self._query_var('all', config.collect_yarn_rm_webapp_port_varname)
@@ -677,9 +680,16 @@ class MonitorBackHandler(BaseHandler):
                 result[key] = "x"
             self.ret("ok","",result)
 
+    # 作业的查询初始化信息
+    def job_query_init_info(self):
+        nm_hosts = self._get_nmhosts()
+        result = {}
+        result['data'] = {'nm_hosts':nm_hosts}
+        self.ret("ok","",result)
+
     #for rm query
     def rm_query(self):
-        fields          = self.get_arguments("fields",['appNum','finishedApp','failedApp'])
+        fields          = self.get_arguments("fields",[])
         happenTimeMax   = self.get_argument("happenTimeMax",0)
         happenTimeMin   = self.get_argument("happenTimeMin",0)
         happenTimeSplit = self.get_argument("happenTimeSplit",600)
@@ -688,11 +698,12 @@ class MonitorBackHandler(BaseHandler):
         queryResult = []
 
         if fields:
-            where = "1" 
+            where = "" 
             if happenTimeMax != 0:
-                where = where + " and happenTime < "+str(happenTimeMax)
+                where += " happenTime < " + str(happenTimeMax)
             if happenTimeMin != 0:
-                where = where + " and happenTime > "+str(happenTimeMin)
+                where += " and" if where else ""
+                where += " happenTime > " + str(happenTimeMin)
         
             sqlFields=""
             for field in fields:
@@ -701,7 +712,7 @@ class MonitorBackHandler(BaseHandler):
             sql = ("select (happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
 
             session = database.getSession()
-            cursor = session.execute(sql)
+            cursor  = session.execute(sql)
             for record in cursor:
                 temp = []
                 for value in record:
@@ -731,12 +742,70 @@ class MonitorBackHandler(BaseHandler):
                     if record[numIndex] != None and record[numIndex] != 0:
                         record[timeIndex] = record[timeIndex] / record[numIndex]
 
-        result= {"result":queryResult, "sql":sql}
-
+        result = {"result":queryResult, "sql":sql}
         self.ret("ok","",result)               
                     
     #for nm query
+    def nm_query(self):
+        hosts           = self.get_arguments("hosts",[])
+        fields          = self.get_arguments("fields",[])
+        happenTimeMax   = self.get_argument("happenTimeMax",0)
+        happenTimeMin   = self.get_argument("happenTimeMin",0)
+        happenTimeSplit = self.get_argument("happenTimeSplit",600)
+        
+        sql         = ""
+        queryResult = []
 
+        if hosts and fields:
+            where = "" 
+            if happenTimeMax != 0:
+                where += " happenTime < " + str(happenTimeMax)
+            if happenTimeMin != 0:
+                where += " and" if where else ""
+                where += " happenTime > " + str(happenTimeMin)
+            
+            hostWhere = ",".join(["'%s'" % h for h in hosts])
+            where += " and" if where else ""
+            where += ' host in (%s)' % hostWhere
+            
+            sqlFields=",".join(["sum(%s) as %s" % (f, f) for f in fields])
+            
+            sql = ("select (happenTime/%s)*%s as printTime, host, %s from nm \
+                    where %s group by printTime, host" % 
+                    (happenTimeSplit, happenTimeSplit, sqlFields, where)
+                  )
+
+            session = database.getSession()
+            cursor  = session.execute(sql)
+            
+            for record in cursor:
+                temp = []
+                for value in record:
+                    if isinstance(value,Decimal):
+                        temp.append(float(value))    
+                    else:
+                        temp.append(value)
+                queryResult.append(temp)
+                
+            #特殊处理mapTime和reduceTime
+            #由于前面有printTime和host两个位置，所以偏移两位
+            fieldOffset = 2
+            if "mapTime" in fields and "mapNum"  in fields :
+                timeIndex = fields.index("mapTime") + fieldOffset
+                numIndex = fields.index("mapNum") + fieldOffset
+                for record in queryResult:
+                    if record[numIndex] != None and record[numIndex] != 0:
+                        record[timeIndex] = record[timeIndex] / record[numIndex] 
+            
+            if "reduceTime" in fields and "reduceNum"  in fields :
+                timeIndex = fields.index("reduceTime") + fieldOffset
+                numIndex = fields.index("reduceNum") + fieldOffset
+                for record in queryResult:
+                    if record[numIndex] != None and record[numIndex] != 0:
+                        record[timeIndex] = record[timeIndex] / record[numIndex]
+            
+        result = {"result":queryResult,"sql":sql}
+        self.ret("ok","",result)               
     
     #for app query
     def app_sum(self):

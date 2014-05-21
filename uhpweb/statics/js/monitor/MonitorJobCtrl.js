@@ -46,6 +46,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             $rootScope.alert("发送app_running请求失败");
         });
     }
+
     $scope.update_appid_info=function(queue,appid){
         $http({
             method: 'GET',
@@ -64,6 +65,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         });
 
     }
+
     $scope.formatQueues=function(queues){
         var re = {}
         for(var name in queues){
@@ -78,6 +80,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         }
         return re;
     }
+
     $scope.init_app=function(){
         var re={}
         re['amTime']='-';
@@ -87,6 +90,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         }
         return re
     }
+
     $scope.format=function(key,value){
         if( key == "startedTime"){
             return unix_to_datetime(value);
@@ -106,14 +110,17 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         }
         return value
     }
+
     $scope.formatAppid=function(appid){
         last = appid.lastIndexOf("_")
         return appid.substring(last+1)
     }
+
     $scope.getNodeFromAddress=function(address){
         length = address.indexOf(":");
         return address.substring(0,length);
     }
+
     $scope.formatElapsedTime=function(elapsedTime){
         if( elapsedTime=="x" ) return elapsedTime;
         var sec = Math.floor(elapsedTime/1000);
@@ -121,6 +128,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         var sec = sec - min*60;
         return min+"m"+sec+"s";
     }
+
     $scope.loadWaittingApp=function(){
         $http({
             method: 'GET',
@@ -225,21 +233,77 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         }   
         return temp;
     }
+    
+    // @return [ {metric:, x:[], y:{host:[]}} ]
+    function convertResultForMultiHost(fields, hosts, result){
+      // [ [time,host,field_value,field_value2,...] ]
+      // [ {metric:,x:[],[{host:,y:[]}]} ]
+      
+      // 先进行一次整理，方便后面使用
+      times= []; // [time]
+      data = {}; // {time:{host:{field:}}}
+      $.each(result, function(i, n){
+        time = parseInt(n[0]);
+        if(!(time in data)){
+          times.push(time);
+          data[time] = {}
+        }
+        
+        host = n[1];
+        data[time][host] = {}
+
+        values = n.slice(2);
+        $.each(values, function(j, v){
+          field = fields[j];
+          data[time][host][field] = v;
+        });
+      });
+
+      // 构建 metrics
+      // [ {metric:, x:[], y:{host:[]}} ]
+      metrics = [];
+      $.each(fields, function(i, f){
+        metric = {metric:f,x:[],y:{}};
+        $.each(times, function(j, t){
+          metric.x.push(t);
+          $.each(hosts, function(k, h){
+            if(!(h in metric.y)){
+              metric.y[h] = [];
+            }
+        
+            v = null;
+            if(h in data[t]){
+              v = data[t][h][f];
+            }
+            metric.y[h].push(v);
+          });
+        }); 
+        metrics.push(metric);
+      });
+
+      return metrics;
+    }
 
     //for nm query
     $scope.nmQuery=function(){
+        var fields = $scope.getNmFieldParams();
         $http({
             method: 'GET',
             url: '/monitorback/nm_query',
             params:{
-                "fields":$scope.getNmFieldParams(),
-                "hosts":$scope.nm_hosts,
-                "happenTimeSplit": $scope.nm_split,
-                "happenTimeMin" :  get_unix_time() - parseInt($scope.nm_time) ,
-                "happenTimeMax" :  get_unix_time()
+                "fields"          : fields,
+                "hosts"           : $scope.selected_nm_hosts,
+                "happenTimeSplit" : $scope.nm_split,
+                "happenTimeMin"   : get_unix_time() - (parseInt($scope.nm_time)*60),
+                "happenTimeMax"   : get_unix_time()
             }
         }).success(function(response, status, headers, config){
             console.log("todo print nm data")
+            $scope.nm = response
+            // 数据格式转换 [[]] => [{}]
+            // 同一指标，多实体对比
+            $scope.nm.metrics = convertResultForMultiHost(fields, $scope.selected_nm_hosts, $scope.nm.result);
+            console.debug($scope.nm.metrics);
         }).error(function(data, status) {
             $rootScope.alert("发送app_nmquery请求失败");
         });
@@ -432,69 +496,84 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.loadAppList()
     }
 
-    //init var below
-    $scope.appkeyList = ["mapsTotal","mapsPending","mapsRunning","failedMapAttempts","killedMapAttempts","successfulMapAttempts","reducesTotal","reducesPending","reducesRunning","failedReduceAttempts","killedReduceAttempts","successfulReduceAttempts"];
-    $scope.app_state = {}
-    $scope.appsum={}
-    $scope.has_query = false
-    //$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'})
-    //init filter value
-    $scope.filterEnd = "1440"
-    $scope.filterStart = -1
-    $scope.orderField="appid"
-    $scope.orderDirection="desc"
-    $scope.limit=50
-    $scope.nowPage=1
-    $scope.maxPage=1
-    //init rm params
-    $scope.rm_fields=["app","map","reduce"]
-    $scope.rm_time=1440
-    $scope.rm_split=60
-    //init nm params
-    $scope.nm_fields=["containerNum","amNum"]
-    $scope.nm_hosts=["hadoop1","hadoop2"]
-    $scope.hosts=["hadoop1","hadoop2","hadoop3"]
-    $scope.nm_time=1440
-    $scope.nm_split=60
-    //init dict
-    $scope.stateDict = {"FINISHED":"完成"}
-    $scope.finalStateDict = {"SUCCEEDED":"成功","KILLED":"中止","FAILED":"失败"}
-    $scope.fieldDict = {
-        "appid":"应用id",
-        "user":"用户",
-        "name":"名称",
-        "queue":"队列",
-        "startedTime":"开始时间",
-        "finishedTime":"结束时间",
-        "state":"状态",
-        "finalStatus":"结果",
-        "attemptNumber":"重试",
-        "mapsTotal":"map数量",
-        "reducesTotal":"reduce数量",
-        "fileRead":"本地读大小",
-        "hdfsRead":"HDFS读大小",
-        "mapsTotal":"map全部",
-        "mapsCompleted":"map完成",
-        "localMap":"map本地",
-        "reducesTotal":"reduce全部",
-        "reducesCompleted":"reduce完成",
-        "fileRead":"本地文件读大小",
-        "fileWrite":"本地文件写大小",
-        "hdfsRead":"HDFS读大小",
-        "hdfsWrite":"HDFS写大小"
+    $scope.init = function(){
+        //init var below
+        $scope.appkeyList = ["mapsTotal","mapsPending","mapsRunning","failedMapAttempts","killedMapAttempts","successfulMapAttempts","reducesTotal","reducesPending","reducesRunning","failedReduceAttempts","killedReduceAttempts","successfulReduceAttempts"];
+        $scope.app_state = {}
+        $scope.appsum={}
+        $scope.has_query = false
+        //$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'})
+        
+        //init filter value
+        $scope.filterEnd = "1440"
+        $scope.filterStart = -1
+        $scope.orderField="appid"
+        $scope.orderDirection="desc"
+        $scope.limit=50
+        $scope.nowPage=1
+        $scope.maxPage=1
+        
+        //init rm params
+        $scope.rm_fields=["app","map","reduce"]
+        $scope.rm_time=1440
+        $scope.rm_split=60
+        
+        //init nm params
+        $rootScope.myHttp('GET', '/monitorback/job_query_init_info', {}, 
+            function(res){
+                $scope.nm_hosts          = res.data.nm_hosts;
+                $scope.selected_nm_hosts = $scope.nm_hosts.slice(0,Math.min(3,$scope.nm_hosts.length));
+                $scope.nm_fields         = ["containerNum","amNum"]
+                $scope.nm_time           = 1440
+                $scope.nm_split          = 60
+
+                $scope.nmQuery(); // 触发第一次查询绘图
+            }
+        );
+       
+        //init dict
+        $scope.stateDict = {"FINISHED":"完成"}
+        $scope.finalStateDict = {"SUCCEEDED":"成功","KILLED":"中止","FAILED":"失败"}
+        $scope.fieldDict = {
+            "appid":"应用id",
+            "user":"用户",
+            "name":"名称",
+            "queue":"队列",
+            "startedTime":"开始时间",
+            "finishedTime":"结束时间",
+            "state":"状态",
+            "finalStatus":"结果",
+            "attemptNumber":"重试",
+            "mapsTotal":"map数量",
+            "reducesTotal":"reduce数量",
+            "fileRead":"本地读大小",
+            "hdfsRead":"HDFS读大小",
+            "mapsTotal":"map全部",
+            "mapsCompleted":"map完成",
+            "localMap":"map本地",
+            "reducesTotal":"reduce全部",
+            "reducesCompleted":"reduce完成",
+            "fileRead":"本地文件读大小",
+            "fileWrite":"本地文件写大小",
+            "hdfsRead":"HDFS读大小",
+            "hdfsWrite":"HDFS写大小"
+        }
+        
+        $scope.orderDict = {"desc":"降序","asc":"升序"}
+        $scope.timeDict = [
+            {"value":"-1","dis":"无"},
+            {"value":"10","dis":"最近10分钟"},
+            {"value":"60","dis":"最近1小时"},
+            {"value":"180","dis":"最近3小时"},
+            {"value":"720","dis":"最近12小时"},
+            {"value":"1440","dis":"最近24小时"},
+            {"value":"4320","dis":"最近3天"},
+            {"value":"10080","dis":"最近7天"}
+        ]
+        
+        $scope.rmQuery();
+        $scope.appQuery();
     }
-    $scope.orderDict = {"desc":"降序","asc":"升序"}
-    $scope.timeDict = [
-        {"value":"-1","dis":"无"},
-        {"value":"10","dis":"最近10分钟"},
-        {"value":"60","dis":"最近1小时"},
-        {"value":"180","dis":"最近3小时"},
-        {"value":"720","dis":"最近12小时"},
-        {"value":"1440","dis":"最近24小时"},
-        {"value":"4320","dis":"最近3天"},
-        {"value":"10080","dis":"最近7天"}
-    ]
-    $scope.rmQuery();
-    $scope.nmQuery();
-    $scope.appQuery();
+
+    $scope.init();
 }]);

@@ -86,26 +86,51 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     return n;
   }
 
-  // host_metric:{metric:,x:,y:}
-  $scope.make_chartOpt=function(host_metric){
-    //x轴转换  
-    console.debug(host_metric);
-    xfunc = $scope.default_xfunc;
-    if('xfunc' in host_metric){
-      xfunc = host_metric.xfunc;
-    }
+  // metric:{metric:, x:[], y:[]}
+  // metric:{metric:, x:[], y:{host:[]}}
+  $scope.make_chartOpt=function(metric){
+    //x轴转换 
+    console.debug(metric);
+    xfunc = metric.xfun || $scope.default_xfunc;
     if(xfunc != $scope.NO_XFUNC){
-      host_metric.x = $.map(host_metric.x, xfunc);
+      metric.x = $.map(metric.x, xfunc);
     }
     
     //转换null值为echart要求格式
-    host_metric.y = $.map(host_metric.y, function(n){
-      return (n===null)?'-':n;
-    });
+    if($.isArray(metric.y)){
+      metric.y = $.map(metric.y, function(n){
+        return (n===null)?'-':n;
+      });
+    } else {
+      $.each(metric.y, function(k, vs){
+        metric.y[k] = $.map(vs, function(n){
+          return (n===null)?'-':n;
+        });
+      });
+    }
+
+    function legendData(){
+      if($.isArray(metric.y)) return [metric.metric];
+      var retu = [];
+      $.each(metric.y, function(k, v){
+        retu.push(k);
+      }); 
+      return retu;
+    }
+
+    function series(){
+      if($.isArray(metric.y)) return [ { name: metric.metric, type:metric.chartType||'line', data:metric.y } ];
+      var retu = [];
+      $.each(metric.y, function(k, v){
+        s = {name:k, type:'line', data:v}
+        retu.push(s);
+      }); 
+      return retu;
+    }
 
     chartOpt = {
         tooltip : { trigger: 'axis' },
-        legend: { x:'left', data:[host_metric.metric] },
+        legend: { x:'left', data:legendData() },
         toolbox: {
             show : true,
             feature : {
@@ -119,12 +144,12 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
         },
         dataZoom: {show:true},
         calculable : false,
-        xAxis : [ { type : 'category', boundaryGap : true, data : host_metric.x } ],
+        xAxis : [ { type : 'category', boundaryGap : true, data : metric.x } ],
         yAxis : [ { type : 'value', splitArea : {show:true} } ],
-        series : [ { name:$scope.show.metric, type:host_metric.chartType||'line', data:host_metric.y } ]
+        series : series()
     }
-    if(bool(host_metric.metric.unit)){
-      chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+host_metric.metric.unit }
+    if(bool(metric.metric.unit)){
+      chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+metric.metric.unit }
     }
     return chartOpt;
   }
@@ -136,7 +161,9 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     console.debug(target);
     if(!bool(target)) return;
     var myChart = echarts.init(target,{grid:{x:40,y:30,x2:10,y2:55}});
-    myChart.setOption($scope.make_chartOpt(host_metric)); // ~ setOption
+    var chartOpt = $scope.make_chartOpt(host_metric)
+    console.debug(chartOpt);
+    myChart.setOption(chartOpt);
   }
   
   $scope.draw=function(id, host_metric){
