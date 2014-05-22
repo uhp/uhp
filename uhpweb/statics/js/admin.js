@@ -1,7 +1,8 @@
 //use base.js
-var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngSanitize','localytics.directives']);
+var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ngSanitize']);
 //,'ui.bootstrap'
 //'$cookiesProvider',
+//,'localytics.directives'
 uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', function($routeProvider, $interpolateProvider,$rootScopeProvider) {
 	$interpolateProvider.startSymbol('[[');
     $interpolateProvider.endSymbol(']]');

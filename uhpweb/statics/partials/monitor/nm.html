@@ -9,7 +9,7 @@
         <div class="col-md-12">
           <div class="input-group">
           <span class="input-group-addon">展示指标</span>
-          <select class="form-control" id="nm-params-field-select" multiple chosen ng-model="nm_fields"  data-placeholder="选择要显示的指标">
+          <select id="nm-params-field-select" class="select-block" multiple chosen ng-model="nm_fields">
             <option value="containerNum">Container数量</option>
             <option value="amNum">Am数量</option>
             <option value="map">Map状况</option>
@@ -26,7 +26,7 @@
         <div class="col-md-12">
           <div class="input-group input-group-sm">
           <span class="input-group-addon">选择机器</span>
-          <select class="form-control" chosen id="nm-params-host-select" multiple ng-model="selected_nm_hosts" ng-options="host for host in nm_hosts" data-placeholder="选择要显示的机器">
+          <select chosen id="nm-params-host-select" multiple ng-model="selected_nm_hosts" ng-options="host for host in nm_hosts" data-placeholder="选择要显示的机器">
           </select>
           </div>
         </div>
@@ -38,7 +38,7 @@
 
           <div class="input-group">
             <span class="input-group-addon">统计时间</span>
-            <select class="form-control" style="width:120px;" ng-model="rm_time">
+            <select style="width:120px;" ng-model="rm_time">
               <!-- <option selected="selected" value ="-1">无</option>  -->
               <option value ="10">最近10分钟</option>
               <option value ="60">最近1小时</option>
@@ -55,7 +55,7 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon">统计间隔</span>
-            <select class="form-control" style="width:120px;" ng-model="rm_split">
+            <select style="width:120px;" ng-model="rm_split">
               <option value ="10">10分钟</option>
               <option value ="60">1小时</option>
               <option value ="180">3小时</option>
@@ -93,3 +93,8 @@
   </div>
 
 </div>
+<script>
+  $(function(){
+    $("select").selectpicker();
+  })
+</script>

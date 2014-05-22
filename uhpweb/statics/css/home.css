@@ -7,9 +7,12 @@ body { padding-top: 55px; }
 .table>tbody>tr>td, 
 .table>tfoot>tr>td { vertical-align: middle; }
 .table>thead>tr>th { text-align: center; }
+.cbtable>tbody>tr>td:first-child { text-align: center; }
 td, th { max-width: 600px; }
 td>pre { margin:0px 0px; }
 select.form-control { -webkit-appearance: menulist; }
+.input-group-addon {background-color:#5bc0de; border:0px;}
+.input-group .select {margin-bottom:0px;}
 /*.form-group { margin-bottom: 0px; }*/
 
 blue { color:blue }
