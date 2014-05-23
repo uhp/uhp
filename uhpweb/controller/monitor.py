@@ -653,7 +653,7 @@ class MonitorBackHandler(BaseHandler):
     def app_waitting(self):
         url = "http://%s:%s/ws/v1/cluster/apps?state=ACCEPTED" %(self._get_rmhost(),self._get_rmport() )
         waittingApp = util.get_http_json(url)
-        if waittingApp.has_key("apps") :
+        if waittingApp.has_key("apps") and waittingApp["apps"] != None :
             apps = waittingApp["apps"]
         else:
             apps = []
