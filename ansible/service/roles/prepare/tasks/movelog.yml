@@ -6,4 +6,5 @@
 - { include : movedir.yml , source_dir : "/var/log/hive" , user : "hive"}
 - { include : movedir.yml , source_dir : "/var/log/hbase" , user : "hbase"}
 - { include : movedir.yml , source_dir : "/var/log/impala" , user : "impala"}
+- { include : movedir.yml , source_dir : "/var/log/hue" , user : "hue"}
 

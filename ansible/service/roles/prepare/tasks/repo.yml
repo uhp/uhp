@@ -10,6 +10,7 @@
     - cloudera-impala.repo
     - epel.repo
     - rpmforge.repo
+    - cloudera-search.repo
 
 - name: depoly the orignal repo
   sudo: yes
@@ -21,6 +22,7 @@
     - cloudera-impala.repo
     - epel.repo
     - rpmforge.repo
+    - cloudera-search.repo
 
 - name: clear yum
   sudo: yes

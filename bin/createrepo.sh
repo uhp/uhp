@@ -15,7 +15,7 @@ build_repository(){
 
     repo_file="$1" ;
     repo_file_name=`basename $repo_file`  
-    repo_name=`cat $repo_file|grep "\[" | grep "\]" |awk '{print substr($1,2,length($0)-3)}' ` 
+    repo_name=`cat $repo_file|grep "\[" | grep "\]" |awk '{print substr($1,2,length($1)-2)}' ` 
     #echo $repo_name
     #repo_name=${repo_name:1}
     #echo $repo_name
@@ -71,7 +71,14 @@ sudo hostname
 
 repo_file_dir=${UHP_HOME}/ansible/service/roles/prepare/files/repo/${centos_version}
 
-for f in `ls $repo_file_dir`
+repo_list="
+#cloudera-cdh4.repo
+#cloudera-gplextras4.repo
+#cloudera-impala.repo
+cloudera-search.repo
+"
+
+for f in $repo_list
 do
     
     build_repository ${repo_file_dir}/$f $target_dir $centos_version

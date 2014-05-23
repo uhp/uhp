@@ -12,7 +12,7 @@
 
 - name: mkdir the same name dir in server log dir
   sudo: yes
-  file: state=directory path={{ services_log_root }}/{{ source_dir|basename }} mode=755 owner={{ user }} group={{ user }}
+  file: state=directory path={{ services_log_root }}/{{ source_dir|basename }} mode=777
 
 
 - name: remove the dir and link the dir to the source_dir

@@ -62,10 +62,23 @@ class Collector:
         默认从数据库中获取,由于可能只使用监控
         所以本函数可以直接修改为固定值
         '''
-        self.rmhost="hadoop5"
-        self.rmport="50088"
-        self.hshost="hadoop5"
-        self.hsport="50888"
+        session = database.getSession()
+        insts = session.query(Instance).filter(Instance.role=="resourcemanager")
+        for inst in insts:
+            self.rmhost = inst.host;
+
+        self.rmport=database.get_service_conf(session,"yarn","yarn_nm_webapp_port")
+        insts = session.query(Instance).filter(Instance.role=="historyserver")
+        for inst in insts:
+            self.hshost = inst.host;
+
+        self.hsport = database.get_service_conf(session,"yarn","mapreduce_jobhistory_webapp_port")
+
+        session.close()
+        #self.rmhost="hadoop5"
+        #self.rmport="50088"
+        #self.hshost="hadoop5"
+        #self.hsport="50888"
 
     def collect(self, recordTime):
         try:
