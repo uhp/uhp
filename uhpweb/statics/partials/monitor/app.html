@@ -1,4 +1,4 @@
-<div style="font-size:14px;padding-top:0px;" ng-controller="MoniJobCtrl"> 
+<div style="font-size:14px;" ng-controller="MoniJobCtrl"> 
 
   <div class="row">
 
@@ -9,13 +9,13 @@
       <div class="row">
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">AppID</span>
+            <span class="input-group-addon w7e">AppID</span>
             <input type="text" class="form-control" placeholder="应用ID" ng-model="filterId">
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">USER</span>
+            <span class="input-group-addon w7e">USER</span>
             <input type="text" class="form-control" placeholder="用户名" ng-model="filterUser">
           </div>
         </div>
@@ -25,13 +25,13 @@
       <div class="row" style="margin-top:10px;">
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">Name</span>
+            <span class="input-group-addon w7e">Name</span>
             <input type="text" class="form-control" placeholder="应用名称" ng-model="filterName">
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">Queue</span>
+            <span class="input-group-addon w7e">Queue</span>
             <input type="text" class="form-control" placeholder="队列" ng-model="filterQueue">
           </div>
         </div>
@@ -41,22 +41,15 @@
       <div class="row" style="margin-top:10px;">
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">State</span>
-            <select ng-model="filterState">
-              <option></option>
-              <option>FINISHED</option>
+            <span class="input-group-addon w7e">State</span>
+            <select ng-model="filterState" ng-options="k as v for (k,v) in stateDict">
             </select>
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">FinalStatus</span>
-            <select ng-model="filterFinalStatus">
-              <option></option>
-              <option>SUCCEEDED</option>
-              <option>KILLED</option>
-              <option>FAILED</option>
-            </select>
+            <span class="input-group-addon w7e">FinalStatus</span>
+            <select ng-model="filterFinalStatus" ng-options="k as v for (k,v) in finalStateDict"></select>
           </div>
         </div>
       </div>
@@ -65,13 +58,13 @@
       <div class="row" style="margin-top:10px;">
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">startTime</span>
+            <span class="input-group-addon w7e">startTime</span>
             <select ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict"></select>
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
-            <span class="input-group-addon">endTime</span>
+            <span class="input-group-addon w7e">endTime</span>
             <select ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict"></select>
           </div>
         </div>

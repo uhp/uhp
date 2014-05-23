@@ -13,6 +13,12 @@ td>pre { margin:0px 0px; }
 select.form-control { -webkit-appearance: menulist; }
 .input-group-addon {background-color:#5bc0de; border:0px;}
 .input-group .select {margin-bottom:0px;}
+.input-group .select button:first-child { border-radius: 0 4px 4px 0; }
+.input-group .form-control:last-child { border-left:0; }
+.select .btn .filter-option { color:#415b76;}
+.w6e {width:6em;}
+.w7e {width:7em;}
+.input-group, .select, .select .btn {width:100%;}
 /*.form-group { margin-bottom: 0px; }*/
 
 blue { color:blue }

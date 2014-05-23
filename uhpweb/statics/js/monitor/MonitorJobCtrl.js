@@ -521,17 +521,20 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         //init nm params
         $rootScope.myHttp('GET', '/monitorback/job_query_init_info', {}, 
             function(res){
-                $scope.nm_hosts          = res.data.nm_hosts;
-                $scope.selected_nm_hosts = $scope.nm_hosts.slice(0,Math.min(3,$scope.nm_hosts.length));
-                $scope.nm_fields         = ["containerNum","amNum"]
-                $scope.nm_time           = 1440
-                $scope.nm_split          = 60
+                $scope.nm_hosts           = res.data.nm_hosts;
+                $scope.selected_nm_hosts  = $scope.nm_hosts.slice(0,Math.min(3,$scope.nm_hosts.length));
+                $scope.selected_nm_fields = ["containerNum","amNum"];
+                $scope.nm_fields          = {containerNum:"Container数量",amNum:"AM数量",map:"Map状况",reduce:"Reduce状况",file:"中间文件读写",hdfs:"HDFS读写"};
+                $scope.nm_time            = 1440;
+                $scope.nm_split           = 60;
 
                 $scope.nmQuery(); // 触发第一次查询绘图
             }
         );
        
         //init dict
+        //$scope.states = ['', 'FINISHED'];
+        //$scope.finalStates = ['', 'SUCCEEDED', 'KILLED', 'FAILED'];
         $scope.stateDict = {"FINISHED":"完成"}
         $scope.finalStateDict = {"SUCCEEDED":"成功","KILLED":"中止","FAILED":"失败"}
         $scope.fieldDict = {
