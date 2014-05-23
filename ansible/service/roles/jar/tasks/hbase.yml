@@ -6,7 +6,7 @@
 
 - name: copy the hdfs's jar
   sudo: yes
-  copy: src={{ JAR_DIR }}/{{item}} dest={{HBASE_HOME}}
+  copy: src={{item}} dest={{HBASE_HOME}}
   with_items:
     - hbase-0.94.2-cdh4.2.1-security-20140519.jar
   when: new_jar.stdout|int == 0

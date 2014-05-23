@@ -1,7 +1,7 @@
 
 - name: copy hive conf
   sudo: yes
-  template: src={{ TEMPLATE_DIR }}/hive/{{item}}.j2 dest=/etc/hive/conf/{{item}}
+  template: src=hive/{{item}}.j2 dest=/etc/hive/conf/{{item}}
   with_items:
     - hive-site.xml
     - hive-env.sh

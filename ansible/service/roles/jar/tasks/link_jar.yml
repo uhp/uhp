@@ -10,7 +10,7 @@
 
 - name: copy the wanted jar
   sudo: yes
-  copy: src={{ JAR_DIR }}/{{ NEW_JAR }} dest={{WANT_HOME}}
+  copy: src={{ NEW_JAR }} dest={{WANT_HOME}}
   when: new_jar.stdout|int == 0
 
 - name: ln new one

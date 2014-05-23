@@ -1,7 +1,7 @@
 
 - name: copy hadoop conf
   sudo: yes
-  template: src={{ TEMPLATE_DIR }}/hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
+  template: src=hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
   with_items:
     - core-site.xml
     - hdfs-site.xml
