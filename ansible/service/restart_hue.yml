@@ -1,0 +1,10 @@
+
+- hosts: HUESERVER
+  tasks:
+  - include: roles/hueserver/tasks/stop.yml
+
+
+- hosts: HUESERVER
+  tasks:
+  - include: roles/hueserver/tasks/start.yml
+

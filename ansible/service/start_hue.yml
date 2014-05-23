@@ -1,0 +1,5 @@
+
+- hosts: HUESERVER
+  tasks:
+  - include: roles/hueserver/tasks/start.yml
+

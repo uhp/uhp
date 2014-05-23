@@ -92,7 +92,19 @@ class Instance(BASE, UHPBase):
         ret["msg"] = self.msg 
         return ret;
             
+    @staticmethod
+    def get_instance_name(host, role):
+        '''将host和role组合为instance name'''
+        return "%s(%s)" % (host, role)
 
+    @staticmethod
+    def split_instance_name(instance_name):
+        '''将instance_name拆分为host 和role'''                                 
+        index = instance_name.find("(") 
+        le = len(instance_name) 
+        if index != -1 and instance_name[le-1] == ')' and index+1 != le-1 and index != 0: 
+           return (instance_name[0:index],instance_name[index+1:le-1]) 
+        return (None,None) 
             
     @staticmethod    
     def get_instance_name(host, role):

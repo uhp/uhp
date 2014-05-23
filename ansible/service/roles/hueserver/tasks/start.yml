@@ -1,0 +1,11 @@
+
+
+- include: ../../conf/tasks/hdfs.yml
+- include: ../../conf/tasks/hive.yml
+- include: ../../conf/tasks/hue.yml
+
+- name: start hue  server
+  sudo: yes
+  service: name=hue state=started
+
+

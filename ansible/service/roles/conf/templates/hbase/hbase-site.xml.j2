@@ -196,7 +196,7 @@
   </property>
   <property>
     <name>zookeeper.znode.parent</name>
-    <value>/hbase</value>
+    <value>{{hbase__zookeeper_znode_parent}}</value>
   </property>
   <property>
     <name>zookeeper.znode.rootserver</name>
@@ -217,5 +217,21 @@
   <property>
     <name>hbase.metrics.showTableName</name>
     <value>false</value>
+  </property>
+</configuration>
+  <property>
+    <name>hbase.replication</name>
+    <value>{{hbase__hbase_replication}}</value>
+  </property>
+  <property>
+    <name>replication.source.ratio</name>
+    <value>{{hbase__hbase_replication_source_ratio}}</value>
+  </property>
+  <!-- Maximum number of hlog entries to replicate in one go. If this is
+       large, and a consumer takes a while to process the events, the
+       HBase rpc call will time out. -->
+  <property>
+    <name>replication.source.nb.capacity</name>
+    <value>{{hbase__replication_source_nb_capacity}}</value>
   </property>
 </configuration>

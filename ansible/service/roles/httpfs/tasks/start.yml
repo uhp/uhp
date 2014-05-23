@@ -1,0 +1,9 @@
+
+
+- include: ../../conf/tasks/hdfs.yml
+
+- name: start httpfs  server
+  sudo: yes
+  service: name=hadoop-httpfs state=started
+
+

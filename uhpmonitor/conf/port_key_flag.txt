@@ -21,6 +21,9 @@
         "qjm": {
             "qjournal_port": true,
             "qjournal_http_port": false
+        },
+        "httpfs":{
+            "httpfs_http_port" : true
         }
     },
     "yarn": {
@@ -82,5 +85,17 @@
         "gmond": {
             "gmond_port": true 
         }
+    },
+    "hue": {
+        "hueserver": {
+            "web_port": true
+        }
+    },
+    "search": {
+        "solrserver": {
+            "solr_port": true,
+            "solr_admin_port": false
+        }
     }
+
 }

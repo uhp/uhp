@@ -1,0 +1,5 @@
+---
+
+- name: stop hbaseindexer 
+  sudo: yes
+  service: name=hbase-solr-indexer  state=stopped

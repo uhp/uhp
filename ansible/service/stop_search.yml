@@ -1,0 +1,8 @@
+
+- hosts: SOLRSERVER
+  tasks:
+  - include: roles/solrserver/tasks/stop.yml
+
+- hosts: HBASEINDEXER
+  tasks:
+  - include: roles/hbaseindexer/tasks/stop.yml

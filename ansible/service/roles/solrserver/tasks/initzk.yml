@@ -1,0 +1,7 @@
+---
+
+- name: init the solr zookeeper config
+  sudo: yes
+  shell: solrctl init --force
+
+

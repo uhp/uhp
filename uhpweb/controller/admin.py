@@ -12,9 +12,9 @@ from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 import async
-import config
 import static_config
 import database
+import config
 import util
 import callback_lib
 import mm
@@ -238,7 +238,8 @@ class AdminBackHandler(BaseHandler):
                 session.merge(hostVar)
                 session.commit()
         session.close()
-
+    
+    
     # 提交一个执行任务 
     # 当前直接把收到start的instance，标记为start状态
     # 当前直接把收到stop的instance，标记为stop状态
@@ -273,8 +274,8 @@ class AdminBackHandler(BaseHandler):
             
         elif actionType=="instance":
             for instance in instances.split(","):
-                (host,role) = Instance.split_instance_name(instance)
-                if host != None and role != None :
+                (host,role) = Instance.split_instance_name(instance) 
+                if host != None and role != None : 
                     task = Task(taskType,service,host,role,taskName);    
                     session.add(task)
                     
@@ -283,7 +284,7 @@ class AdminBackHandler(BaseHandler):
                     session.flush()
                     running_id.append(task.id)
                 else:
-                    self.ret("error","split instance name %s error" % instance)
+                    self.ret("error","split instance name %s error" % instance) 
                     return
         else:
             self.ret("error", "unsport actionType")
@@ -642,7 +643,8 @@ class AdminBackHandler(BaseHandler):
         #更新instance表的对应状态为removing
         session = database.getSession()
         for delInst in delInstance:
-            database.update_instance(session,delInst["host"],delInst["role"],Instance.STATUS_REMOVING)
+            session.query(Instance).filter(and_(Instance.host==delInst["host"],Instance.role==delInst["role"])) \
+                    .update({Instance.status:Instance.STATUS_REMOVING})
         session.commit()
         #提交卸载活动
         running_id=[]
@@ -874,6 +876,7 @@ class AdminBackHandler(BaseHandler):
         '''
         dir = self.get_argument("dir")
         file = self.get_argument("file")
+        file = file+".j2"
         host = self.get_argument("host")
         (content,output) = shell_lib.get_template_file(host,dir,file);
         if content != "":
@@ -954,23 +957,4 @@ class AdminBackHandler(BaseHandler):
         session.flush()
         session.close()
         self.ret("ok","")
-    
-    #修改数据库 直接使用merge进行合并
-    # 未完成
-    def manual_execute2(self):
-        method = self.get_argument("method")
-        table = self.get_argument("table")
-        values = self.get_argument("values")
-        app_log.debug("method:" + method)
-        app_log.debug("table:" + table)
-        app_log.debug("values:" + str(values))
-        #method:insert
-        #table:monitor_assist
-        #values:{"name":"a","value":"b"}
-        #session = database.getSession()
-        #result = session.execute(sql)
-        #session.commit()
-        #session.flush()
-        #session.close()
-        self.ret("error","未完成")
         

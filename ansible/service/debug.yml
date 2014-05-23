@@ -1,8 +1,10 @@
 
 - hosts: 
   - hadoop2
+  - hadoop3
+  - hadoop4
+  - hadoop5
   tasks:
-  - include: roles/regionserver/tasks/setup.yml
-  - include: roles/hbasemaster/tasks/setup.yml
+  - include: roles/jar/tasks/hbase.yml
 
 

@@ -1,0 +1,8 @@
+---
+
+- name: remove the httpfs sever
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - hadoop-httpfs
+

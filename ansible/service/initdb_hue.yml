@@ -1,0 +1,5 @@
+
+- hosts:
+  - HUESERVER[0]
+  tasks:
+  - include: roles/hueserver/tasks/initdb.yml

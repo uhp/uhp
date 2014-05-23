@@ -1,0 +1,4 @@
+
+- name: stop hue
+  sudo: yes
+  service: name=hue state=stopped
