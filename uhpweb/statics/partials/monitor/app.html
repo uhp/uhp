@@ -42,7 +42,7 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon">State</span>
-            <select class="form-control" ng-model="filterState">
+            <select ng-model="filterState">
               <option></option>
               <option>FINISHED</option>
             </select>
@@ -51,7 +51,7 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon">FinalStatus</span>
-            <select class="form-control" ng-model="filterFinalStatus">
+            <select ng-model="filterFinalStatus">
               <option></option>
               <option>SUCCEEDED</option>
               <option>KILLED</option>
@@ -66,13 +66,13 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon">startTime</span>
-            <select class="form-control" ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict"></select>
+            <select ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict"></select>
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon">endTime</span>
-            <select class="form-control" ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict"></select>
+            <select ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict"></select>
           </div>
         </div>
       </div>
@@ -204,3 +204,8 @@
   <!-- ~row -->
 
 </div>
+<script>
+  $(function(){
+    $("select").selectpicker();
+  })
+</script>
