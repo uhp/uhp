@@ -7,7 +7,7 @@ adminmenus = {
     "name":"admin", 
     "display":"管理员", 
     "href":"/admin",
-    "menus":[{"name":"admin", "display":"管理", "href":"/admin",
+    "menus":[{"name":"admin", "display":"<i class='fa fa-cogs'></i> 管理", "href":"/admin",
         'submenus':[
             {"name":"service", "display":"服务", "href":"#admin-service"},
             {"name":"host", "display":"机器", "href":"#admin-host"},
@@ -22,7 +22,7 @@ adminmenus['is_manager'] = config.install_manager
 adminmenus['is_monitor'] = config.install_monitor
 
 if config.install_monitor:
-    adminmenus['menus'].append({"name":"monitor", "display":"监控", "href":"#/monitor",
+    adminmenus['menus'].append({"name":"monitor", "display":"<i class='fa fa-eye'></i> 监控", "href":"#/monitor",
         'submenus':[
             {"name":"mOverview", "display":'概览', "href":"#/monitor/overview",
                 "tabs": [

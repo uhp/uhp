@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="/statics/jslib/anagular-chosen/vendor/chosen.css" />
     <link rel="stylesheet" href="/statics/jslib/anagular-chosen/chosen-spinner.css" />
     -->
-    <link rel="stylesheet" href="/statics/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/statics/css/font-awesome/4.1.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/statics/css/home.css"/>
 
     <!--
@@ -78,15 +78,17 @@
           <div class="collapse navbar-collapse bs-navbar-collapse">
             <ul class="nav navbar-nav">
               <li ng-class="item == narmenu && 'active'" ng-repeat="item in menus.menus">
-              <a href="[[item.href]]" ng-click='setActiveMenu(item)'>[[item.display]]</a>
+              <a href="[[item.href]]" ng-click='setActiveMenu(item)' ng-bind-html='item.display'></a>
               </li>
             </ul>
 
             <!-- 飘游菜单 -->
             <ul class="nav navbar-nav navbar-right">
+              <!--
               <li>
               <a href="../about"><span class="glyphicon glyphicon-info-sign"></span></a>
               </li>
+              -->
               <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user fui-user icon-white"></span> [[user.name]]<b class="caret"></b></a>
               <ul class="dropdown-menu">
