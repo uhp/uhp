@@ -9,8 +9,7 @@
         <div class="col-md-12">
           <div class="input-group">
           <span class="input-group-addon w7e">展示指标</span>
-          <select id="nm-params-field-select" class="select-block" multiple chosen ng-model="selected_nm_fields" ng-options="k as v for (k,v) in nm_fields">
-          </select>
+          <select class="select-block" multiple ng-model="selected_nm_fields" ng-options="k as v for (k,v) in nm_fields"></select>
           </div>
         </div>
       </div>
@@ -20,8 +19,7 @@
         <div class="col-md-12">
           <div class="input-group">
           <span class="input-group-addon w7e">选择机器</span>
-          <select chosen id="nm-params-host-select" multiple ng-model="selected_nm_hosts" ng-options="host for host in nm_hosts" data-placeholder="选择要显示的机器">
-          </select>
+          <select class="select-block" multiple ng-model="selected_nm_hosts" ng-options="host for host in nm_hosts"></select>
           </div>
         </div>
       </div>
@@ -32,30 +30,14 @@
 
           <div class="input-group">
             <span class="input-group-addon w7e">统计时间</span>
-            <select style="width:120px;" ng-model="rm_time">
-              <!-- <option selected="selected" value ="-1">无</option>  -->
-              <option value ="10">最近10分钟</option>
-              <option value ="60">最近1小时</option>
-              <option value ="180">最近3小时</option>
-              <option value="720">最近12小时</option>
-              <option value="1440">最近1天</option>
-              <option value="4320">最近3天</option>
-              <option value="10080">最近7天</option>
-              <option value ="-2">自定义</option>
-            </select>
+            <select class="select-block" ng-model="nm_time" ng-options="t.value as t.dis for t in timeDict"></select>
           </div>
         </div>
 
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon w7e">统计间隔</span>
-            <select style="width:120px;" ng-model="rm_split">
-              <option value ="10">10分钟</option>
-              <option value ="60">1小时</option>
-              <option value ="180">3小时</option>
-              <option value="360">6小时</option>
-              <option value="1440">1天</option>
-            </select>
+            <select class="select-block" ng-model="nm_split" ng-options="t.value as t.dis for t in timeIntervalDict"></select>
           </div>
         </div>
       </div>
@@ -89,6 +71,6 @@
 </div>
 <script>
   $(function(){
-    $("select").selectpicker({menuStyle: 'dropdown-inverse'});
+    $("select").selectpicker();
   })
 </script>

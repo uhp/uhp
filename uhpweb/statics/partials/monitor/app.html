@@ -42,14 +42,13 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon w7e">State</span>
-            <select ng-model="filterState" ng-options="k as v for (k,v) in stateDict">
-            </select>
+            <select class="select-block" ng-model="filterState" ng-options="k as v for (k,v) in stateDict"></select>
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon w7e">FinalStatus</span>
-            <select ng-model="filterFinalStatus" ng-options="k as v for (k,v) in finalStateDict"></select>
+            <select class="select-block" ng-model="filterFinalStatus" ng-options="k as v for (k,v) in finalStateDict"></select>
           </div>
         </div>
       </div>
@@ -59,13 +58,13 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon w7e">startTime</span>
-            <select ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict"></select>
+            <select class="select-block" ng-model="filterStart" ng-options="temp.value as temp.dis for temp in timeDict"></select>
           </div>
         </div>
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon w7e">endTime</span>
-            <select ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict"></select>
+            <select class="select-block" ng-model="filterEnd" ng-options="temp.value as temp.dis for temp in timeDict"></select>
           </div>
         </div>
       </div>

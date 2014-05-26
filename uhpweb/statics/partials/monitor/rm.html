@@ -9,13 +9,7 @@
 
           <div class="input-group imput-group-sm">
             <span class="input-group-addon w7e">展示指标</span>
-            <select class="select-block" chosen  multiple ng-model="rm_fields">
-              <option value="app">App状况</option>
-              <option value="map">Map状况</option>
-              <option value="reduce">Reduces状况</option>
-              <option value="file">中间文件读写</option>
-              <option value="hdfs">HDFS读写</option>
-            </select>
+            <select class="select-block" chosen  multiple ng-model="selected_rm_fields" ng-options="k as v for (k,v) in rm_fields"></select>
           </div>
 
         </div>
@@ -27,30 +21,14 @@
 
           <div class="input-group imput-group-sm">
             <span class="input-group-addon w7e">统计时间</span>
-            <select ng-model="rm_time">
-              <!-- <option selected="selected" value ="-1">无</option>  -->
-              <option value ="10">最近10分钟</option>
-              <option value ="60">最近1小时</option>
-              <option value ="180">最近3小时</option>
-              <option value="720">最近12小时</option>
-              <option value="1440">最近1天</option>
-              <option value="4320">最近3天</option>
-              <option value="10080">最近7天</option>
-              <option value ="-2">自定义</option>
-            </select>
+            <select class="select-block" chosen ng-model="rm_time" ng-options="t.value as t.dis for t in timeDict"></select>
           </div>
         </div>
 
         <div class="col-md-6">
           <div class="input-group imput-group-sm">
             <span class="input-group-addon w7e">统计间隔</span>
-            <select ng-model="rm_split">
-              <option value ="10">10分钟</option>
-              <option value ="60">1小时</option>
-              <option value ="180">3小时</option>
-              <option value="360">6小时</option>
-              <option value="1440">1天</option>
-            </select>
+            <select class="select-block" ng-model="rm_split" ng-options="t.value as t.dis for t in timeIntervalDict"></select>
           </div>
         </div>
         <!-- col-12 -->

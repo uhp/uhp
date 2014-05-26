@@ -200,8 +200,8 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
 
     $scope.getRmFieldParams=function(){
         var temp = []
-        for(var index in $scope.rm_fields){
-            var value = $scope.rm_fields[index]
+        for(var index in $scope.selected_rm_fields){
+            var value = $scope.selected_rm_fields[index]
             if( value == "app" ){
                 temp.push("appNum")
                 temp.push("finishedApp")
@@ -514,7 +514,8 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.maxPage=1
         
         //init rm params
-        $scope.rm_fields=["app","map","reduce"]
+        $scope.selected_rm_fields=["app","map","reduce"]
+        $scope.rm_fields= {app:"App状况",map:"Map状况",reduce:"Reduce状况",file:"中间文件读写",hdfs:"HDFS读写"};
         $scope.rm_time=1440
         $scope.rm_split=60
         
@@ -564,15 +565,22 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         
         $scope.orderDict = {"desc":"降序","asc":"升序"}
         $scope.timeDict = [
-            {"value":"-1","dis":"无"},
-            {"value":"10","dis":"最近10分钟"},
-            {"value":"60","dis":"最近1小时"},
-            {"value":"180","dis":"最近3小时"},
-            {"value":"720","dis":"最近12小时"},
-            {"value":"1440","dis":"最近24小时"},
-            {"value":"4320","dis":"最近3天"},
-            {"value":"10080","dis":"最近7天"}
-        ]
+            {"value":10,"dis":"最近10分钟"},
+            {"value":60,"dis":"最近1小时"},
+            {"value":180,"dis":"最近3小时"},
+            {"value":720,"dis":"最近12小时"},
+            {"value":1440,"dis":"最近24小时"},
+            {"value":4320,"dis":"最近3天"},
+            {"value":10080,"dis":"最近7天"}
+        ];
+
+        $scope.timeIntervalDict = [
+            {"value":10,"dis":"10分钟"},
+            {"value":60,"dis":"1小时"},
+            {"value":180,"dis":"3小时"},
+            {"value":360,"dis":"6小时"},
+            {"value":1440,"dis":"24小时"}
+        ];
         
         $scope.rmQuery();
         $scope.appQuery();
