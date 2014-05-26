@@ -1,7 +1,0 @@
-#用于web生成配置文件查看不能直接执行，请执行script/get_template_file.sh
----
-- hosts: hadoop3
-  tasks:
-  - name: build local template file
-    local_action: template src={{TEMPLATE_DIR}}/hadoop/yarn-site.xml.j2 dest=/tmp/
-

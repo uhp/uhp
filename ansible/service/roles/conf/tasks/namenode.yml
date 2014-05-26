@@ -4,7 +4,7 @@
 
 - name: copy namenode conf
   sudo: yes
-  template: src={{ TEMPLATE_DIR }}/hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
+  template: src=hadoop/{{item}}.j2 dest=/etc/hadoop/conf/{{item}}
   with_items:
     - dfs_hosts_exclude.txt
     - dfs_hosts_include.txt

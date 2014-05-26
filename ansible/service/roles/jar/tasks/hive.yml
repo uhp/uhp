@@ -6,7 +6,7 @@
 
 - name: copy the hive's jar
   sudo: yes
-  copy: src={{ JAR_DIR }}/{{item}} dest={{HIVE_HOME}}/lib/{{ item }}
+  copy: src={{item}} dest={{HIVE_HOME}}/lib/{{ item }}
   with_items:
     - mysql-connector-java-5.1.16-bin.jar
     - hive-exec-0.10.0-cdh4.2.1-20140213-2.jar

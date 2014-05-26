@@ -115,15 +115,6 @@ def conf_to_db(dir):
 
             session.merge(gv)
 
-    #添加特殊变量
-    gv = GroupVar("all","","UHP_HOME",config.uhphome,0,"")
-    session.merge(gv)
-    gv = GroupVar("all","","TEMPLATE_DIR",config.template_dir,0,"")
-    session.merge(gv)
-    gv = GroupVar("all","","JAR_DIR",config.jar_dir,0,"")
-    session.merge(gv)
-    session.commit()
-
     #读取机器变量
     if os.path.exists(host_var_dir):
         for host in os.listdir(host_var_dir):
