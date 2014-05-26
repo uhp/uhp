@@ -1,48 +1,47 @@
-<div  ng-controller="SettingCtrl">
+<div ng-controller="SettingCtrl">
 
   <div class="row">
-    <div class="col-md-12 span12">
-      <form class="form-inline" role="form">
-        <div class="form-group">
-          <select class="form-control" ng-model="showType">
-            <option value="group">组变量</option>
-            <option value="host">机器变量</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-control" ng-model="settingSearchText">
-        </div>
-        <div class="form-group">
-          <button  type="button" class="btn btn-primary" ng-click="addConfVar()">添加配置项</button>
-        </div>
-      </form>
+    <div class="col-md-3">
+      <div class="input-group">
+        <span class="input-group-addon w7e">变量类型</span>
+        <select class="select-block" ng-model="showType">
+          <option value="group">组变量</option>
+          <option value="host">机器变量</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" ng-model="settingSearchText">
+    </div>
+    <div class="col-md-2">
+      <button  type="button" class="btn btn-primary" ng-click="addConfVar()">添加配置项</button>
     </div>
   </div>
 
   <div class="row" style="margin-top:20px">
     <div class="col-md-12 span12">
       <div class="panel panel-info">
-      <table class="table table-striped table-bordered table-hover">
-        <thead>
-          <tr>
-            <th ng-show="showType=='group'">组</th>
-            <th ng-show="showType=='host'">机器</th>
-            <th>配置名称</th>
-            <th>配置数值</th>
-            <th>类型</th>
-            <th>注释</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-dblclick="editConfVar(var)" ng-repeat="var in confVar|filter:confSearchText">
-            <td>[[var.group]]</td>
-            <td>[[var.name]]</td>
+        <table class="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th ng-show="showType=='group'">组</th>
+              <th ng-show="showType=='host'">机器</th>
+              <th>配置名称</th>
+              <th>配置数值</th>
+              <th>类型</th>
+              <th>注释</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-dblclick="editConfVar(var)" ng-repeat="var in confVar|filter:confSearchText">
+              <td>[[var.group]]</td>
+              <td>[[var.name]]</td>
             <td><pre>[[var.value]]</pre></td>
-            <td>[[var.type]]</td>
-            <td>[[var.text]]</td>
-          </tr>
-        </tbody>
-      </table>
+              <td>[[var.type]]</td>
+              <td>[[var.text]]</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -107,3 +106,8 @@
   <!-- ~模式对话框  -->
 
 </div>
+<script>
+  $(function(){
+    $("select").selectpicker();
+  })
+</script>

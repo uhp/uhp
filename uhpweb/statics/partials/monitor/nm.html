@@ -8,7 +8,7 @@
       <div class="row">
         <div class="col-md-12">
           <div class="input-group">
-          <span class="input-group-addon w7e">展示指标</span>
+          <span class="input-group-addon">展示指标</span>
           <select class="select-block" multiple ng-model="selected_nm_fields" ng-options="k as v for (k,v) in nm_fields"></select>
           </div>
         </div>
@@ -27,7 +27,6 @@
       <!-- 第三行 -->
       <div class="row" style="padding-top:10px">
         <div class="col-md-6">
-
           <div class="input-group">
             <span class="input-group-addon w7e">统计时间</span>
             <select class="select-block" ng-model="nm_time" ng-options="t.value as t.dis for t in timeDict"></select>

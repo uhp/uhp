@@ -2,28 +2,31 @@
   <div class="col-md-3">
     <div class="input-group">
       <span class="input-group-addon">时间</span>
-      <select class="form-control" ng-model="show.precision" required ng-options="v.name as v.display for v in show.precisions"></select>
+      <select class="select-block" ng-model="show.precision" required ng-options="v.name as v.display for v in show.precisions"></select>
     </div>
   </div>
   <div class="col-md-3 col-md-offset-6">
     <div class="input-group">
       <span class="input-group-addon">指标</span>
-      <select class="form-control" ng-model="show.metric" ng-options="v.name as v.display for v in show.metrics"></select>
+      <select class="select-block" ng-model="show.metric" ng-options="v.name as v.display for v in show.metrics"></select>
     </div>
   </div>
 </div>
 
 <div class="row" style="margin-top:20px;">
-  <div class="col-md-12">
-    <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.hosts_metric">
-      <div class="panel panel-info">
-        <div class="panel-heading"><h3 class="panel-title">[[host_metric.host]]</h3></div>
-        <div class="panel-body">
-          <div id="draw_[[host_metric.host]]" style="width:420px;"></div>
-          <div ng-init="draw('#draw_'+host_metric.host, host_metric)" class="hide"></div>
-        </div>
+  <div class="col-md-6 pull-left" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.hosts_metric">
+    <div class="panel panel-info">
+      <div class="panel-heading"><h3 class="panel-title">[[host_metric.host]]</h3></div>
+      <div class="panel-body">
+        <div id="draw_[[host_metric.host]]"></div>
+        <div ng-init="draw('#draw_'+host_metric.host, host_metric)" class="hide"></div>
       </div>
     </div>
   </div>
 </div>
+<script>
+  $(function(){
+    $("select").selectpicker();
+  })
+</script>
 

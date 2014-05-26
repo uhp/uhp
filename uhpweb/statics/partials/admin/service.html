@@ -318,7 +318,7 @@
             <div class="form-group" ng-show="showType=='host'">
               <span class="col-md-4 control-label">配置机器:</span>
               <div class="col-md-8">
-                <select ng-model="nowConfVar.host" class="form-control" ng-options="host for host in hosts"></select>
+                <select ng-model="nowConfVar.host" class="select-block" ng-options="host for host in hosts"></select>
               </div>
             </div>
           
@@ -333,7 +333,7 @@
             <div class="form-group">
               <span class="col-md-4 control-label">类型:</span>
               <div class="col-md-8">
-                <select class="form-control" ng-model="nowConfVar.type">
+                <select class="select-block" ng-model="nowConfVar.type">
                   <option value="string">字符串</option>
                   <option value="list">数组(请使用换行分割)</option>
                 </select>
@@ -564,6 +564,6 @@
 <script>
   $(function(){
     $('.dropdown-toggle').dropdown();
-    $("select").selectpicker({style: 'btn-default', menuStyle: 'dropdown-inverse'});
+    $("select").selectpicker();
   })
 </script>

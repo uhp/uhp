@@ -3,14 +3,14 @@
   <div class="row">
     <div class="col-md-3 span3">
         <div class="input-group">
-          <span class="input-group-addon label-info" style="background-color:#5bc0de;border:0px;">目录</span>
-          <select class="form-control" ng-model="nowdir" ng-options="dir as dir for (dir,files) in templates"></select>
+          <span class="input-group-addon">目录</span>
+          <select class="select-block" ng-model="nowdir" ng-options="dir as dir for (dir,files) in templates"></select>
         </div>
     </div>
     <div class="col-md-3 span3">
         <div class="input-group" >
           <span class="input-group-addon">文件</span>
-          <select class="form-control" ng-model="nowfile" ng-options="file for file in templates[nowdir]"></select>
+          <select class="select-block" ng-model="nowfile" ng-options="file for file in templates[nowdir]"></select>
         </div>
     </div>
     <div class="col-md-2 col-md-offset-2">
@@ -25,7 +25,7 @@
     <div class="col-md-6">
       <div class="input-group">
         <span class="input-group-addon">针对指定机器查看生成的配置文件</span>
-        <select class="form-control" ng-model="nowhost" ng-options="host for host in hosts"></select>
+        <select class="select-block" ng-model="nowhost" ng-options="host for host in hosts"></select>
       </div>
     </div>
     <div class="col-md-2 col-md-offset-2">
@@ -109,3 +109,8 @@
   </div>
 
 </div>
+<script>
+  $(function(){
+    $("select").selectpicker();
+  })
+</script>
