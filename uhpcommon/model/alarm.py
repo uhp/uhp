@@ -53,14 +53,16 @@ class AlarmList(BASE, UHPBase):
     id    = Column(Integer, primary_key  = True)
     level = Column(String(10), nullable  = False)
     title = Column(String(255), nullable = False)
+    host  = Column(String(32), nullable = False)
     msg   = Column(Text, nullable        = False)
     ctime = Column(Integer)
     
     LEVEL_WARN     = "WARN"
     LEVEL_ERROR    = "ERROR"
 
-    def __init__(self, title, msg, level, ctime):
+    def __init__(self, title, host, msg, level, ctime):
         self.title = title
+        self.host  = host
         self.msg   = msg
         self.level = level
         self.ctime = ctime

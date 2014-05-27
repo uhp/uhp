@@ -1,13 +1,3 @@
-#以下是UHP的必须配置
-ansible_ssh_user: qiujw
-ansible_ssh_port: 9922
-ansible_ssh_pass: just4test
-ansible_sudo_pass: just4test
-local_repo_enabled: "true*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url
-local_http_url: "http://localhost:8080/uhp*地仓库的HTTP服务local_http_url"
-java_tar: "jdk1.6.0_45.tar.gz*添加机器的时候。检查到没有java的话会安装的java的tar包。请填写绝对路径。"
-java_untar_floder: "jdk1.6.0_45*装java的时候tar包解压的名称。推荐安装示例形式填写"
-
 #以下是服务的配置目录
 
 zookeeper_conf_dir: /etc/zookeeper/conf
