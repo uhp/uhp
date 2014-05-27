@@ -14,14 +14,15 @@
 </div>
 
 <div class="row" style="margin-top:20px;">
-  <div class="col-md-6 pull-left" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.hosts_metric">
+  <div class="col-md-6 pull-left" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.hosts_metric" ng-init="ID=formatIdName()">
+
     <div class="panel panel-info">
       <div class="panel-heading"><h3 class="panel-title">[[host_metric.host]]</h3></div>
       <div class="panel-body">
-        <div id="draw_[[host_metric.host]]"></div>
-        <div ng-init="draw('#draw_'+host_metric.host, host_metric)" class="hide"></div>
+        <div id="[[ID]]" ng-init="draw('#'+ID, host_metric)"></div>
       </div>
     </div>
+
   </div>
 </div>
 <script>

@@ -311,8 +311,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
 
     $scope.getNmFieldParams=function(){
         var temp = []
-        for(var index in $scope.nm_fields){ 
-            var value = $scope.nm_fields[index]
+        angular.forEach($scope.selected_nm_fields, function(value, k){ 
             if( value  == "map" ){
                 temp.push("mapNum")
                 temp.push("mapTime")
@@ -334,7 +333,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             else{
                 temp.push(value)
             }   
-        }  
+        });
         return temp;
     }
 
