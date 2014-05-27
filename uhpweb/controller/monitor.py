@@ -600,7 +600,7 @@ class MonitorBackHandler(BaseHandler):
             for record in query:
                 temp = []
                 for col in columns:
-                    temp.append(str(getattr(record,col)))
+                    temp.append(getattr(record,col))
                 data.append(temp);
             alarms = {'columns':columns, 'rows':data}
             self.ret("ok", "", {"data": alarms})
