@@ -39,31 +39,12 @@ def conf_to_db(file):
 
         session.merge(gv)
 
-    #添加特殊变量
-    gv = GroupVar("all","","UHP_HOME",config.uhphome,0,"")
-    session.merge(gv)
-    gv = GroupVar("all","","TEMPLATE_DIR",config.template_dir,0,"")
-    session.merge(gv)
-    gv = GroupVar("all","","JAR_DIR",config.jar_dir,0,"")
-    session.merge(gv)
-    session.commit()
-
     session.close()
 
 def load_special_conf():
     print "import special var"
-    session=database.getSession()
-    
-    #添加特殊变量
-    gv = GroupVar("all","","UHP_HOME",config.uhphome,0,"")
-    session.merge(gv)
-    gv = GroupVar("all","","TEMPLATE_DIR",config.template_dir,0,"")
-    session.merge(gv)
-    gv = GroupVar("all","","JAR_DIR",config.jar_dir,0,"")
-    session.merge(gv)
-    session.commit()
-
-    session.close()
+    #session=database.getSession()
+    #session.close()
 
 def ensureDir(dir):
     if not os.path.exists(dir):

@@ -1,4 +1,4 @@
-#!python
+#!/usr/bin/env python
 #coding=utf8
 
 import string
@@ -179,11 +179,7 @@ def del_instance(session,host,role):
         .delete()
     session.commit()
 
-if __name__ == "__main__":
-    
-    #drop_db()
-    create_db()
-    sys.exit(0)
+def init():
     #默认的admin
     insert(User("admin","admin","admin@ucweb.com",0));
     #默认分组
@@ -204,8 +200,17 @@ if __name__ == "__main__":
     #初始化服务数据
     for service in static_config.services:
         insert(Service(service['name']))
-    ansible_back_dir = os.path.join(config.uhphome,"conf","ansible_back")
-    #插入ansible_back中的变量
-    if not config.fade_windows:
-        import inventory_tool
-        inventory_tool.conf_to_db(ansible_back_dir)
+
+if __name__ == "__main__":
+    if len(sys.argv) >= 2:
+        action = sys.argv[1]
+        print "running action: %s" % action
+        obj = locals()
+        if obj.has_key(action):
+            func = obj[action]
+            apply(func)
+        else:
+            print "not find action %s" % action
+    else:
+        print "please give the action name"
+
