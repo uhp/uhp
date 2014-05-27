@@ -21,6 +21,7 @@ import database
 import util
 import time
 from lib.logger import log
+from model.instance import Instance
 from model.applicationRecord import ApplicationRecord
 from model.nmRecord import NmRecord
 from model.rmRecord import RmRecord

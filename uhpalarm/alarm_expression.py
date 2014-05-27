@@ -7,13 +7,15 @@ import string
 from lib import contants
 from lib.manager import Manager
 from lib.logger import log
+from lib.exp_parser import ExpParser
 
 class AlarmExpManager(Manager):
     def __init__(self):
         self.exp_map = AlarmExpMap()
-        self.exp_pattern = re.compile('^([a-zA-Z0-9_\\-]+)\\((.*)\\)$')
-        self.double_pattern = re.compile('^[0-9]+(\\.[0-9]*)?$') 
-        self.var_pattern = re.compile('^[0-9a-zA-Z\\._-]+$')
+        self.exp_parser = ExpParser()
+        #self.exp_pattern = re.compile('^([a-zA-Z0-9_\\-]+)\\((.*)\\)$')
+        #self.double_pattern = re.compile('^[0-9]+(\\.[0-9]*)?$') 
+        #self.var_pattern = re.compile('^[0-9a-zA-Z\\._-]+$')
     
     def judge(self, host, rule, data_set):
         
@@ -41,17 +43,13 @@ class AlarmExpManager(Manager):
 
     def _parse_expression(self, expression):
         '''
-        翻译表达式  返回调用的函数和参数的变量列表
-        正则表达式如下：'^([a-zA-Z0-9_\\-]+)\\((.*)\\)$'
+        使用语法解析工具解析,解析
         '''
-        m = self.exp_pattern.match(expression)
-        if m and len( m.groups() ) == 2:
-            gs = m.groups()
-            func_name = gs[0]
-            args_str = gs[1]
-            args = args_str.split(',')
+        func_name,exp_list = self.exp_parser.parse_exp(expression)
+        #log.info("parse the %s : %s %s" % expression,func_name," ".join(exp_list))
+        if func_name != None :
             if hasattr(self.exp_map, func_name) :
-                return (func_name, getattr(self.exp_map, func_name), args )
+                return (func_name, getattr(self.exp_map, func_name), exp_list )
             else:
                 raise Exception("ExpError","can't find %s in map" % func_name)
         else:
@@ -61,31 +59,8 @@ class AlarmExpManager(Manager):
     def _get_args_from_ds(self, data_set, args):
         real_args = []
         for arg in args:
-            arg = arg.strip()
-            if len(arg) == 0 :
-                continue
-            
-            #is string
-            if len(arg) >= 3 and (
-            ( arg.startswith("\"") and arg.endswith("\"") ) or
-            ( arg.startswith("'") and arg.endswith("'" ) )
-            ):
-                str_arg = arg[1:len(arg)-1]
-                real_args.append(str_arg)
-                #log.debug("find string args %s",str_arg)
-            #is int or double    
-            elif self.double_pattern.match( arg ):
-                dou_arg = string.atof(arg)
-                real_args.append(dou_arg)
-                #log.debug("find double args %s",dou_arg)  
-            #is var
-            elif self.var_pattern.match( arg ):
-                if data_set.has_key( arg ):
-                    var_arg = data_set[arg]
-                    #log.debug("find var args %s",var_arg)
-                    real_args.append(var_arg)
-                else:
-                    real_args.append(None)
+            (value,msg) = self.exp_parser.get_exp_value(arg,data_set)
+            real_args.append(value)
         return real_args
     
 class AlarmExpMap:
@@ -97,7 +72,7 @@ class AlarmExpMap:
     self.host 获取当前的判断的host
     self.data_set 获取当前的判断集合
 
-    对于cluster的函数,请在cluster_func加入对于的函数
+    对于cluster的函数,请在cluster_func加入对应的函数
 
     '''
     def __init__(self):
@@ -118,11 +93,37 @@ class AlarmExpMap:
 
     def max(self, value, warn, error):
         if value > error :
-            return (contants.ALARM_ERROR, u"%s 检查到错误状态  %f 大于  %f" % (self.rule.name, value, error) )
+            return (contants.ALARM_ERROR, u"%s 检查到错误状态  %.2f 大于  %.2f" % (self.rule.name, value, error) )
         elif value > warn:
-            return (contants.ALARM_WARN, u"%s 检查到警告状态  %f 大于  %f" % (self.rule.name, value, warn) )
+            return (contants.ALARM_WARN, u"%s 检查到警告状态  %.2f 大于  %.2f" % (self.rule.name, value, warn) )
         else:
             return (contants.ALARM_OK, "")
+
+    def disk_use(self, warn, error):
+        '''
+        判断硬盘的使用量，结合ganglia的拓展模块multidisk.py一起使用
+        默认判断所有dev-xxxx-disk_used.rrd
+        '''
+        key_pattern = re.compile('^dev-[a-zA-Z0-9]*-disk_used$')  
+        level = 0 
+        msg = u""
+        for (k,v) in self.data_set.items():
+            m = key_pattern.match(k)
+            if m :
+                if v >= error :
+                    level = level | 2
+                    msg = msg + (u"指标%s %.2f 大于 %.2f. " % (k,v,error))
+                elif v >= warn :
+                    level = level | 1
+                    msg = msg + (u"指标%s %.2f 大于 %.2f. " % (k,v,warn))
+        if ( level & 2 ) > 0 :
+            return (contants.ALARM_ERROR, msg)
+        elif ( level & 1 ) > 0 :
+            return (contants.ALARM_WARN, msg)
+        else :
+            return (contants.ALARM_OK, "")
+
+
 
     def sum_and_equal(self, point_name, want):
         return (contants.ALARM_OK, "")  

@@ -4,14 +4,22 @@
 import time
 
 import mail_center
+import database
 from lib.manager import Manager
 from lib.logger import log
 from lib import contants
+from model.alarm import AlarmList
 
 class AlarmCallbackManager(Manager):
     def __init__(self):
         self.cb_map = AlarmCallbackMap()
     
+    def pre_check(self):
+        self.cb_map.pre_check()
+    
+    def post_check(self):
+        self.cb_map.post_check()
+
     def callback(self, host, rule, exp_result):
         #节省重复反射时间
         if rule.callback_func == None :
@@ -19,6 +27,8 @@ class AlarmCallbackManager(Manager):
 
         self.cb_map.rule = rule
         self.cb_map.host = host
+        #调用base callback
+        apply(self.cb_map.base_callback, exp_result)
         #调用callback
         apply(rule.callback_func, exp_result)
         
@@ -39,6 +49,17 @@ class AlarmCallbackMap:
     
     def __init__(self):
         pass
+
+    def pre_check(self):
+        self.session = database.getSession()
+
+    def post_check(self):
+        self.session.close()
+
+    def base_callback(self, state, msg):
+        if state != contants.ALARM_OK :
+            self.session.add( AlarmList(self.rule.name, self.host, msg, state, int(time.time()) ))
+        self.session.commit()
 
     def print_log(self, state, msg):
         log.info("%s %s %s" % (self.rule.name, state, msg))

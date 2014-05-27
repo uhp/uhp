@@ -9,9 +9,11 @@
   sudo: yes
   template: src=ganglia/{{ item }}.pyconf.j2 dest=/etc/ganglia/conf.d/{{ item }}.pyconf
   with_items:
-   - disksmartctl
    - diskiostat
+   - disksmartctl
+   - diskusage
    - servicestat
+   - tcpconn
    
    #- serviceport
 

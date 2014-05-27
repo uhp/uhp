@@ -69,6 +69,7 @@ sudo pip install callbacks
 sudo pip install mysql-python
 sudo pip install lockfile
 sudo pip install python-daemon 
+sudo pip install simpleparse
 
 chmod +x $UHP_HOME/inventor/mysqlinventory.py 
 

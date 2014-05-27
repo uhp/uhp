@@ -3,10 +3,11 @@
 
 import database
 
-ALARM_OK = "ok"
-ALARM_WARN = "warn"
-ALARM_ERROR = "error"
-ALARM_CONFIG_ERROR = "config_error"
+ALARM_OK = "OK"
+#same as alarmlist
+ALARM_WARN = "WARN"
+ALARM_ERROR = "ERROR"
+ALARM_CONFIG_ERROR = "CONFIG_ERROR"
 
 def get_cluster_name():
     cluster_name = ""

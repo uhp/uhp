@@ -35,7 +35,7 @@
 # for Ganglia 3.1 support
 *.sink.ganglia.class=org.apache.hadoop.metrics2.sink.ganglia.GangliaSink31
 
-*.sink.ganglia.period=10
+*.sink.ganglia.period=30
 
 # default for supportsparse is false
 *.sink.ganglia.supportsparse=true
@@ -51,7 +51,7 @@
 #*.sink.ganglia.tagsForPrefix.dfs=
 #*.sink.ganglia.tagsForPrefix.rpc=
 #*.sink.ganglia.tagsForPrefix.mapred=
-{% set server_list =  ( ganglia__data_source | join(':' + ganglia__gmond_port + ',') ) + ':' + ganglia__gmond_port %}
+{% set server_list =  ( ganglia__data_source | join(':' + ganglia__gmond_port + ' ') ) + ':' + ganglia__gmond_port %}
 
 namenode.sink.ganglia.servers={{ server_list }}
 namenode.sink.ganglia.tagsForPrefix.jvm=ProcessName

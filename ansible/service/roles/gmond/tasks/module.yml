@@ -4,9 +4,13 @@
   sudo: yes
   copy: src={{ item }}.py dest=/usr/lib64/ganglia/python_modules/{{ item }}.py
   with_items:
-   - disksmartctl
    - diskiostat
+   - disksmartctl
+   - multidisk
    - servicestat
+   - tcpconn
+
+   #- serviceport
 
 
 #copy some diy but not for all python script
