@@ -29,7 +29,10 @@
       <tr ng-show="is_adding_new_record">
         <form>
           <td ng-repeat="col in column">
+            <!--
             <input type="text" class="form-control" name="[[col]]" ng-readonly="col=='id'" ng-model="new_record[col]">
+            -->
+            <textarea class="form-control" rows="1" style="overflow-y:auto;resize:vertical"  name="[[col]]" ng-readonly="col=='id'" ng-model="new_record[col]"></textarea>
           </td>
           <td>
             <button type="submit" class="btn btn-primary btn-sm" ng-click="save_new_record()">保存</button>
