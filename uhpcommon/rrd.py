@@ -92,7 +92,7 @@ class RrdWrapper(object):
         返回（时间戳，数值）的二元组
         如果,最近5分钟没有数据则返回None
         '''
-        result = rrdtool.fetch(rrdfile, "AVERAGE", "--start", "-300s", "--end", "now")
+        result = self._fetch_data(rrdfile, "-300s", "now")
         time_meta = result[0]
         data = result[2]
         last_ts = None

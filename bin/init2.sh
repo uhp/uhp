@@ -14,15 +14,34 @@ chmod a+x bin/*.sh
 
 export VIRTUAL_ENV="$UHP_HOME/vpy" 
 
-#python lib/virtualenv-*.py --no-site-packages $VIRTUAL_ENV
-#echo "export PATH=$VIRTUAL_ENV/bin:\$PATH" >> ~/.bash_profile
-#export PATH=$VIRTUAL_ENV/bin:$PATH
+sudo rm -rf $VIRTUAL_ENV
 
-sudo yum install -y make python2-devel mysql-devel
+coms=(
+    "redhat-lsb"
+    "cairo-devel"
+    "pango-devel"
+    "libxml2-devel"
+    "rrdtool-devel"
+    "make"
+    "python2-devel"
+    "mysql-devel"
+    )
+
+for com in ${coms[@]}; do
+    echo "###############################################"
+    echo "# install: $com"
+    echo "###############################################"
+    sudo yum install -y $com
+done 
+
+python lib/virtualenv-*.py --no-site-packages $VIRTUAL_ENV
+echo "export PATH=$VIRTUAL_ENV/bin:\$PATH" >> ~/.bash_profile
+export PATH=$VIRTUAL_ENV/bin:$PATH
 
 PIP="$VIRTUAL_ENV/bin/pip"
 
-coms=("snakemq"
+coms=(
+    "snakemq"
     "sqlalchemy"
     "tornado"    
     "threadpool"
@@ -31,24 +50,30 @@ coms=("snakemq"
     "python-daemon"
     "mysql-python"
     "ansible"
-    "lockfile")
+    "python-rrdtool"
+    "lockfile"
+    )
 
 for com in ${coms[@]}; do
-    echo "--------$com--------"
-    $PIP install $com
+    echo "###############################################"
+    echo "# install: $com"
+    echo "###############################################"
+    sudo $PIP install $com
 done 
 
-exit 0
-sudo yum install -y python-pip rpm-build make python2-devel mysql-devel
-sudo pip-python install -U pip
-sudo yum install -y ansible
+rm -f $UHP_HOME/vpy/lib/python2.*/site-packages/rrdtoolmodule.so
+cp $UHP_HOME/lib/rrdtoolmodule.so ./vpy/lib/python2.*/site-packages/rrdtoolmodule.so
+
+#sudo yum install -y python-pip rpm-build make python2-devel mysql-devel
+#sudo pip-python install -U pip
+#sudo yum install -y ansible
 #check ansible 
 #检查ansible安装成功
-#RE=`ansible  --version|grep ansible|wc -l`
-#if [ "$RE" == "0" ] ; then
-#    echo "ansible not found" ;
-#    exit 1;
-#fi
+RE=`ansible --version|grep ansible|wc -l`
+if [ "$RE" == "0" ] ; then
+    echo "ansible not found" ;
+    exit 1;
+fi
 
 #ansible all -m ping
 mkdir -p $UHP_HOME/logs/web
@@ -57,18 +82,5 @@ mkdir -p $UHP_HOME/logs/worker
 
 mkdir -p $UHP_HOME/db
 
-
-sudo pip install ansible
-sudo pip install snakemq
-#sudo pip install mysql.connector
-sudo pip install sqlalchemy
-sudo pip install tornado
-sudo pip install daemon
-sudo pip install threadpool
-sudo pip install callbacks
-sudo pip install mysql-python
-sudo pip install lockfile
-sudo pip install python-daemon 
-
 chmod +x $UHP_HOME/inventor/mysqlinventory.py 
-
+echo "All is OK!"

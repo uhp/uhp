@@ -16,6 +16,7 @@
       body { background-color: #1abc9c; }
       .container { width: 970px !important; height: 600px; }
       .login { background:transparent; background-size:940px 0px; padding-bottom:0px;}
+      .login .login-field { border-color:#bdc3c7 }
     </style>
   </head>
 
@@ -30,25 +31,25 @@
           </div>
 
           <div class="login-form">
-		      <form action="/login" method="post">
-            <div class="form-group">
-              <input type="text" class="form-control login-field" name="useranme" value="" placeholder="用户" id="login-name" />
-              <label class="login-field-icon fui-user" for="login-name"></label>
-            </div>
+            <form action="/login" method="post">
+              <div class="form-group">
+                <input type="text" class="form-control login-field" name="useranme" value="" placeholder="用户" id="login-name" />
+                <label class="login-field-icon fui-user" for="login-name"></label>
+              </div>
 
-            <div class="form-group">
-              <input type="password" class="form-control login-field" name="password" value="" placeholder="密码" id="login-pass" />
-              <label class="login-field-icon fui-lock" for="login-pass"></label>
-            </div>
-            <button class="btn btn-primary btn-lg btn-block" type="submit">Log in</button>
-          </form>
+              <div class="form-group">
+                <input type="password" class="form-control login-field" name="password" value="" placeholder="密码" id="login-pass" />
+                <label class="login-field-icon fui-lock" for="login-pass"></label>
+              </div>
+              <button class="btn btn-primary btn-lg btn-block" type="submit">Log in</button>
+            </form>
           </div>
         </div>
       </div>
 
     </div> 
     <!-- /container -->
-    
+
   </body>
 </html>
 

@@ -32,6 +32,8 @@ from model.services import Service
 from model.callback import CallBack
 from model.alarm import *
 
+__all__ =  ['MonitorBackHandler']
+
 app_log = logging.getLogger("tornado.application")
         
 class MonitorBackHandler(BaseHandler):
