@@ -99,6 +99,14 @@ class AlarmExpMap:
         else:
             return (contants.ALARM_OK, "")
 
+    def min(self, value, warn, error):
+        if value < error :
+            return (contants.ALARM_ERROR, u"%s 检查到错误状态  %.2f 小于  %.2f" % (self.rule.name, value, error) )
+        elif value < warn:
+            return (contants.ALARM_WARN, u"%s 检查到警告状态  %.2f 小于  %.2f" % (self.rule.name, value, warn) )
+        else:
+            return (contants.ALARM_OK, "")
+
     def disk_use(self, warn, error):
         '''
         判断硬盘的使用量，结合ganglia的拓展模块multidisk.py一起使用
