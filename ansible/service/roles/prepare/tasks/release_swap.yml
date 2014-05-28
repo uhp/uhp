@@ -1,0 +1,4 @@
+
+- name: release swap
+  sudo: yes
+  script: release_swap.sh
