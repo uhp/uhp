@@ -7,7 +7,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   // 公共变量
   // 公共函数
   $rootScope.formatIdName=function(name){
-    return name.replace(/\./g,"_");
+    return 'draw_' + parseInt(Math.random() * 1000000000);
   };
 
   $rootScope.showHostsMetric = function(newValue, oldValue, scope){
@@ -91,7 +91,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   $scope.make_chartOpt=function(metric){
     //x轴转换 
     console.debug(metric);
-    xfunc = metric.xfun || $scope.default_xfunc;
+    xfunc = metric.xfunc || $scope.default_xfunc;
     if(xfunc != $scope.NO_XFUNC){
       metric.x = $.map(metric.x, xfunc);
     }
@@ -176,6 +176,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     // 等待界面target元素绘制完成
     $timeout(function(){ 
       var t = $(id);
+      // 响应宽度变化
       $scope.$watch(function(){return t.width();}, function(newValue, oldValue){
         if(newValue <= 0) return;
         var w = newValue;
@@ -215,13 +216,12 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
               saveAsImage : {show: true}
           }
       },
-      calculable : true,
+      calculable : false,
       series : [        
           {
               name:rose_group_metric.name,
               type:'pie',
-              radius : ['20%', '75%'],
-              roseType : 'area',
+              radius : '55%',
               data:rose_group_metric.data
           }
       ]
@@ -230,25 +230,36 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     myChart.setOption(chartOpt);
   }
 
-  $scope.drawRose=function(id, rose_group_metric, limit){
-    if(angular.isUndefined(limit)) {
-      limit = 20;
+  $scope.drawRose=function(id, rose_group_metric){
+    if(!bool(rose_group_metric)) {
+      return false;
     }
-    if(limit < 0) return false;
+    console.debug("draw ...")
     // 等待界面target元素绘制完成
     $timeout(function(){ 
       var t = $(id);
-      var w = t.width();
-      if(w == 0) return $scope.drawRose(id, rose_group_metric, limit-1);
-      var h = t.height();
-      if(h < 10){
-        h = w;
-        t.height(h);
-      }
-      console.debug('id:'+id);
-      drawRose(t, rose_group_metric); 
-    }, 500);
+      $scope.$watch(function(){return t.width();}, function(newValue, oldValue){
+        if(newValue <= 0) return;
+        var w = t.width();
+        var h = t.height();
+        if(h < 10){
+          h = w * 0.9;
+          t.height(h);
+        }
+        console.debug('id:'+id);
+        drawRose(t, rose_group_metric); 
+      });
+    }, 300);
   }; 
+  
+  $scope.showBigDistribution=function(dist_metric){
+		$("#bigDrawModal").modal();
+    drawRose($("#draw_big"), dist_metric);
+  }
+  
+  $scope.drawDistribution = function(targetSelect, dist_metric){
+    $scope.drawRose(targetSelect, dist_metric);
+  }
 }
 
 // @dep
@@ -353,7 +364,6 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
   $scope.init = function(){
     $scope.showInfo();
     console.debug($scope.show);
-    // group_metric = {metric:{},x:,y:}
 
     var all_load = {
       metric:'负载',
@@ -384,23 +394,14 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     };
 
     $scope.show.all_host_overview = [all_load, all_net, all_mem, all_disk];
+    angular.forEach($scope.show.all_host_overview, function(v, k){
+      v.xfunc=$scope.NO_XFUNC;
+      console.debug(v);
+    });
+  }
 
-    //$scope.draw_1();
-    //$scope.drawAllHostLoadDistribution();
-  }
-  
-  $scope.drawAllHost=function(targetSelect, group_metric){
-    //var host_metric=$scope.show.all_host_load;
-    console.debug(targetSelect);
-    console.debug(group_metric);
-    var host_metric=group_metric;
-    if(!bool(host_metric.xfunc)){
-      host_metric.xfunc=$scope.NO_XFUNC;
-    }
-    $scope.draw(targetSelect,host_metric);
-  }
- 
-  $scope.drawAllHostDistribution = function(targetSelect, group_metric){
+  // 计算分布情况
+  $scope.calculateDistribution = function(group_metric){
     var host_metric = group_metric;
     // 计算分布
     var rose_group_metric = {name:host_metric.metric, data:[]};
@@ -428,12 +429,9 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     rose_group_metric.data = $.map(rose_group_metric.data, function(n){
       return n.value<=0?null:n;
     });
-    $scope.drawRose(targetSelect,rose_group_metric);
+    return rose_group_metric;
   }
   
-  //$scope.draw_2=function(){$scope.draw('#all_disk_use', $scope.show.all_disk_use);}
-  //$scope.draw_3=function(){$scope.draw('#all_resource_use', $scope.show.all_resource_use);}
-  //$scope.draw_4=function(){$scope.draw('#all_net_use', $scope.show.all_net_use);}
 
   $scope.init();
 

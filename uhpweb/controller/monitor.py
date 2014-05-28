@@ -32,6 +32,8 @@ from model.services import Service
 from model.callback import CallBack
 from model.alarm import *
 
+__all__ =  ['MonitorBackHandler']
+
 app_log = logging.getLogger("tornado.application")
         
 class MonitorBackHandler(BaseHandler):
@@ -124,8 +126,11 @@ class MonitorBackHandler(BaseHandler):
         # 指定组的指标
         # { name:,metrics:{} }
         groups_metrics = self._checkout_groups_metrics(group_names)
-    
-        all_rrd_metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+        all_rrd_metrics = [] 
+        try:
+            all_rrd_metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+        except:
+            app_log.exception('')
 
         show_info['metrics'] = [] 
         #metric_name_map = dict([ (m['name'], m['display']) for m in static_config.monitor_show_info['metrics'] ])
@@ -172,7 +177,7 @@ class MonitorBackHandler(BaseHandler):
         cluster_name     = self._query_var('all', 'cluster_name')
         cluster_name     = self._sure_str(cluster_name)
     
-        rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir, config.rrd_image_dir)
 
         for service in services:
             service_shows = None
@@ -193,10 +198,10 @@ class MonitorBackHandler(BaseHandler):
                         (ts, value) = (None, None)
                         try:
                             (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
-                            if value is None: continue
-                            instance_status.append([host,value])
-                        except Exception, e:
-                            pass
+                        except:
+                            app_log.exception('')
+                        if value is None: continue
+                        instance_status.append([host,value])
                     if instance_status:
                         show['instance-status'] = instance_status
                     else:
@@ -216,10 +221,10 @@ class MonitorBackHandler(BaseHandler):
                             (ts, value) = (None, None)
                             try:
                                 (ts, value) = rrd_wrapper.query_last(metric_name, hostname=host, clusterName=cluster_name)
-                                if value is None: continue
-                                show['list'].append([metric, value])
-                            except Exception, e:
-                                pass
+                            except:
+                                app_log.exception('')
+                            if value is None: continue
+                            show['list'].append([metric, value])
                             break
                     if not show['list']:
                         show.clear()
@@ -260,7 +265,7 @@ class MonitorBackHandler(BaseHandler):
         
         cluster_name = self._query_var('all', 'cluster_name')
         cluster_name = self._sure_str(cluster_name)
-        rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        rrd_wrapper  = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
         start = "-%ds" % sec
@@ -297,8 +302,12 @@ class MonitorBackHandler(BaseHandler):
         end = "now" 
 
         data = []
-        
-        metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+       
+        metrics = [] 
+        try:
+            metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
+        except:
+            app_log.exception('')
         
         groups_metrics = self._checkout_groups_metrics(group_names)
 
@@ -315,12 +324,16 @@ class MonitorBackHandler(BaseHandler):
         ret = {"data":data}
         self.ret("ok", "", ret);
 
+    # None: 未获取
     def _fetch_host_last_metric(self, rrd_wrapper, cluster_name, host, metric):
         host   = self._sure_str(host)
         metric = self._sure_str(metric)
-        (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
+        (ts, value) = (None, None)
+        try:
+            (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
+        except:
+            app_log.exception('')
         return value
-
     
     # 计算表达式
     # -1: 未获取
@@ -458,7 +471,8 @@ class MonitorBackHandler(BaseHandler):
         for metric in expr_vars:
             try:
                 rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
-            except Exception, e:
+            except:
+                app_log.exception('')
                 return None
             x,y = rrd.convert_to_xy(rrd_metric)
            
@@ -600,7 +614,12 @@ class MonitorBackHandler(BaseHandler):
             for record in query:
                 temp = []
                 for col in columns:
-                    temp.append(getattr(record,col))
+                    v = getattr(record,col)
+                    # 特别的，时间转化
+                    if col == 'ctime':
+                        t = time.localtime(v)
+                        v = time.strftime("%Y-%m-%d %H:%M:%S", t)
+                    temp.append(v)
                 data.append(temp);
             alarms = {'columns':columns, 'rows':data}
             self.ret("ok", "", {"data": alarms})

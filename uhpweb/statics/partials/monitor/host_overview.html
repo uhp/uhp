@@ -2,21 +2,24 @@
 <div class="row" ng-repeat="group_metric in show.all_host_overview">
   <!--  可以双击放大 -->
   <div class="col-md-8">
-    <div class="panel panel-info" ng-dblclick="showBig(group_metric)">
+
+    <div class="panel panel-info" ng-dblclick="showBig(group_metric)" ng-init="ID=formatIdName()">
       <div class="panel-heading"><h3 class="panel-title">[[group_metric.metric]]</h3></div>
       <div class="panel-body">
-        <div id="all_host_[[$index]]"></div>
-        <div ng-init="drawAllHost('#all_host_'+$index,group_metric)"></div>
+        <div id="[[ID]]" ng-init="draw('#'+ID,group_metric)"></div>
       </div>
     </div>
+
   </div>
-  <div class="col-md-4">
-    <div class="panel panel-info">
+
+  <div class="col-md-4" ng-init="DIST=calculateDistribution(group_metric)">
+
+    <div class="panel panel-info" ng-dblclick="showBigDistribution(DIST)" ng-init="ID2=formatIdName()">
       <div class="panel-heading"><h3 class="panel-title">分布</h3></div>
       <div class="panel-body">
-        <div id="all_host_[[$index]]_distribution"></div>
-        <div ng-init="drawAllHostDistribution('#all_host_'+$index+'_distribution',group_metric)"></div>
+        <div id="[[ID2]]" ng-init="drawDistribution('#'+ID2,DIST)"></div>
       </div>
     </div>
+
   </div>
 </div>

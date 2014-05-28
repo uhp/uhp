@@ -1,30 +1,16 @@
 <div class="row">
   <div class="col-md-12">
-    <div class="panel panel-danger">
+    <div class="panel panel-info">
       <div class="panel-heading">最新告警列表</div>
       <table class="table table-bordered table-striped table-hover">
         <thead>
           <tr>
             <th ng-repeat="col in alarms.columns">[[col]]</th>
-            <!--
-            <th>ID</th>
-            <th>等级</th>
-            <th>标题</th>
-            <th>时间</th>
-            <th>详细</th>
-            -->
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="record in alarms.rows">
-            <td style="max-width:500px;overflow:auto;" ng-repeat="v in record">[[v]]</td>
-            <!--
-            <td style="max-width:500px;overflow:auto;">1</td>
-            <td style="max-width:500px;overflow:auto;">WARN</td>
-            <td style="max-width:500px;overflow:auto;">磁盘容量不足1G</td>
-            <td style="max-width:500px;overflow:auto;">2014-04-02 12:24:31</td>
-            <td style="max-width:500px;overflow:auto;"><button>msg</button></td>
-            -->
+            <td style="max-width:500px;overflow:auto;word-wrap:break-word;white-space:pre-wrap;" ng-repeat="v in record">[[v]]</td>
           </tr>
         </tbody>
       </table>

@@ -9,9 +9,12 @@
     <tbody>
       <tr ng-repeat="record in data track by record[0]" ng-init="iR=$index">
         <form>
-          <td style="max-width:500px;overflow:auto;" ng-repeat="v in record track by $index" ng-init="jC=$index">
-            <span ng-show="!is_editing[iR]">[[v]]</span>
+          <td style="max-width:500px;" ng-repeat="v in record track by $index" ng-init="jC=$index">
+            <span style="word-wrap:break-word;white-space:pre-wrap;" ng-show="!is_editing[iR]">[[v]]</span>
+            <!--
             <input type="text" class="form-control" ng-show="is_editing[iR] && !$first" ng-model="record[jC]">
+            -->
+            <textarea class="form-control" rows="1" style="overflow-y:auto;resize:vertical" ng-show="is_editing[iR] && !$first" ng-model="record[jC]"></textarea>
             <span ng-show="is_editing[iR] && $first">[[v]]</span>
           </td>
           <td>
@@ -26,7 +29,10 @@
       <tr ng-show="is_adding_new_record">
         <form>
           <td ng-repeat="col in column">
+            <!--
             <input type="text" class="form-control" name="[[col]]" ng-readonly="col=='id'" ng-model="new_record[col]">
+            -->
+            <textarea class="form-control" rows="1" style="overflow-y:auto;resize:vertical"  name="[[col]]" ng-readonly="col=='id'" ng-model="new_record[col]"></textarea>
           </td>
           <td>
             <button type="submit" class="btn btn-primary btn-sm" ng-click="save_new_record()">保存</button>

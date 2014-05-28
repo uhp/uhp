@@ -12,7 +12,7 @@ td, th { max-width: 600px; }
 td>pre { margin:0px 0px; }
 select.form-control { -webkit-appearance: menulist; }
 .input-group-addon {background-color:#5bc0de; border:0px;}
-thead tr {background-color: #5bc0de;}
+thead tr {background-color: #d9edf7;}
 .input-group .select {margin-bottom:0px;}
 .input-group .select button:first-child { border-radius: 0 4px 4px 0; }
 .input-group .form-control:last-child { border-left:0; }
@@ -25,7 +25,5 @@ thead tr {background-color: #5bc0de;}
 blue { color:blue }
 red { color:red }
 
-.smalltd{
-    padding:1px !important;
-}
+.smalltd{ padding:1px !important; }
 
