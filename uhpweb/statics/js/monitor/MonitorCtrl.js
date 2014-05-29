@@ -88,6 +88,7 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
 
   // metric:{metric:, x:[], y:[]}
   // metric:{metric:, x:[], y:{host:[]}}
+  // metric:[{name,x:[],series:[{name:,type:,data:[]}]}]
   $scope.make_chartOpt=function(metric){
     //x轴转换 
     console.debug(metric);
@@ -97,19 +98,34 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     }
     
     //转换null值为echart要求格式
-    if($.isArray(metric.y)){
-      metric.y = $.map(metric.y, function(n){
-        return (n===null)?'-':n;
-      });
-    } else {
-      $.each(metric.y, function(k, vs){
-        metric.y[k] = $.map(vs, function(n){
+    if(metric.series){//新的数据格式，可以绘制多个指标在同一个图
+      $.each(metric.series, function(k, v){
+        metric.series[k].data = $.map(v.data, function(n){
           return (n===null)?'-':n;
         });
       });
+    } else { //旧的数据格式
+      if($.isArray(metric.y)){ //单个指标
+        metric.y = $.map(metric.y, function(n){
+          return (n===null)?'-':n;
+        });
+      } else { //多个指标
+        $.each(metric.y, function(k, vs){
+          metric.y[k] = $.map(vs, function(n){
+            return (n===null)?'-':n;
+          });
+        });
+      }
     }
 
     function legendData(){
+      if(metric.series){
+        var retu = [];
+        $.each(metric.series, function(k, v){
+          retu.push(v.name);
+        }); 
+        return retu;
+      }
       if($.isArray(metric.y)) return [metric.metric];
       var retu = [];
       $.each(metric.y, function(k, v){
@@ -119,6 +135,9 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     }
 
     function series(){
+      if(metric.series){
+        return metric.series;
+      }
       if($.isArray(metric.y)) return [ { name: metric.metric, type:metric.chartType||'line', data:metric.y } ];
       var retu = [];
       $.each(metric.y, function(k, v){
@@ -360,44 +379,27 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     $scope.show.metric=host_metric.metric;
     $rootScope.setActiveMonMenuTabByName('mtHostsMetric');
   }
- 
+
+  $scope.fetchHostCurrentOverview = function(){
+    //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_host_current_overview', 
+    $rootScope.myHttp('GET', '/monitorback/fetch_host_current_overview', 
+      {}, 
+      function(res){
+        // data:[{name,x:[],series:[{name:,type:,data:[]}]}]
+        $scope.show.all_host_overview = res['data'];
+        angular.forEach($scope.show.all_host_overview, function(v, k){
+          v.xfunc=$scope.NO_XFUNC;
+          v.chartType = 'bar';
+          console.debug(v);
+        });
+      }
+    );
+  }
+
   $scope.init = function(){
     $scope.showInfo();
     console.debug($scope.show);
-
-    var all_load = {
-      metric:'负载',
-      chartType:'bar',
-      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-      y:[2.5,3.0,2.2,3.4,4]
-    };
-    
-    var all_net = {
-      metric:'网络',
-      chartType:'bar',
-      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-      y:[3.3,5.3,3.2,4.4,5]
-    };
-
-    var all_disk = {
-      metric:'存储',
-      chartType:'bar',
-      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-      y:[3.3,5.3,3.2,4.4,5]
-    };
-
-    var all_mem = {
-      metric:'内存',
-      chartType:'bar',
-      x:['hadoop1','hadoop2','hadoop3','hadoop4','hadoop5'],
-      y:[20,30,22,34,40]
-    };
-
-    $scope.show.all_host_overview = [all_load, all_net, all_mem, all_disk];
-    angular.forEach($scope.show.all_host_overview, function(v, k){
-      v.xfunc=$scope.NO_XFUNC;
-      console.debug(v);
-    });
+    $scope.fetchHostCurrentOverview();
   }
 
   // 计算分布情况
