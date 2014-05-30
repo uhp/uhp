@@ -47,7 +47,7 @@ from model.instance import Instance
 from sqlalchemy import and_
 
 def query():
-    """query special id tasks
+    """query all instance 
     
     like sql : "SELECT id, service, role, hostname FROM instance"
     
@@ -55,8 +55,10 @@ def query():
     """
   
     session = database.getSession(False)
-    rows = session.query(Instance)
-    session.close()
+    try:
+        rows = session.query(Instance)
+    finally:
+        session.close()
     return rows 
 
 def run_update(instance):
@@ -224,7 +226,7 @@ def check():
             instance_ports[ins] = ports
     
     #check_all_instance(instance_ports)
-    # 限制同一个host只有一个
+    # 同一个host上的instance同时检查
     host_ins_map = {} # {host:[(ins,[port])]}
     for ins, ports in instance_ports.items():
         if ins.host not in host_ins_map:

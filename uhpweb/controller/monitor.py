@@ -244,6 +244,7 @@ class MonitorBackHandler(BaseHandler):
         self.ret("ok", "", ret);
 
     # 获取所有的机器
+    # return [host]
     def _host_list(self):
         session = database.getSession()
         hosts = session.query(Host)
@@ -332,7 +333,7 @@ class MonitorBackHandler(BaseHandler):
         try:
             (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
         except:
-            app_log.exception('')
+            pass
         return value
     
     # 计算表达式
@@ -625,6 +626,156 @@ class MonitorBackHandler(BaseHandler):
             self.ret("ok", "", {"data": alarms})
         finally:
             session.close()
+    
+    # 监控 机器 概览 当前 
+    # data:[{name,x:[],series:[{name:,type:,data:[]}]}]
+    def fetch_host_current_overview(self):
+        data = []
+        
+        cluster_name = self._query_var('all', 'cluster_name')
+        cluster_name = self._sure_str(cluster_name)
+        rrd_wrapper  = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+
+        # hosts: [host]
+        hosts = self._host_list()
+        
+        # 负载 load_one                       : proc_run                        : cpu_num
+        # CPU  cpu_user                       : cpu_system                      : cpu_wio
+        # 网络 bytes_in                       : bytes_out                       : 1G        : 2G
+        # 内存 mem used(mem_total-mem_free)   : swap used(swap_total-swap_free) : mem_free
+        # 存储 disk_use(disk_total-disk_free) : disk_free
+        # 存储扩展 [ { name:hadoop1磁盘, x:[sda1,sdb1], series:[{ name:disk_used, type:bar, stack:disk, data:[1,2] }
+        #                                                         { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
+        
+        load_metric = {'name':'负载','x':hosts,'series':[]}
+        cpu_metric  = {'name':'CPU', 'x':hosts,'series':[]}
+        net_metric  = {'name':'网络','x':hosts,'series':[]}
+        mem_metric  = {'name':'内存','x':hosts,'series':[]}
+        disk_metric = {'name':'磁盘','x':hosts,'series':[]}
+
+        load_metric_load_one  = []
+        load_metric_proc_run  = []
+        load_metric_cpu_num   = []
+        cpu_metric_cpu_user   = []
+        cpu_metric_cpu_system = []
+        cpu_metric_cpu_wio    = []
+        net_metric_bytes_in   = []
+        net_metric_bytes_out  = []
+        net_metric_1g_mark    = []
+        net_metric_2g_mark    = []
+        mem_metric_mem_used   = []
+        mem_metric_mem_free   = []
+        mem_metric_swap_used  = []
+        disk_metric_disk_used = []
+        disk_metric_disk_free = []
+
+        for host in hosts:
+            host = self._sure_str(host)
+            load_one   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'load_one')
+            proc_run   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'proc_run')
+            cpu_num    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'cpu_num')
+            cpu_user   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'cpu_user')
+            cpu_system = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'cpu_system')
+            cpu_wio    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'cpu_wio')
+            bytes_in   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'bytes_in')
+            bytes_out  = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'bytes_out')
+            mem_total  = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_total')
+            mem_free   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_free')
+            swap_total = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'swap_total')
+            swap_free  = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'swap_free')
+            disk_total = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_total')
+            disk_free  = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_free')
+            
+            # 负载
+            load_metric_load_one.append(load_one)
+            load_metric_proc_run.append(proc_run)
+            load_metric_cpu_num.append(cpu_num)
+            # CPU
+            cpu_metric_cpu_user.append(cpu_user)
+            cpu_metric_cpu_system.append(cpu_system)
+            cpu_metric_cpu_wio.append(cpu_wio)
+            # 网络
+            net_metric_bytes_in.append(bytes_in)
+            net_metric_bytes_out.append(bytes_out)
+            net_metric_1g_mark.append(128*1024*1024)
+            net_metric_2g_mark.append(256*1024*1024)
+            # 内存
+            mem_used = None
+            if mem_total is not None and mem_free is not None:
+                mem_used = mem_total - mem_free
+            mem_metric_mem_used.append(mem_used)
+            mem_metric_mem_free.append(mem_free)
+            swap_used = None
+            if swap_total is not None and swap_free is not None:
+                swap_used = swap_total - swap_free
+            mem_metric_swap_used.append(swap_used)
+            # 存储
+            disk_used = None
+            if disk_total is not None and disk_free is not None:
+                disk_used = disk_total - disk_free
+            disk_metric_disk_used.append(disk_used)
+            disk_metric_disk_free.append(disk_free)
+
+        # 负载
+        load_metric['series'].append({'name':'load_one', 'type':'bar', 'data':load_metric_load_one})
+        load_metric['series'].append({'name':'proc_run', 'type':'bar', 'data':load_metric_proc_run})
+        load_metric['series'].append({'name':'cpu_num', 'type':'line', 'data':load_metric_cpu_num})
+        # CPU
+        cpu_metric['series'].append({'name':'cpu_user', 'type':'bar', 'stack':'cpu', 'data':cpu_metric_cpu_user})
+        cpu_metric['series'].append({'name':'cpu_system', 'type':'bar', 'stack':'cpu', 'data':cpu_metric_cpu_system})
+        cpu_metric['series'].append({'name':'cpu_wio', 'type':'bar', 'stack':'cpu', 'data':cpu_metric_cpu_wio})
+        # 网络
+        net_metric['series'].append({'name':'bytes_in', 'type':'bar', 'data':net_metric_bytes_in})
+        net_metric['series'].append({'name':'bytes_out', 'type':'bar', 'data':net_metric_bytes_out})
+        net_metric['series'].append({'name':'1g_mark', 'type':'line', 'data':net_metric_1g_mark})
+        net_metric['series'].append({'name':'2g_mark', 'type':'line', 'data':net_metric_2g_mark})
+        # 内存
+        mem_metric['series'].append({'name':'mem_used', 'type':'bar', 'stack':'mem', 'data':mem_metric_mem_used})
+        mem_metric['series'].append({'name':'mem_free', 'type':'bar', 'stack':'mem', 'data':mem_metric_mem_free})
+        mem_metric['series'].append({'name':'swap_used', 'type':'bar', 'stack':'mem', 'data':mem_metric_swap_used})
+        # 存储
+        disk_metric['series'].append({'name':'disk_used', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_used})
+        disk_metric['series'].append({'name':'disk_free', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_free})
+        
+        data.append(load_metric)
+        data.append(cpu_metric)
+        data.append(net_metric)
+        data.append(mem_metric)
+        data.append(disk_metric)
+        
+        # 存储扩展 [ { name:hadoop1磁盘, x:[sda1,sdb1], xtype:'h', series:[{ name:disk_used, type:bar, stack:disk, data:[1,2] }
+        #                                                       { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
+        regex = re.compile(r'dev_(\w+)_disk_total')
+        for host in hosts:
+            host = self._sure_str(host)
+            names = []
+            try:
+                names = rrd_wrapper.match_rrd_names(regex, host, cluster_name)
+            except:
+                pass
+            if not names: continue
+            disks = {'name':'%s磁盘状况','x':[], 'xtype':'h', 'series':[]}
+            disk_useds = []
+            disk_frees = []
+            for name in names:
+                matchObj = regex.match(name)
+                dev = regex.group(1)
+                path = "/dev/%s" % dev
+                disks['x'].append(path)
+                disk_used = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_used' % dev)
+                disk_total = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_total' % dev)
+                disk_free = None
+                if disk_total is not None and disk_used is not None:
+                    disk_free = disk_total - disk_used
+                disk_useds.append(disk_used)
+                disk_frees.append(disk_free)
+                
+            disks['series'].append({'name':'disk_used','type':'bar','stack':'disk','data':disk_useds})
+            disks['series'].append({'name':'disk_free','type':'bar','stack':'disk','data':disk_frees})
+            data.append(disks)
+
+        ret = {"data":data}
+        self.ret("ok", "", ret);
 
     def _query_special_hosts(self, service_name, role_name):
         # [{name:, roles:{role:[instance]}}]

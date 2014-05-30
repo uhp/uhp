@@ -137,6 +137,23 @@ class RrdWrapper(object):
             if name.startswith(prefix) and name.endswith('.rrd'):
                 names.append(name[:-4])
         return names
+    
+    def match_rrd_names(self, regex, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
+        """
+        regex match
+        :param regex:
+        :param hostname:
+        :param clusterName:
+        :return:
+        """
+        names = []
+        rrd_dirname = os.path.join(self.rrd_rootdir, clusterName, hostname)
+        for name in os.listdir(rrd_dirname):
+            if not name.endswith('.rrd'): continue
+            name = name[:-4]
+            if regex.match(name):
+                names.append(name)
+        return names
 
     def get_all_rrd_names(self, hostname="__SummaryInfo__", clusterName="__SummaryInfo__"):
         """
