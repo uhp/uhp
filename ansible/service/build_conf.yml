@@ -4,5 +4,5 @@
   - "{{ WANT_HOST }}"
   tasks:
   - name: build template remote file
-    local_action: template src=roles/conf/templates/{{WANT_DIR}}/{{item}}.j2 dest=/tmp/{{TS}}/{{WANT_HOST}}/{{WANT_DIR}}/{{item}}
+    local_action: template src=roles/conf/templates/{{WANT_DIR}}/{{item}} dest=/tmp/{{TS}}/{{WANT_HOST}}/{{WANT_DIR}}/{{item}}
     with_items: "{{WANT_FILE}}"
