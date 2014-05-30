@@ -1,0 +1,26 @@
+{
+    "msg":"",
+    "ret":"ok",
+    "data": [
+        {
+            "metric":"负载",
+            "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+            "y":[2.5,3.0,2.2,3.4,4]
+        },
+        {
+            "metric":"网络",
+            "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+            "y":[3.3,5.3,3.2,4.4,5]
+        },
+        {
+            "metric":"内存",
+            "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+            "y":[20,30,22,34,40]
+        },
+        {
+            "metric":"存储",
+            "x":["hadoop1","hadoop2","hadoop3","hadoop4","hadoop5"],
+            "y":[3.3,5.3,3.2,4.4,5]
+        }
+    ]
+}
