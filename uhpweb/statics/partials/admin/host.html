@@ -197,7 +197,10 @@
         <div class="tab-pane fade [[tabClass('role','in')]] ">
           <div class="row">
             <div class="col-md-3">
-              <select class="select-block" ng-model="chosenService" ng-options="ser for ser in serviceList" ></select>
+              <div class="input-group">
+                <span class="input-group-addon">选择服务</span>
+                <select class="select-block" ng-model="chosenService" ng-options="ser for ser in serviceList" ></select>
+              </div>
             </div>
             <div class="col-md-3">
               <input type="text" class="form-control" ng-model="hostSearchText" placeholder="过滤机器">
@@ -208,29 +211,34 @@
             <div class="col-md-2">
               <button type="button" class="btn btn-block btn-primary" ng-click="readySetupInstance()">提交</button>
             </div>
-            <label ng-show="isDoing" >有安装或者卸载正在进行，不能进行修改</label>
+          </div>
+
+          <div class="row" style="margin-top:13px;" ng-show="isDoing">
+            <div class="col-md-12 text-center">
+              <label class="label label-info fui-volume"> 有安装或者卸载正在进行，不能进行修改</label>
+            </div>
           </div>
 
           <div class="row" style="margin-top:13px;">
             <div class="col-md-12">
               <div class="panel panel-info">
-              <table id="table_id" class="table table-striped table-bordered" >
-                <thead>
-                  <tr>
-                    <th>机器\角色</th>
-                    <th ng-repeat="role in roles[chosenService]">[[role]]</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="(host,info) in filterHostBySearch(hostroles,hostSearchText)">
-                    <td>[[host]]</td>
-                    <td ng-repeat="role in roles[chosenService]">
-                      <input type="checkbox" ng-model="hostRoleMap[host][role]" ng-disabled="isDoing" >
-                      [[doingStatus(host,role)]]
-                    </td>
-                  </tr>
-                </tbody>
-              </table>	
+                <table id="table_id" class="table table-striped table-bordered" >
+                  <thead>
+                    <tr>
+                      <th>机器\角色</th>
+                      <th ng-repeat="role in roles[chosenService]">[[role]]</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="(host,info) in filterHostBySearch(hostroles,hostSearchText)">
+                      <td>[[host]]</td>
+                      <td ng-repeat="role in roles[chosenService]">
+                        <input type="checkbox" ng-model="hostRoleMap[host][role]" ng-disabled="isDoing" >
+                        [[doingStatus(host,role)]]
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>	
               </div>
             </div>
           </div>
@@ -257,27 +265,27 @@
                   <div ng-show="vars.length!=0">
                     将会添加以下的安装变量:
                     <div class="panel panel-info">
-                    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
-                      <thead>
-                        <tr>
-                          <th >服务</th>
-                          <th >变量类型</th>
-                          <th >分组/机器</th>
-                          <th >名称</th>
-                          <th >值</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat="one in vars">
-                          <td>[[ one['service'] ]]</td>
-                          <td ng-show="one['showType']=='group'">分组变量</td>
-                          <td ng-show="one['showType']=='host'">机器变量</td>
-                          <td>[[ one['group'] ]]</td>
-                          <td>[[ one['name'] ]]</td>
-                          <td><input type="text" ng-model="one['value']" style="width:40px;" ></td>
-                        </tr>
-                      </tbody>
-                    </table>	
+                      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" >
+                        <thead>
+                          <tr>
+                            <th >服务</th>
+                            <th >变量类型</th>
+                            <th >分组/机器</th>
+                            <th >名称</th>
+                            <th >值</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat="one in vars">
+                            <td>[[ one['service'] ]]</td>
+                            <td ng-show="one['showType']=='group'">分组变量</td>
+                            <td ng-show="one['showType']=='host'">机器变量</td>
+                            <td>[[ one['group'] ]]</td>
+                            <td>[[ one['name'] ]]</td>
+                            <td><input type="text" ng-model="one['value']" style="width:40px;" ></td>
+                          </tr>
+                        </tbody>
+                      </table>	
                     </div>
                   </div>
                 </div>
@@ -310,22 +318,22 @@
           </div>
 
           <div class="panel panel-info" style="margin-top:13px;">
-          <table id="table_id" class="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th >机器\分组</th>
-                <th ng-repeat="(group,text) in groups" ng-dblclick="editGroup(group)" >[[group]]</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="(host,info) in filterHostBySearch(hostgroups,hostSearchText)">
-                <td>[[host]]</td>
-                <th ng-repeat="(group,text) in groups">
-                  <input type="checkbox" ng-model="hostGroupMap[host][group]" ng-disabled="group=='all'">
-                </th>
-              </tr>
-            </tbody>
-          </table>	
+            <table id="table_id" class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th >机器\分组</th>
+                  <th ng-repeat="(group,text) in groups" ng-dblclick="editGroup(group)" >[[group]]</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="(host,info) in filterHostBySearch(hostgroups,hostSearchText)">
+                  <td>[[host]]</td>
+                  <th ng-repeat="(group,text) in groups">
+                    <input type="checkbox" ng-model="hostGroupMap[host][group]" ng-disabled="group=='all'">
+                  </th>
+                </tr>
+              </tbody>
+            </table>	
           </div>
 
           <!--  修改分组关系的模式对话框 -->

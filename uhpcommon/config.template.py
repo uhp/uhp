@@ -35,7 +35,7 @@ ansible_host_list = os.path.join(uhphome,"inventor/mysqlinventory.py")
 worker_thread_numb = 10
 
 # for monitor
-monitor_script_checkport = os.path.join(uhphome, "uhpmonitor/script/nt.sh")
+monitor_script_checkport = os.path.join(uhphome, "uhpmonitor/script/mnt.sh")
 monitor_thread_numb = 10
 monitor_timer_interval = 10
 port_key_flag = "file://%s/uhpmonitor/conf/port_key_flag.txt" % uhphome

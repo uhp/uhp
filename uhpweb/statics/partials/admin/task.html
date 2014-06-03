@@ -25,156 +25,156 @@
   <div class="row" style="margin-top:20px;">
     <div class="col-md-12 span12">
       <div class="panel panel-info">
-      <table class="table table-striped table-bordered" id="task-table">
-        <thead>
-          <tr>
-            <th ng-click="changeOrderBy('id')"><i class="[[getIconClass('id')]]"></i> id</th>
-            <th ng-click="changeOrderBy('sumbitTime')"><i class="[[getIconClass('sumbitTime')]]"></i> 提交时间</th>
-            <th ng-click="changeOrderBy('taskType')"><i class="[[getIconClass('taskType')]]"></i> 任务类型</th>
-            <th ng-click="changeOrderBy('service')"><i class="[[getIconClass('service')]]"></i> 服务</th>
-            <th ng-click="changeOrderBy('host')"><i class="[[getIconClass('host')]]"></i> 机器</th>
-            <th ng-click="changeOrderBy('role')"><i class="[[getIconClass('role')]]"></i> 角色</th>
-            <th ng-click="changeOrderBy('task')"><i class="[[getIconClass('task')]]"></i> 任务名称</th>
-            <th ng-click="changeOrderBy('status')"><i class="[[getIconClass('status')]]"></i> 状态</th>
-            <th ng-click="changeOrderBy('result')"><i class="[[getIconClass('result')]]"></i> 结果</th>
-            <th>消息</th>
-            <th style="width: 76px;">操作 </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="task in tasks">
-            <td>[[task.id]]</td>
-            <td style="min-width:100px">[[task.sumbitTime]]</td>
-            <td>[[task.taskType]]</td>
-            <td>[[task.service]]</td>
-            <td>[[task.host]]</td>
-            <td>[[task.role]]</td>
-            <td>[[task.task]]</td>
-            <td>[[task.status]]</td>
-            <td><i class="[[ resultIconMap[task.result]['class'] ]]" style="[[ resultIconMap[task.result]['style'] ]]" ></i> [[task.result]]</td>
-            <td><button class="btn btn-info" ng-click="showTaskDetail(task.id)">msg</button></td>
-            <td>
-              <button class="btn btn-danger" ng-click="killTask(task.id)" ng-show="task.status=='running'" >终止</button>
-              <button class="btn btn-danger" ng-click="rerunTask(task.id)" ng-show="canRerun(task)" >重跑</button>
-            </td>
-          </tr>
-        </tbody>	
-      </table>
+        <table class="table table-striped table-bordered" id="task-table">
+          <thead>
+            <tr>
+              <th ng-click="changeOrderBy('id')"><i class="[[getIconClass('id')]]"></i> id</th>
+              <th ng-click="changeOrderBy('sumbitTime')"><i class="[[getIconClass('sumbitTime')]]"></i> 提交时间</th>
+              <th ng-click="changeOrderBy('taskType')"><i class="[[getIconClass('taskType')]]"></i> 任务类型</th>
+              <th ng-click="changeOrderBy('service')"><i class="[[getIconClass('service')]]"></i> 服务</th>
+              <th ng-click="changeOrderBy('host')"><i class="[[getIconClass('host')]]"></i> 机器</th>
+              <th ng-click="changeOrderBy('role')"><i class="[[getIconClass('role')]]"></i> 角色</th>
+              <th ng-click="changeOrderBy('task')"><i class="[[getIconClass('task')]]"></i> 任务名称</th>
+              <th ng-click="changeOrderBy('status')"><i class="[[getIconClass('status')]]"></i> 状态</th>
+              <th ng-click="changeOrderBy('result')"><i class="[[getIconClass('result')]]"></i> 结果</th>
+              <th>消息</th>
+              <th style="width: 76px;">操作 </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="task in tasks">
+              <td>[[task.id]]</td>
+              <td style="min-width:100px">[[task.sumbitTime]]</td>
+              <td>[[task.taskType]]</td>
+              <td>[[task.service]]</td>
+              <td>[[task.host]]</td>
+              <td>[[task.role]]</td>
+              <td>[[task.task]]</td>
+              <td>[[task.status]]</td>
+              <td><i class="[[ resultIconMap[task.result]['class'] ]]" style="[[ resultIconMap[task.result]['style'] ]]" ></i> [[task.result]]</td>
+              <td><button class="btn btn-info" ng-click="showTaskDetail(task.id)">msg</button></td>
+              <td>
+                <button class="btn btn-danger" ng-click="killTask(task.id)" ng-show="task.status=='running'" >终止</button>
+                <button class="btn btn-danger" ng-click="rerunTask(task.id)" ng-show="canRerun(task)" >重跑</button>
+              </td>
+            </tr>
+          </tbody>	
+        </table>
       </div>
     </div>
   </div>
   <!-- ~row -->
 
-      <!-- 查看任务详细信息的模式对话框 -->
-      <div id="taskDetailModal" class="modal fade" role="dialog" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog" style="min-width: 650px">
-          <div class="modal-content">
+  <!-- 查看任务详细信息的模式对话框 -->
+  <div id="taskDetailModal" class="modal fade" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" style="min-width: 650px">
+      <div class="modal-content">
 
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fui-cross"></span></button>
-              <h4 class="modal-title">任务[[nowTask.id]]</h4>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fui-cross"></span></button>
+          <h4 class="modal-title">任务[[nowTask.id]]</h4>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">ID：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.id]]</div>
+              </div>
             </div>
 
-            <!-- modal body -->
-            <div class="modal-body">
-
+            <div class="col-md-6 span6">
               <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">ID：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.id]]</div>
-                  </div>
-                </div>
-
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">时间：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.sumbitTime]]</div>
-                  </div>
-                </div>
+                <div class="col-md-4" style="text-align:right; padding:0px;">时间：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.sumbitTime]]</div>
               </div>
-
-              <div class="row">
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">类型：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.taskType]]</div>
-                  </div>
-                </div>
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">服务：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.service]]</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">机器：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.host]]</div>
-                  </div>
-                </div>
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">角色：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.role]]</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">名称：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.task]]</div>
-                  </div>
-                </div>
-                <div class="col-md-6 span6">
-                  <div class="row" >
-                    <div class="col-md-4" style="text-align:right; padding:0px;">状态：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.status]]</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">结果：</div>
-                    <div class="col-md-8" style="padding:0px">[[nowTask.result]]</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 span6">
-                  <div class="row">
-                    <div class="col-md-4" style="text-align:right; padding:0px;">消息：</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-12 span12">
-                  <div class="form-group">
-                    <label class="sr-only control-label">消息：</label>
-                    <pre style="border-style:groove">[[nowTask.msg]]</pre>
-                  </div>
-                </div>
-              </div>
-
             </div>
-            <!-- ~ modal body -->
+          </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+          <div class="row">
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">类型：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.taskType]]</div>
+              </div>
             </div>
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">服务：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.service]]</div>
+              </div>
+            </div>
+          </div>
 
-          </div> <!-- content -->
-        </div> <!-- dialog -->
-      </div> <!-- modal -->
-      <!-- ~查看任务详细信息的模式对话框 -->
+          <div class="row">
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">机器：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.host]]</div>
+              </div>
+            </div>
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">角色：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.role]]</div>
+              </div>
+            </div>
+          </div>
 
-    </div>
+          <div class="row">
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">名称：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.task]]</div>
+              </div>
+            </div>
+            <div class="col-md-6 span6">
+              <div class="row" >
+                <div class="col-md-4" style="text-align:right; padding:0px;">状态：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.status]]</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">结果：</div>
+                <div class="col-md-8" style="padding:0px">[[nowTask.result]]</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 span6">
+              <div class="row">
+                <div class="col-md-4" style="text-align:right; padding:0px;">消息：</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 span12">
+              <div class="form-group">
+                <label class="sr-only control-label">消息：</label>
+                <pre style="border-style:groove">[[nowTask.msg]]</pre>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- ~ modal body -->
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+        </div>
+
+      </div> <!-- content -->
+    </div> <!-- dialog -->
+  </div> <!-- modal -->
+  <!-- ~查看任务详细信息的模式对话框 -->
+
+</div>

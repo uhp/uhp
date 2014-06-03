@@ -3,7 +3,8 @@
         "zookeeper": {
             "zookeeper_client_port": true,
             "zookeeper_election_port": true,
-            "zookeeper_leader_port": false
+            "zookeeper_leader_port": false,
+            "key":"QuorumPeerMain"
         }
     },
     "hdfs": {
@@ -11,19 +12,23 @@
             "dfs_namenode_rpc_address_port": true,
             "dfs_namenode_servicerpc_address_port": true,
             "dfs_namenode_http_address_port": true,
-            "dfs_namenode_https_address_port": false
+            "dfs_namenode_https_address_port": false,
+            "key":"proc_namenode"
         },
         "datanode": {
             "dfs_datanode_ipc_address_port": true,
             "dfs_datanode_http_address_port": true,
-            "dfs_datanode_address_port": true
+            "dfs_datanode_address_port": true,
+            "key":"proc_datanode"
         },
         "qjm": {
             "qjournal_port": true,
-            "qjournal_http_port": false
+            "qjournal_http_port": false,
+            "key":"proc_journalnode"
         },
         "httpfs":{
-            "httpfs_http_port" : true
+            "httpfs_http_port" : true,
+            "key":"proc_httpfs"
         }
     },
     "yarn": {
@@ -32,58 +37,70 @@
             "yarn_rm_port": true,
             "yarn_rm_resource_tracker_port": true,
             "yarn_rm_scheduler_port": true,
-            "yarn_rm_webapp_port": true 
+            "yarn_rm_webapp_port": true,
+            "key":"proc_resourcemanager"
         },
         "nodemanager": {
             "mapreduce_shuffle_port": true,
             "yarn_nm_localizer_port": true,
             "yarn_nm_webapp_port": true,
-            "yarn_nm_port": true 
+            "yarn_nm_port": true, 
+            "key":"proc_nodemanager"
         },
         "historyserver": {
             "mapreduce_jobhistory_port": true,
-            "mapreduce_jobhistory_webapp_port": true 
+            "mapreduce_jobhistory_webapp_port": true,
+            "key":"proc_historyserver"
         }
     },
     "hbase": {
         "hbasemaster": {
             "hbase_master_info_port": false,
-            "hbase_master_port": true
+            "hbase_master_port": true,
+            "key":"hbase.*master"
         },
         "regionserver": {
             "hbase_resigionserver_info_port": true,
-            "hbase_resigionserver_port": true
+            "hbase_resigionserver_port": true,
+            "key":"hbase.*regionserver"
         }
     },
     "hive": {
         "hivemetastore": {
-            "hive_metastore_port": true
+            "hive_metastore_port": true,
+            "key":"HiveMetaStore"
         },
         "hiveserver": {
-            "hive_server_thrift_port": true
+            "hive_server_thrift_port": true,
+            "key":"HiveServer"
         },
         "hiveserver2": {
-            "hive_server2_thrift_port": true
+            "hive_server2_thrift_port": true,
+            "key":"HiveServer2"
         }
     },
     "impala": {
         "impalastatestore": {
             "impala_state_store_port": true,
-            "impala_state_store_web_port": true
+            "impala_state_store_web_port": true,
+            "key":"statestored"
         },
         "impalaserver": {
             "impala_backend_port": true,
             "impala_server_hs2_port": false,
             "impala_server_beeswax_port": false,
-            "impala_server_web_port": true
+            "impala_server_web_port": true,
+            "key":"impalad"
         }
     },
     "ganglia": {
         "gmetad": {
-            "gmetad_xml_port": true
+            "gmetad_xml_port": true,
+            "key":"gmetad"
         },
         "gmond": {
-            "gmond_port": true 
+            "gmond_port": true,
+            "key":"gmond"
         }
     },
     "hue": {
@@ -97,5 +114,4 @@
             "solr_admin_port": false
         }
     }
-
 }
