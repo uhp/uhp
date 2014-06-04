@@ -9,7 +9,7 @@ from simpleparse.parser import Parser
 class ExpParser():
     def __init__(self):
         declaration = r'''
-        fun             :=  fun_name,'(',exp_list,')'
+        fun             :=  ( fun_name,'(',')' )/( fun_name,'(',exp_list,')' )
         fun_name        :=  [a-zA-Z0-9_-]+
         exp_list        :=  exp,(',',exp)*
         exp             :=  pm_exp
@@ -27,10 +27,11 @@ class ExpParser():
         if success == 1 :
             tag,start,end,subtags = child[0]
             func_name = str[start:end]
-            tag,start,end,subtags = child[1]
             exp_list = []
-            for exp in subtags:
-                exp_list.append(str[exp[1]:exp[2]])       
+            if len(child) > 1 :
+                tag,start,end,subtags = child[1]
+                for exp in subtags:
+                    exp_list.append(str[exp[1]:exp[2]])       
             return (func_name, exp_list)
         else:
             return (None,None)
@@ -108,9 +109,12 @@ class ExpParser():
 if __name__ == "__main__":   
     
     testData="rate((swap_total - swap_free) / mem_total * 5,(swap_total - swap_free) / 0.05,(swap_total - swap_free) * 0.2,a + b * c,(a + b) / c,a + b + c - b - c,a * b * c / a / b / c_.d_a-b-d_.d)"
+    #testData="a()"
     
     ep = ExpParser()
     func_name,exp_list =  ep.parse_exp(testData)
+    print func_name
+    print exp_list
     import sys
     if func_name == None:
         sys.exit(1)
