@@ -149,7 +149,7 @@ def check_one_host_(host, ins_ports_key_list):
     for ins, ports, key in ins_ports_key_list:
         script += " %d:%s:%s " % (ins.id, ",".join(ports), key)
         ins_dict[ins.id] = ins 
-    cmd = ["/usr/bin/env", "ansible", "-i", config.ansible_host_list, ins.host, "-m", "script", "-a", script]
+    cmd = ["/usr/bin/env", "ansible", "-s", "-i", config.ansible_host_list, ins.host, "-m", "script", "-a", script]
     
     log.debug("cmd="+" ".join(cmd))
     log.debug("host[%s], runner.run", host)

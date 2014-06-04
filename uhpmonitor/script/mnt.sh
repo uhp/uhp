@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 myname=${0##.*/}
 
 USAGE=<<EOS
@@ -18,7 +19,7 @@ EOS
 
 # pid=port
 # tcp        0      0 127.0.0.1:4000              0.0.0.0:*                   LISTEN      30448/python
-check_ports=$(netstat -nplt 2>/dev/null | grep LISTEN | grep tcp | awk '{ port=sub(/.*:/,"",$4); pid=sub(/\/.*/,"",$7); if($7 != "-") printf("%s=%s\n",$7,$4);}' | sort)
+check_ports=$(netstat -nplt 2>/dev/null | grep LISTEN | grep tcp | awk '{ port=sub(/.*:/,"",$4); pid=sub(/\/.*/,"",$7); if($7 != "-") printf("%s=%s\n",$7,$4);}')
 
 retu=()
 
@@ -38,17 +39,19 @@ for param in $@; do
     # 查找端口
     pid_ports=()
     for pid_port in $check_ports; do
-        [[ $pid_port =~ ${pid}=.* ]] && {
-            port=${pid_port##*=}
+        pid_port=(${pid_port//=/ })
+        [[ $pid == ${pid_port[0]} ]] && {
+            port=${pid_port[1]}
             pid_ports+=($port)
         }
     done
 
     # 匹配端口要求
-    exist_ports=()
+    exist_port=()
     unexist_port=()
-    lack_ports=() # 缺少的端口
+    lack_port=() # 缺少的端口
     state=0
+
     for port in ${ports[@]}; do
         must="true"
         [[ ${port:0:1} == "-" ]] && {
@@ -58,26 +61,32 @@ for param in $@; do
         find_it="false"
         for pid_port in ${pid_ports[@]}; do
             [[ $port == $pid_port ]] && {
-                exist_ports+=($port)
+                exist_port+=($port)
                 find_it='true'
                 break
             }
         done
         [[ "$find_it" != "true" ]] && {
             unexist_port+=($port) 
-            [[ $must == "true" ]] && { lack_ports+=($port); state=1; }
+            [[ $must == "true" ]] && { 
+                lack_port+=($port); 
+                state=1; 
+            }
         }
     done
    
-    exist_ports_str=${exist_ports[@]// /,}
+    exist_port_str=${exist_port[@]// /,}
     unexist_port_str=${unexist_port[@]// /,}
-    lack_ports_str=${lack_ports[@]// /,}
+    lack_port_str=${lack_port[@]// /,}
+    pid_ports_str=${pid_ports[@]// /,}
+    #check_ports_str=${check_ports// /,}
     
-    msg="all_is_ok."
-    [[ $lack_ports_str != "" ]] && {
-        msg="缺少必要的端口[$lack_ports_str]"
+    msg="all_is_ok"
+    [[ $lack_port_str != "" ]] && {
+        msg="缺少必要的端口[$lack_port_str]"
     }
-    retu+=("{\"insid\":$insid,\"state\":$state,\"msg\":{\"pid\":$pid,\"exist_port\":[$exist_ports_str],\"unexist_port\":[$unexist_port_str],\"msg\":\"$msg\"}}")
+
+   retu+=("{\"insid\":$insid,\"state\":$state,\"msg\":{\"pid\":$pid,\"exist_port\":[$exist_port_str],\"unexist_port\":[$unexist_port_str],\"pid_port\":[$pid_ports_str],\"msg\":\"$msg\"}}")
 
 done
 
@@ -91,5 +100,5 @@ for r in ${retu[@]}; do
     }
     echo -n $r
 done
-echo -n "]"
+echo "]"
 
