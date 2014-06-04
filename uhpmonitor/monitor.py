@@ -259,7 +259,7 @@ def check():
                 raise Exception("special key[%s] not exists for host[%s]" % (host_vars_find_key, ins.host))
             port = host_vars[host_vars_find_key]
        
-            if not flag: port = -port
+            if not flag: port = "-%s" % port
             ports.append(port)
 
         if ports:
