@@ -90,7 +90,7 @@ for param in $@; do
 
 done
 
-echo -n "["
+echo -n ":CHECKSTART:["
 first="true"
 for r in ${retu[@]}; do
     [[ $first == "true" ]] && {
@@ -100,5 +100,5 @@ for r in ${retu[@]}; do
     }
     echo -n $r
 done
-echo "]"
+echo "]:CHECKEND:"
 

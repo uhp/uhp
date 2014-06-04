@@ -47,6 +47,9 @@ import database
 from model.instance import Instance
 from sqlalchemy import and_
 
+# 用于跳出多层循环
+class FoundException(Exception):pass
+
 def query_all_instance():
     """query all instance 
     
@@ -174,8 +177,12 @@ def check_one_host_(host, ins_ports_key_list):
         json_obj = json.loads(json_str)
 
         stdout = json_obj['stdout']
-        log.debug("stdout: %s" % stdout)
-        insid_state_msg_list = json.loads(stdout)
+        #通过特别标记获取脚本的输出，避免ansible的其它输出的影响
+        s=stdout.index(":CHECKSTART:")+len(":CHECKSTART:")
+        e=stdout.index(":CHECKEND:")
+        check_out = stdout[s:e] 
+        log.debug("check_out: %s" % check_out)
+        insid_state_msg_list = json.loads(check_out)
         log.debug(insid_state_msg_list)
         for insid_state_msg in insid_state_msg_list:
 
@@ -242,28 +249,32 @@ def check():
 
     # 收集待判定端口
     for ins in query_all_instance():
-        ports = []
-        
-        if ins.service not in port_key_flag: continue
-        if ins.role not in port_key_flag[ins.service]: continue
-        port_keys = port_key_flag[ins.service][ins.role]
+        try:
+            ports = []
+            
+            if ins.service not in port_key_flag: continue
+            if ins.role not in port_key_flag[ins.service]: continue
+            port_keys = port_key_flag[ins.service][ins.role]
        
-        key = ins.role # 默认使用角色名
-        host_vars = inv.get_variables(ins.host) or {}
-        for (port_key, flag) in port_keys.iteritems():
-            if port_key == "key": 
-                key = flag
-                continue
-            host_vars_find_key = ins.service + '__' + port_key
-            if host_vars_find_key not in host_vars:
-                raise Exception("special key[%s] not exists for host[%s]" % (host_vars_find_key, ins.host))
-            port = host_vars[host_vars_find_key]
+            key = ins.role # 默认使用角色名
+            host_vars = inv.get_variables(ins.host) or {}
+            for (port_key, flag) in port_keys.iteritems():
+                if port_key == "key": 
+                    key = flag
+                    continue
+                host_vars_find_key = ins.service + '__' + port_key
+                if host_vars_find_key not in host_vars:
+                    # 跳过此ins
+                    raise FoundException("special key[%s] not exists for host[%s]" % (host_vars_find_key, ins.host))
+                port = host_vars[host_vars_find_key]
        
-            if not flag: port = "-" + port
-            ports.append(port)
+                if not flag: port = "-" + port
+                ports.append(port)
 
-        if ports:
-            instance_ports[ins] = (ports, key)
+            if ports:
+                instance_ports[ins] = (ports, key)
+        except FoundException, e:
+            log.exception(e)
     
     # 同一个host上的instance同时检查
     host_ins_map = {} # {host:[(ins,[port],key)]}
@@ -318,10 +329,13 @@ def work():
     start_check_timeout_process()
    
     while True:
-        log.debug("check ...")
-        check()
-        log.debug("check over")
-        time.sleep(float(config.monitor_timer_interval))
+        try:
+            log.debug("check ...")
+            check()
+            log.debug("check over")
+            time.sleep(float(config.monitor_timer_interval))
+        except:
+            log.exception("")
 
 def valid_config():
     k = "port_key_flag"
