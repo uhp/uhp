@@ -1,7 +1,7 @@
 
-export JMX_OPEN_1100=" -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.port=1100 -Djava.rmi.server.hostname={{ansible_hostname}} "
+#export JMX_OPEN_1100=" -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.port=1100 -Djava.rmi.server.hostname={{ansible_hostname}} "
 
-export JMX_OPEN_1110=" -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.port=1110 -Djava.rmi.server.hostname={{ansible_hostname}} "
+#export JMX_OPEN_1110=" -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.port=1110 -Djava.rmi.server.hostname={{ansible_hostname}} "
 
 export REGIONSERVER_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source[0] }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/hbase/conf/hbase-regionserver-jmxetric.xml"
 
