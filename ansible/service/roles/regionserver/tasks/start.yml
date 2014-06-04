@@ -5,3 +5,6 @@
   sudo: yes
   service: name=hbase-regionserver state=started
 
+- name: use the env var classpath to replace the -classpath jvm params
+  sudo: yes
+  copy: src=hbase dest=/usr/lib/hbase/bin/hbase mode=0755
