@@ -1,6 +1,6 @@
 
 
-uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$rootScope,$http){
+uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$timeout',function($scope,$rootScope,$http,$timeout){
 	
 	
 	$scope.init=function(){
@@ -637,7 +637,9 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http',function($scope,$
 	    				$rootScope.alert(warn_msg[index],"warn");	
 	    			}
 	    		}
-	        	window.location.href="#/admin-task"
+                $timeout(function(){
+	        	    window.location.href="#/admin-task"
+                },1000)
 	        	//$scope.initInstance();
 	        }
 	    }).error(function(data, status) {
