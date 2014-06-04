@@ -647,11 +647,11 @@ class MonitorBackHandler(BaseHandler):
         # 存储扩展 [ { name:hadoop1磁盘, x:[sda1,sdb1], series:[{ name:disk_used, type:bar, stack:disk, data:[1,2] }
         #                                                         { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
         
-        load_metric = {'name':'负载','x':hosts,'series':[]}
-        cpu_metric  = {'name':'CPU', 'x':hosts,'series':[]}
-        net_metric  = {'name':'网络','x':hosts,'series':[]}
-        mem_metric  = {'name':'内存','x':hosts,'series':[]}
-        disk_metric = {'name':'磁盘','x':hosts,'series':[]}
+        load_metric = {'metric':'负载','x':hosts,'series':[]}
+        cpu_metric  = {'metric':'CPU', 'x':hosts,'series':[]}
+        net_metric  = {'metric':'网络','x':hosts,'series':[]}
+        mem_metric  = {'metric':'内存','x':hosts,'series':[]}
+        disk_metric = {'metric':'磁盘','x':hosts,'series':[]}
 
         load_metric_load_one  = []
         load_metric_proc_run  = []
@@ -690,26 +690,39 @@ class MonitorBackHandler(BaseHandler):
             load_metric_load_one.append(load_one)
             load_metric_proc_run.append(proc_run)
             load_metric_cpu_num.append(cpu_num)
+
             # CPU
             cpu_metric_cpu_user.append(cpu_user)
             cpu_metric_cpu_system.append(cpu_system)
             cpu_metric_cpu_wio.append(cpu_wio)
+
             # 网络
+            if bytes_in  is not None: bytes_in  = int(bytes_in)/1024
+            if bytes_out is not None: bytes_out = int(bytes_out)/1024
             net_metric_bytes_in.append(bytes_in)
             net_metric_bytes_out.append(bytes_out)
-            net_metric_1g_mark.append(128*1024*1024)
-            net_metric_2g_mark.append(256*1024*1024)
+            net_metric_1g_mark.append(128*1024)
+            net_metric_2g_mark.append(256*1024)
+
             # 内存
+            if mem_total is not None: mem_total = int(mem_total)/1024
+            if mem_free  is not None: mem_free  = int(mem_free)/1024
             mem_used = None
             if mem_total is not None and mem_free is not None:
                 mem_used = mem_total - mem_free
             mem_metric_mem_used.append(mem_used)
             mem_metric_mem_free.append(mem_free)
+            
+            if swap_total is not None: swap_total = int(swap_total)/1024
+            if swap_free  is not None: swap_free  = int(swap_free)/1024
             swap_used = None
             if swap_total is not None and swap_free is not None:
                 swap_used = swap_total - swap_free
             mem_metric_swap_used.append(swap_used)
+
             # 存储
+            if disk_total is not None: disk_total = int(disk_total)
+            if disk_free  is not None: disk_free  = int(disk_free)
             disk_used = None
             if disk_total is not None and disk_free is not None:
                 disk_used = disk_total - disk_free
@@ -720,19 +733,23 @@ class MonitorBackHandler(BaseHandler):
         load_metric['series'].append({'name':'load_one', 'type':'bar', 'data':load_metric_load_one})
         load_metric['series'].append({'name':'proc_run', 'type':'bar', 'data':load_metric_proc_run})
         load_metric['series'].append({'name':'cpu_num', 'type':'line', 'data':load_metric_cpu_num})
+
         # CPU
         cpu_metric['series'].append({'name':'cpu_user', 'type':'bar', 'stack':'cpu', 'data':cpu_metric_cpu_user})
         cpu_metric['series'].append({'name':'cpu_system', 'type':'bar', 'stack':'cpu', 'data':cpu_metric_cpu_system})
         cpu_metric['series'].append({'name':'cpu_wio', 'type':'bar', 'stack':'cpu', 'data':cpu_metric_cpu_wio})
+
         # 网络
-        net_metric['series'].append({'name':'bytes_in', 'type':'bar', 'data':net_metric_bytes_in})
-        net_metric['series'].append({'name':'bytes_out', 'type':'bar', 'data':net_metric_bytes_out})
-        net_metric['series'].append({'name':'1g_mark', 'type':'line', 'data':net_metric_1g_mark})
-        net_metric['series'].append({'name':'2g_mark', 'type':'line', 'data':net_metric_2g_mark})
+        net_metric['series'].append({'name':'bytes_in', 'type':'bar', 'stack':'net', 'data':net_metric_bytes_in})
+        net_metric['series'].append({'name':'bytes_out', 'type':'bar', 'stack':'net', 'data':net_metric_bytes_out})
+        #net_metric['series'].append({'name':'1g_mark', 'type':'line', 'data':net_metric_1g_mark})
+        #net_metric['series'].append({'name':'2g_mark', 'type':'line', 'data':net_metric_2g_mark})
+
         # 内存
         mem_metric['series'].append({'name':'mem_used', 'type':'bar', 'stack':'mem', 'data':mem_metric_mem_used})
         mem_metric['series'].append({'name':'mem_free', 'type':'bar', 'stack':'mem', 'data':mem_metric_mem_free})
         mem_metric['series'].append({'name':'swap_used', 'type':'bar', 'stack':'mem', 'data':mem_metric_swap_used})
+
         # 存储
         disk_metric['series'].append({'name':'disk_used', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_used})
         disk_metric['series'].append({'name':'disk_free', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_free})
@@ -754,19 +771,24 @@ class MonitorBackHandler(BaseHandler):
             except:
                 pass
             if not names: continue
-            disks = {'name':'%s磁盘状况','x':[], 'xtype':'h', 'series':[]}
+            disks = {'metric':'[%s]磁盘状况'%host,'x':[], 'xtype':'horizontal', 'series':[]}
             disk_useds = []
             disk_frees = []
             for name in names:
                 matchObj = regex.match(name)
-                dev = regex.group(1)
+                dev = matchObj.group(1)
                 path = "/dev/%s" % dev
                 disks['x'].append(path)
+
                 disk_used = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_used' % dev)
                 disk_total = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_total' % dev)
+
+                if disk_total is not None: disk_total = int(disk_total)
+                if disk_free  is not None: disk_free  = int(disk_free)
                 disk_free = None
                 if disk_total is not None and disk_used is not None:
                     disk_free = disk_total - disk_used
+
                 disk_useds.append(disk_used)
                 disk_frees.append(disk_free)
                 

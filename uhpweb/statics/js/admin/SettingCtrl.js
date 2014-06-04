@@ -57,7 +57,7 @@ uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$
 		$scope.showConfModal()
 	}
 	$scope.showConfModal=function(){
-		$("#settingConfModal").modal();
+		$("#settingConfModal").modal('toggle');
 	}
 	
 	//保存配置
