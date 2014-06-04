@@ -1,4 +1,4 @@
 
-- hosts: hadoop4
+- hosts: hadoop3
   tasks: 
-  - include: roles/prepare/tasks/release_swap.yml
+  - include: roles/jar/tasks/hive.yml

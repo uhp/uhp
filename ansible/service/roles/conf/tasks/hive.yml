@@ -7,3 +7,6 @@
     - hive-env.sh
     - hive-log4j.properties
     - hive-exec-log4j.properties
+    - hive-metastore-jmxetric.xml
+    - hive-server-jmxetric.xml
+    - hive-server2-jmxetric.xml

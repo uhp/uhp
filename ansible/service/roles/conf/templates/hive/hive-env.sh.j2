@@ -1,18 +1,21 @@
 
+export HIVE_METASTORE_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source[0] }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/hive/conf/hive-metastore-jmxetric.xml "
+
+export HIVE_SERVER_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source[0] }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/hive/conf/hive-server-jmxetric.xml "
+
+export HIVE_SERVER2_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source[0] }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/hive/conf/hive-server2-jmxetric.xml "
+
 if [ "$SERVICE" = "cli" ]; then
-   export HADOOP_CLIENT_OPTS=' {{ hive__HIVE_CLI_OPTS }} '
+   export HADOOP_CLIENT_OPTS=" {{ hive__HIVE_CLI_OPTS }} "
 fi
 
-if [ "$SERVICE" = "metastore" ]; then
-   export HADOOP_CLIENT_OPTS=' {{ hive__HIVE_METASTORE_OPTS }} '
-fi
+export HIVE_METASTORE_OPTS=" {{SERVER_OPTS}} $HIVE_METASTORE_JMXETRIC {{hive__HIVE_METASTORE_OPTS}} "
 
-if [ "$SERVICE" = "hiveserver" ]; then
-   export HADOOP_CLIENT_OPTS=' {{ hive__HIVE_SERVER_OPTS }} '
-fi
+export HIVE_METASTORE_PORT=" -p {{hive__hive_metastore_port}} "
 
+export HIVE_SERVER_OPTS=" {{SERVER_OPTS}} $HIVE_SERVER_JMXETRIC {{hive__HIVE_SERVER_OPTS}} "
 
-if [ "$SERVICE" = "hiveserver2" ]; then
-   export HADOOP_CLIENT_OPTS=' {{ hive__HIVE_SERVER2_OPTS }} '
-fi
+export HIVE_SERVER_PORT=" -p {{hive__hive_server_thrift_port}} "
+
+export HIVE_SERVER2_OPTS=" {{SERVER_OPTS}} $HIVE_SERVER2_JMXETRIC {{hive__HIVE_SERVER2_OPTS}} "
 

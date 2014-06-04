@@ -1,11 +1,10 @@
 
-- include: ../../conf/tasks/hive-server2.yml
+- include: ../../conf/tasks/hive.yml
+
+- name: use the new start sh for use java agent
+  sudo: yes
+  copy: src=hiveserver2.sh dest=/usr/lib/hive/bin/ext/hiveserver2.sh mode=0755
 
 - name: start hive server2
   sudo: yes
   script: start.sh
-
-#- name: start hive server2
-#  sudo: yes
-#  service: name=hive-server2 state=started
-

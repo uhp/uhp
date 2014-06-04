@@ -1,11 +1,9 @@
 
-- include: ../../conf/tasks/hive-metastore.yml
+- include: ../../conf/tasks/hive.yml
 
-#- name: sent default hive-metastore 
-#  sudo: yes
-#  shell: echo "export PORT='{{item}}'" > /etc/default/hive-metastore
-#  with_items:
-#   - " -p {{ hive__hive_metastore_port }}"
+- name: use the new start sh for use java agent
+  sudo: yes
+  copy: src=metastore.sh dest=/usr/lib/hive/bin/ext/metastore.sh mode=0755
 
 - name: start hive metastore
   sudo: yes

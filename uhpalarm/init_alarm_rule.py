@@ -47,7 +47,9 @@ if __name__ == "__main__" :
     session.add(Alarm("check rs heap","max(regionserver_memory_memHeapUsed/regionserver_memory_memHeapCommitted,0.8,0.9)","send_mail","regionserver"))
 
     #hive
-    #session.add(
+    session.add(Alarm("check metastore heap","max(hivemetastore_memory_memHeapUsed/hivemetastore_memory_memHeapCommitted,0.8,0.9)","send_mail","hivemetastore"))
+    session.add(Alarm("check h2 heap","max(hiveserver_memory_memHeapUsed/hiveserver_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver"))
+    session.add(Alarm("check hs2 heap","max(hiveserver2_memory_memHeapUsed/hiveserver2_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver2"))
 
     session.commit()
     session.close()
