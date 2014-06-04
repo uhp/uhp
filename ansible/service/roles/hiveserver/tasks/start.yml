@@ -1,12 +1,12 @@
 
 
-- include: ../../conf/tasks/hive.yml
+- include: ../../conf/tasks/hive-server.yml
 
-- name: set port env
-  sudo: yes
-  shell: echo "export PORT='{{item}}'" > /etc/default/hive-server
-  with_items:
-   - " -p {{ hive__hive_server_thrift_port }}"
+#- name: set port env
+#  sudo: yes
+#  shell: echo "export PORT='{{item}}'" > /etc/default/hive-server
+#  with_items:
+#   - " -p {{ hive__hive_server_thrift_port }}"
 
 - name: start hive server
   sudo: yes

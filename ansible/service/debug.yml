@@ -1,0 +1,4 @@
+
+- hosts: hadoop4
+  tasks: 
+  - include: roles/prepare/tasks/release_swap.yml

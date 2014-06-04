@@ -1,0 +1,9 @@
+
+
+- include: hive.yml
+
+- name: copy hive server conf
+  sudo: yes
+  template: src=hive/{{item}}.j2 dest=/etc/default/{{item}}
+  with_items:
+    - hive-server
