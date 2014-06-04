@@ -102,7 +102,7 @@ class Instance(BASE, UHPBase):
             elif ret["monitor_time"] >3600 :
                 ret["monitor_time"] = ">3600"
 
-        if ret["status"] == Instance.STATUS_STOP and ret["health"] == Instance.HEALTH_UNHEALTHY :
+        if ret["status"] == Instance.STATUS_STOP and ret["health"] == Instance.HEALTH_DOWN :
             ret["health"] = Instance.HEALTH_STOP
 
         return ret;
