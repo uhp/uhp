@@ -38,6 +38,7 @@ def conf_to_db(file):
             gv = GroupVar(group,service,new_name,value,0,"")
 
         session.merge(gv)
+    session.commit()
 
     session.close()
 
