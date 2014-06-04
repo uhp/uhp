@@ -10,5 +10,3 @@
    - hadoop-lzo-cdh4
    - bigtop-utils
 
-
-- include: ../../jar/tasks/hadoop.yml
