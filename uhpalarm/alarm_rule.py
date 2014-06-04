@@ -30,7 +30,7 @@ class AlarmRuleManager(Manager):
         self.group_host_map = {}
         session = database.getSession()
 
-        for instance in session.query(Instance):
+        for instance in session.query(Instance).filter(Instance.status==Instance.STATUS_START) :
             host = instance.host
             role = instance.role
             if not self.role_host_map.has_key(role) :
