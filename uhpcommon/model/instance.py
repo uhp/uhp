@@ -52,6 +52,7 @@ class Instance(BASE, UHPBase):
     HEALTH_UNKNOW    = "unknow"
     HEALTH_HEALTHY   = "healthy"
     HEALTH_UNHEALTHY = "unhealthy"
+    HEALTH_STOP      = "stop"
     HEALTH_DOWN      = "down"
 
 
@@ -75,21 +76,35 @@ class Instance(BASE, UHPBase):
         ret["role"] = self.role;
         ret["rack"] = self.rack;
         ret["status"] = self.status;
-        ret["health"] = self.health;
+        ret["health"] = self.health
+
         if self.uptime == 0 :
             ret["uptime"] = "----"
         else:
             timeArray = time.localtime(self.uptime)
             ret["uptime"] = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+
         if self.monitor_time == None or self.monitor_time == 0  :
             ret["monitor_time"] = "----"
         else:
             ret["monitor_time"] = int(time.time()) - self.monitor_time
+
+        ret["msg"] = self.msg 
+
+        #instance 状态修正
+        #health加入关闭状态和unknow状态的修正
+        #monitor_time 加入 >3600 修正
+        if isinstance(ret["monitor_time"],(int,long)) :
+            if ret["monitor_time"] > 60 :
+                ret["health"] = Instance.HEALTH_UNKNOW
             if ret["monitor_time"] < 0 :
                 ret["monitor_time"] = 0
             elif ret["monitor_time"] >3600 :
                 ret["monitor_time"] = ">3600"
-        ret["msg"] = self.msg 
+
+        if ret["status"] == Instance.STATUS_STOP and ret["health"] == Instance.HEALTH_UNHEALTHY :
+            ret["health"] = Instance.HEALTH_STOP
+
         return ret;
             
     @staticmethod

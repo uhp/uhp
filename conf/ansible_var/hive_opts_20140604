@@ -1,0 +1,6 @@
+
+#for hive opts
+hive__HIVE_CLI_OPTS: " -Xmx1025m "
+hive__HIVE_METASTORE_OPTS: " -Xmx1026m "
+hive__HIVE_SERVER_OPTS: " -Xmx1027m"
+hive__HIVE_SERVER2_OPTS: " -Xmx1028m"

@@ -1,10 +1,9 @@
 
-- include: ../../conf/tasks/hive.yml
+- include: ../../conf/tasks/hive-server2.yml
 
 - name: start hive server2
   sudo: yes
   script: start.sh
-
 
 #- name: start hive server2
 #  sudo: yes

@@ -1,11 +1,11 @@
 
-- include: ../../conf/tasks/hive.yml
+- include: ../../conf/tasks/hive-metastore.yml
 
-- name: set port env
-  sudo: yes
-  shell: echo "export PORT='{{item}}'" > /etc/default/hive-metastore
-  with_items:
-   - " -p {{ hive__hive_metastore_port }}"
+#- name: sent default hive-metastore 
+#  sudo: yes
+#  shell: echo "export PORT='{{item}}'" > /etc/default/hive-metastore
+#  with_items:
+#   - " -p {{ hive__hive_metastore_port }}"
 
 - name: start hive metastore
   sudo: yes
