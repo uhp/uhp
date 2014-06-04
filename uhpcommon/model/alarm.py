@@ -22,16 +22,33 @@ class Alarm(BASE, UHPBase):
     expression= Column(String(250), nullable=False)
     #回调函数  sendmail 调用参数是 expression的返回的二元组
     callback= Column(String(250), nullable=False)
-    #为* 或者为 机器名 或者为 cluster
-    host = Column(String(30),nullable=False)
+    #拓展host字段的规则如下:
+    #want1,want2...:except1,except2...
+    #为all 或者为 机器名 或者为 cluster
+    host = Column(String(256),nullable=False)
 
-    HOST_ALL = "*"
+    HOST_ALL = "all"
     
     def __init__(self, name, expression, callback, host=HOST_ALL ):
         self.name = name
         self.expression = expression
         self.callback = callback
         self.host = host
+    
+    def get_host_tuple(self):
+        '''
+        解析want1,want2...:except1,except2...的格式
+        返回最终要检查的主机列表和例外的主机列表
+        [all,cluster,hadoop1],[hadoop2]
+        '''
+        if self.host != None and len(self.host) > 0 :
+            host_lists = self.host.split(":")
+            if len(host_lists) == 2 :
+                return (host_lists[0].split(","),host_lists[1].split(","))
+            else :
+                return (host_lists[0].split(","),[])
+
+        return ([],[])
     
 class AlarmAssist(BASE, UHPBase):
     

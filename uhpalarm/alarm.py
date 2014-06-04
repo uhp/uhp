@@ -47,13 +47,14 @@ class Alarm:
         
     def run(self):
         while not self.stop:
-            
+            begin = time.time()
             log.info("BEGIN TO CHECK")
             self.pre_check_manager_list()
             self.judge_host_rule()
                
             self.post_check_manager_list()
-            log.info("END CHECK")
+            end = time.time()
+            log.info("END CHECK using %.3fs" % (end-begin) )
             
             self.interval()
             

@@ -3,25 +3,13 @@
 - hosts: 
   - NAMENODE[0]
   tasks:
-  - include: roles/checker/tasks/hdfs.yml
-
-- hosts: 
-  - NAMENODE[0]
-  tasks:
   - name: test ssh to other
-    sudo: yes
     sudo_user: hdfs
     script: script/test_ssh.sh {{ ansible_ssh_port }} {{ groups.NAMENODE[1] }}
-    register: result
-    failed_when: " 'SSH_FAILED' in result.stdout "
 
 - hosts: 
   - NAMENODE[1]
   tasks:
   - name: test ssh to other
-    sudo: yes
     sudo_user: hdfs
     script: script/test_ssh.sh {{ ansible_ssh_port }} {{ groups.NAMENODE[0] }}
-    register: result
-    failed_when: " 'SSH_FAILED' in result.stdout "
-

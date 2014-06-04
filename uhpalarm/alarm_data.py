@@ -36,8 +36,10 @@ class AlarmDataManager(Manager):
             child_path = os.path.join(dir,child)
             if os.path.isfile(child_path) :
                 point_name = child[0:len(child)-4]
-                (ts,value) = self.rrd_wrapper.get_last( child_path )
+                #(ts,value) = self.rrd_wrapper.get_last( child_path )
+                (pre,value) = self.rrd_wrapper.get_pre_last( child_path )
                 re[point_name] = value
+                re["PRE_"+point_name] = pre
             elif os.path.isdir(child_path) :
                 re[child] = self.get_last_rrd( child_path )
         return re
@@ -67,4 +69,5 @@ if __name__ == '__main__':
     
     dm = AlarmDataManager()
     #print dm.data_set
+    dm.pre_check()
     print dm.get_data_by_host("hadoop2")

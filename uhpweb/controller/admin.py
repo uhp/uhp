@@ -112,14 +112,14 @@ class AdminBackHandler(BaseHandler):
     def service_info(self):
         service = self.get_argument("service")
         ret = { "name": service,"instances" : self.get_instance(service),"summary":self.get_service_summary(service) }
-        self.ret("ok", "", ret);
+        self.ret("ok", "", ret)
         
     def get_instance(self,service):
         session = database.getSession()
         instances = session.query(Instance).filter(Instance.service == service )
-        ret = [];
+        ret = []
         for instance in instances:
-            ret.append(instance.format());
+            ret.append(instance.format())
         session.close()
         return ret;
         
@@ -130,9 +130,10 @@ class AdminBackHandler(BaseHandler):
             ret[role] = {}
    
         for instance in session.query(Instance).filter(Instance.service==service):
-            if not ret[instance.role].has_key(instance.health) :
-                ret[instance.role][instance.health] = 0;
-            ret[instance.role][instance.health] = ret[instance.role][instance.health] + 1;
+            inst = instance.format()
+            if not ret[inst["role"]].has_key(inst["health"]) :
+                ret[inst["role"]][inst["health"]] = 0
+            ret[inst["role"]][inst["health"]] += 1
         
         session.close()
         return ret;
@@ -141,8 +142,8 @@ class AdminBackHandler(BaseHandler):
     def group_host_list(self):
         session = database.getSession()
         groups = session.query(Group)
-        ret={};
-        temp=[];
+        ret={}
+        temp=[]
         for group in groups:
             temp.append( {"name" : group.group});
         ret["groups"]=temp
