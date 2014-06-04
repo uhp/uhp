@@ -6,7 +6,8 @@
 - name: remove all the old one
   sudo: yes
   shell: rm -f {{ WANT_HOME }}/{{ JAR_PREFIX }}*.jar ;
-  when: new_jar.stdout|int == 0
+
+#  when: new_jar.stdout|int == 0
 
 - name: copy the wanted jar
   sudo: yes
