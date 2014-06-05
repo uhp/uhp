@@ -3,10 +3,11 @@
 
 import json
 import os.path, logging, sys
-import config
 import random
 import commands
 import time
+
+import config
 
 app_log = logging.getLogger("tornado.application")
 
@@ -45,6 +46,15 @@ def download_template_file(host,dir):
         return ("/tmp/%s_%s_%s.tar.gz" % (ts,host,dir),output)
     return ("",output)
 
+def kill_app(application_id):
+    shell_command = "sh %s/ansible/service/script/kill_app.sh %s " % (config.uhphome,application_id )
+    print shell_command
+    (status,output)=commands.getstatusoutput( shell_command )
+    if status == 0 :
+        return ("OK",output)
+    return ("ERROR",output)
+
 if __name__ == '__main__':
     #print get_template_file("hadoop1","hbase","hbase-env.sh")
-    print download_template_file("hadoop1","hadoop")
+    #print download_template_file("hadoop1","hadoop")
+    print kill_app("application_1401883144361_0019")
