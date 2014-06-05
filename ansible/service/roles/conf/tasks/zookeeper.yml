@@ -7,3 +7,4 @@
     - configuration.xsl
     - log4j.properties
     - zookeeper-env.sh
+    - zookeeper-jmxetric.xml
