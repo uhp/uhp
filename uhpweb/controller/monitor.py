@@ -645,13 +645,15 @@ class MonitorBackHandler(BaseHandler):
         # 内存 mem used(mem_total-mem_free)   : swap used(swap_total-swap_free) : mem_free
         # 存储 disk_use(disk_total-disk_free) : disk_free
         # 存储扩展 [ { name:hadoop1磁盘, x:[sda1,sdb1], series:[{ name:disk_used, type:bar, stack:disk, data:[1,2] }
-        #                                                         { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
-        
+        #                                                       { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
         load_metric = {'metric':'负载','x':hosts,'series':[]}
         cpu_metric  = {'metric':'CPU', 'x':hosts,'series':[]}
         net_metric  = {'metric':'网络','x':hosts,'series':[]}
         mem_metric  = {'metric':'内存','x':hosts,'series':[]}
         disk_metric = {'metric':'磁盘','x':hosts,'series':[]}
+        # 负载分布
+        # {metric:,type:,data:[{value:,name:''}]}
+        load_metric_dist = {'metric':'负载分布','series':[{'name':'负载分布','type':'pie','data':[]}]}
 
         load_metric_load_one  = []
         load_metric_proc_run  = []
@@ -668,6 +670,8 @@ class MonitorBackHandler(BaseHandler):
         mem_metric_swap_used  = []
         disk_metric_disk_used = []
         disk_metric_disk_free = []
+        # 负载分布 百分比
+        load_metric_load_percent = []
 
         for host in hosts:
             host = self._sure_str(host)
@@ -690,6 +694,10 @@ class MonitorBackHandler(BaseHandler):
             load_metric_load_one.append(load_one)
             load_metric_proc_run.append(proc_run)
             load_metric_cpu_num.append(cpu_num)
+            load_percent = None
+            if load_one is not None and cpu_num is not None:
+                load_percent = int((load_one / cpu_num) * 100)
+            load_metric_load_percent.append(load_percent)
 
             # CPU
             cpu_metric_cpu_user.append(cpu_user)
@@ -754,6 +762,26 @@ class MonitorBackHandler(BaseHandler):
         disk_metric['series'].append({'name':'disk_used', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_used})
         disk_metric['series'].append({'name':'disk_free', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_free})
         
+        # 负载分布
+        # load_metric_load_percent.append(load_percent)
+        load_percent_group={"Down":0,"0-25%":0,"25-50%":0,"50-75%":0,"75-100%":0,"100%+":0}
+        for load_percent in load_metric_load_percent:
+            if load_percent is None:
+                load_percent_group['Down'] += 1
+            elif load_percent <= 25:
+                load_percent_group['0-25%'] += 1
+            elif load_percent <= 50:
+                load_percent_group['25-50%'] += 1
+            elif load_percent <= 75:
+                load_percent_group['50-75%'] += 1
+            elif load_percent <= 100:
+                load_percent_group['75-100%'] += 1
+            else:
+                load_percent_group['100%+'] += 1
+
+        load_metric_dist['series'][0]['data'] = [{'name':k, 'value':v} for k,v in load_percent_group.iteritems()]
+
+        data.append(load_metric_dist)
         data.append(load_metric)
         data.append(cpu_metric)
         data.append(net_metric)

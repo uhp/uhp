@@ -92,20 +92,22 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   // metric:{metric:, x:[], y:[]}
   // metric:{metric:, x:[], y:{host:[]}}
   // metric:[{metric:,x:[], xtype:'horizontal', series:[{name:,type:,data:[]}]}]
+  // metric:[{metric:,series:[{name:,type:,data:[]}]}] # pie 分布图
   $scope.make_chartOpt=function(metric){
-    //x轴转换 
     console.debug(metric);
-    //xfunc = metric.xfunc || $scope.default_xfunc;
-    //if(xfunc != $scope.NO_XFUNC){
-    //  metric.x = $.map(metric.x, xfunc);
-    //}
-    
+ 
+    type = "axis";
+
     //转换null值为echart要求格式
     if(metric.series){//新的数据格式，可以绘制多个指标在同一个图
       $.each(metric.series, function(k, v){
-        metric.series[k].data = $.map(v.data, function(n){
-          return (n===null)?'-':n;
-        });
+        if(v.type == "pie"){ // 分布图已经计算好
+          type = "pie";
+        } else {
+          metric.series[k].data = $.map(v.data, function(n){
+            return (n===null)?'-':n;
+          });
+        }
       });
     } else { //旧的数据格式
       if($.isArray(metric.y)){ //单个指标
@@ -124,7 +126,8 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     function legendData(){
       if(metric.series){
         var retu = [];
-        $.each(metric.series, function(k, v){
+        var temp = type == 'pie' ? metric.series[0].data : metric.series;
+        $.each(temp, function(k, v){
           retu.push(v.name);
         }); 
         return retu;
@@ -149,38 +152,42 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
       }); 
       return retu;
     }
-    
-    xAxis = [ { type : 'category', boundaryGap : true, data : metric.x } ];
-    yAxis = [ { type : 'value', splitArea : {show:true} } ];
-    if(metric.xtype == 'horizontal'){
-      tmp = xAxis;
-      xAxis = yAxis;
-      yAxis = tmp;
-    }
 
     chartOpt = {
-        tooltip : { trigger: 'axis' },
-        legend: { x:'left', data:legendData() },
+        tooltip : type == 'pie' ? { trigger: 'item' } : { trigger: 'item' },
+        legend  : type == 'pie' ? { orient:'vertical', x:'left', data:legendData() } : { x:'left', data:legendData() },
         toolbox: {
             show : true,
             feature : {
                 mark : {show: false},
                 dataView : {show: true, readOnly: true},
-                magicType : {show: true, type: ['line', 'bar', 'stack']},
+                magicType : type == 'pid' ? {show: false} : {show: true, type: ['line', 'bar', 'stack']},
                 restore : {show: false},
                 saveAsImage : {show: true},
-                dataZoom:{show: true}
+                dataZoom: type == 'pie' ? {show: false} : {show: true}
             }
         },
-        dataZoom: {show:true},
+        dataZoom: type == 'pie' ? {show: false} : {show: true},
         calculable : false,
-        xAxis : xAxis,
-        yAxis : yAxis, 
         series : series()
     }
+
+    if(type != 'pie'){
+        xAxis = function() {return [ { type : 'category', boundaryGap : true, data : metric.x } ];}
+        yAxis = function() {return [ { type : 'value', splitArea : {show:true} } ];};
+        if(metric.xtype == 'horizontal') {
+          tmp = xAxis;
+          xAxis = yAxis;
+          yAxis = tmp;
+        }
+        chartOpt.xAxis=xAxis();
+        chartOpt.yAxis=yAxis();
+    }
+
     if(bool(metric.metric) && bool(metric.metric.unit)){
       chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+metric.metric.unit }
     }
+
     return chartOpt;
   }
   
@@ -398,10 +405,10 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
       function(res){
         // data:[{name,x:[],series:[{name:,type:,data:[]}]}]
         $scope.show.all_host_overview = res['data'];
-        angular.forEach($scope.show.all_host_overview, function(v, k){
-          v.chartType = 'bar';
-          console.debug(v);
-        });
+        //angular.forEach($scope.show.all_host_overview, function(v, k){
+        //  v.chartType = 'bar';
+        //  console.debug(v);
+        //});
       }
     );
   }
