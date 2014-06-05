@@ -26,6 +26,10 @@ if __name__ == "__main__" :
     #instance check state
     session.add(Alarm("check instance","check_instance_state()","send_mail","cluster"))
 
+    #zookeeper check
+    session.add(Alarm("check zk heap","max(zookeeper_memory_memHeapUsed/zookeeper_memory_memHeapCommitted,0.8,0.9)","send_mail","zookeeper"))
+
+
     #hdfs check
     session.add(Alarm("check missing blocks","max(dfs.FSNamesystem.MissingBlocks,0,5)","send_mail","namenode"))
     session.add(Alarm("check lost heartbeat","max(dfs.FSNamesystem.ExpiredHeartbeats-PRE_dfs.FSNamesystem.ExpiredHeartbeats,0,0)","send_mail","namenode"))
@@ -48,8 +52,8 @@ if __name__ == "__main__" :
 
     #hive
     session.add(Alarm("check metastore heap","max(hivemetastore_memory_memHeapUsed/hivemetastore_memory_memHeapCommitted,0.8,0.9)","send_mail","hivemetastore"))
-    session.add(Alarm("check h2 heap","max(hiveserver_memory_memHeapUsed/hiveserver_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver"))
-    session.add(Alarm("check hs2 heap","max(hiveserver2_memory_memHeapUsed/hiveserver2_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver2"))
+    session.add(Alarm("check hiveserver heap","max(hiveserver_memory_memHeapUsed/hiveserver_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver"))
+    session.add(Alarm("check hiveserver2 heap","max(hiveserver2_memory_memHeapUsed/hiveserver2_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver2"))
 
     session.commit()
     session.close()

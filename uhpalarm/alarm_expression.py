@@ -144,7 +144,7 @@ class AlarmExpMap:
 
     def resourcemanager_web(self):
         session = database.getSession()
-        rm_port = database.get_service_conf(session,"yarn","yarn_nm_webapp_port")
+        rm_port = database.get_service_conf(session,"yarn","yarn_rm_webapp_port")
         rms = []
         for inst in session.query(Instance).filter(Instance.role == "resourcemanager"):
             rms.append(inst.host)
