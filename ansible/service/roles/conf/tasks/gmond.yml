@@ -12,9 +12,9 @@
    - diskiostat
    - disksmartctl
    - diskusage
-   - servicestat
    - tcpconn
    
+   #- servicestat
    #- serviceport
 
 #- name: template the gmond python conf

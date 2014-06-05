@@ -2,6 +2,7 @@
 #coding=utf8
 
 import os.path, logging, sys
+import json
 
 #for main run
 #commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
@@ -79,12 +80,12 @@ class InstanceStateChecker:
             except:
                 info = None
             
-            if info != None and port in info["exist_port"]:
+            if info != None and int(port) in info["exist_port"]:
                 masters.append( role.host )
 
         if start :
             if len(roles) > 1 and len(masters) == 0 :
-                return ("ERROR", u"检测到zookeeper在分布式状态启动,但是找不到领导结点。")
+                return ("ERROR", u"检测到zookeeper在分布式状态启动,但是找不到领导结点。" )
             elif len(masters) > 1 :
                 return ("ERROR", u"检测到有多个zookeeper的领导结点 %s。" % (",".join(masters)) )
 
@@ -94,19 +95,24 @@ class InstanceStateChecker:
         
         start = False
         masters = []
+        debug_msg = ""
         for role in roles:
+            if role.role != "hbasemaster" :
+                continue
             if role.status == Instance.STATUS_START :
                 start = True
             try:
                 info = json.loads(role.msg)
             except:
                 info = None
-            
-            if info != None and port in info["exist_port"]:
+            debug_msg += json.dumps(info["exist_port"])
+
+            if info != None and int(port) in info["exist_port"]:
                 masters.append( role.host )
+
         if start :
             if len(masters) == 0 :
-                return ("ERROR", u"检测到hbase没有主hbasemaster。")
+                return ("ERROR", u"检测到hbase没有主hbasemaster。%s " % debug_msg )
             elif len(masters) > 1:
                 return ("ERROR", u"检测到有多个主hbasemaster %s。" % (",".join(masters)))
         return ("OK","")

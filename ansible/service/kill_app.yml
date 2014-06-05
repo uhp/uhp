@@ -1,0 +1,12 @@
+#用于web杀死app,不能直接执行,请执行script/kill_app.sh
+---
+- hosts: RESOURCEMANAGER 
+  tasks:
+  - name: kill the application
+    sudo: yes
+    sudo_user: yarn
+    shell: yarn application -kill {{ APP }}
+    register: kill_result
+
+  - name: print output
+    debug: msg={{ kill_result.stdout }}

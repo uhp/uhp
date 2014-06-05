@@ -120,7 +120,7 @@ yarn__yarn_rm_admin_port: 50141
 yarn__yarn_rm_scheduler_port: 50030
 yarn__yarn_rm_resource_tracker_port: 50025
 yarn__yarn_rm_webapp_port: 50088
-yarn__yarn_nm_webapp_port: 50088
+yarn__yarn_nm_webapp_port: 50842
 yarn__yarn_nm_port: 50841
 yarn__yarn_nm_localizer_port: 50840
 yarn__yarn_nm_remote_app_log_dir: /var/log/hadoop-yarn
