@@ -363,6 +363,16 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
         {precision:$scope.show.precision}, 
         function(res){
           $scope.show.all_health_history = res['data'];
+          xfunc = $scope.default_xfunc;
+          angular.forEach($scope.show.all_health_history, function(v, k){
+            if(v.type=='single'){ 
+              v.x = $.map(v.x, xfunc);
+            } else if(v.type == 'multi'){
+              $.each(v.group, function(i, m){
+                m.x = $.map(m.x, xfunc);
+              });
+            }
+          });
         }
       );
     });
@@ -377,6 +387,39 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     );
   }
 
+	$scope.enterQuery=function(code){
+		if( code == 13 ){
+			$scope.query()
+		}
+	}
+
+	$scope.query=function(){
+		$http({
+	        method: 'GET',
+	        url: '/monitorback/query_alarms',
+	        params:  
+        	{
+        		"search" : $scope.alarmSearchText,
+        		"orderby" : 'id',
+        		"dir" : 'desc',
+        		"offset" : ($scope.nowPage-1)*$scope.limit,
+        		"limit" : $scope.limit
+        	}
+	    }).success(function(response, status, headers, config){
+	    	if(response["ret"]!="ok"){
+	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
+	        }
+	    	$scope.tasks=response["tasks"];
+	    	$scope.totalTask =response["totalTask"];
+	    	$scope.totalPage = Math.floor(($scope.totalTask-1)/$scope.limit)+1;
+	    }).error(function(data, status) {
+	    	$rootScope.alert("发送tasks请求失败");
+	    });
+	}
+
+  $scoep.alarmSerchText = '';
+  $scope.nowPage = 1;
+  $scope.limit = 20;
   $scope.init();
 
 }]);

@@ -27,7 +27,7 @@
       <div class="panel-body" ng-switch-when="single">
         <ul class="list-inline">
           <li ng-repeat="h in health.x">
-            <span class="label" ng-class="mapColor(health.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
+            <span class="label" ng-class="mapColor(health.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]">[[h]]</span>
           </li>
         </ul>
       </div>
@@ -44,19 +44,12 @@
             <div class="panel-body">
               <ul class="list-inline">
                 <li ng-repeat="h in role.x">
-                  <span class="label" ng-class="mapColor(role.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
+                <span class="label" ng-class="mapColor(role.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]">[[h]]</span>
                 </li>
               </ul>
             </div>
           </div>
           <!-- ~roles -->
-        <!--
-        <ul class="list-inline">
-          <li ng-repeat="h in item.x">
-            <span class="label" ng-class="mapColor(item.y[$index])" data-toggle="tooltip" data-placement="top" title="[[h]]" data-original-title=="[[h]]" ng-mouseover="">[[h]]</span>
-          </li>
-        </ul>
-        -->
         </li>
         <!-- ~service -->
       </ul>
@@ -68,6 +61,7 @@
 
 <script>
   $(function(){
-    //$('div[data-toggle="tooltip"]').mouseover(function(){alert("show");$(this).tooltip("show");}).mouseout(function(){this.tooltip("hide");});
+    //$('span[data-toggle="tooltip"]').tooltip({delay:{show:500, hide:100}});
+    $('span[data-toggle="tooltip"]').tooltip();
   });
 </script>

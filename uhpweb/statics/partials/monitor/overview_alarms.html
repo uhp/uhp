@@ -1,4 +1,26 @@
 <div class="row">
+  <div class="col-md-3 span3">
+    <input type="text" class="form-control" ng-model="alarmSearchText" ng-keypress="enterQuery($event.keyCode)" placeholder="过滤">
+  </div>
+  <div class="col-md-9 span9">
+    <div class="pull-right">
+      <form class="form-inline" role="form">
+        <label>一共[[totalAlarm]]个告警([[totalPage]]页)，当前第[[nowPage]]页</label>
+        <div class="btn-group">
+          <button type="button" class="btn" ng-click="nowPage=1"><span class="glyphicon glyphicon-step-backward"></span></button>
+          <button type="button" class="btn [[isDisable('pre')]] " ng-click="prepage()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+          <button type="button" class="btn [[isDisable('next')]] " ng-click="nextpage()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+          <button type="button" class="btn" ng-click="nowPage=totalPage"><span class="glyphicon glyphicon-step-forward"></span></button>
+        </div>
+        <input type="text" class="form-control" ng-model="wantPage">
+        <button type="button" class="btn" ng-click="jump()">跳转</button>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- ~row -->
+
+<div class="row" style="margin-top:20px;">
   <div class="col-md-12">
     <div class="panel panel-info">
       <div class="panel-heading">最新告警列表</div>

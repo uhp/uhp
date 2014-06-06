@@ -714,15 +714,15 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$timeout',functi
 	}
 	
 	$scope.iconMap={
-			"unknow":{"class":"fa fa-circle-o fa-lg","style":"color:rgb(52, 89, 209)"},	
-			"healthy":{"class":"fa fa-circle fa-lg","style":"color:rgb(56, 173, 26)"},	
-			"unhealthy":{"class":"fa fa-times-circle-o fa-lg","style":"color:rgb(223, 65, 65)"},	
-			"down":{"class":"fa fa-circle fa-lg","style":"color:rgb(223, 65, 65)"},	
+			"unknow":{"class":"fa fa-circle-o ","style":"color:rgb(52, 89, 209)"},	
+			"healthy":{"class":"fa fa-circle ","style":"color:rgb(56, 173, 26)"},	
+			"unhealthy":{"class":"fa fa-times-circle-o ","style":"color:rgb(223, 65, 65)"},	
+			"down":{"class":"fa fa-circle ","style":"color:rgb(223, 65, 65)"},	
 			
-			"start":{"class":"fa fa-play fa-lg","style":"color:rgb(78, 65, 223)"},	
-			"stop":{"class":"fa fa-minus fa-lg","style":"color:rgb(78, 65, 223)"},	
-			"setup":{"class":"fa fa-refresh fa-lg","style":"color:rgb(78, 65, 223)"},
-			"removing":{"class":"fa fa-refresh fa-lg","style":"color:rgb(78, 65, 223)"}
+			"start":{"class":"fa fa-play ","style":"color:rgb(78, 65, 223)"},	
+			"stop":{"class":"fa fa-minus ","style":"color:rgb(78, 65, 223)"},	
+			"setup":{"class":"fa fa-refresh ","style":"color:rgb(78, 65, 223)"},
+			"removing":{"class":"fa fa-refresh ","style":"color:rgb(78, 65, 223)"}
 		}
 	
 	$rootScope.menu="admin";
