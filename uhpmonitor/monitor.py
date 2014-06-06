@@ -290,6 +290,7 @@ def start_check_timeout_process():
         try:
             if p.poll() != None: # terminateed
                 return
+            log.warn("p timeout, terminate it")
             p.terminate()
         except Exception, e:
             log.exception("")

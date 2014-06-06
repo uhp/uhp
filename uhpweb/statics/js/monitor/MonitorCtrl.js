@@ -11,17 +11,18 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
   };
 
   $rootScope.showHostsMetric = function(newValue, oldValue, scope){
-    console.log('precision:' + scope.show.precision);
-    console.log('metric:' + scope.show.metric);
     if(!bool(scope.show.precision) || !bool(scope.show.metric)) return;
+    //http://hadoop1:59990/monitorback/show_hosts_metric?hosts=hadoop1&hosts=hadoop4&hosts=hadoop5&metric=disk_free&precision=p7200
     $rootScope.myHttp('POST', '/monitorback/show_hosts_metric', 
-      {precision:scope.show.precision, metric:scope.show.metric, hosts:scope.show.hosts}, 
+      {precision:$scope.show.precision, metric:$scope.show.metric, hosts:$scope.show.hosts}, 
       function(res){
-        scope.show.hosts_metric=[];
+        $scope.show.hosts_metric=[];
         angular.forEach(res['data'], function(v, k){
           v.metric = scope.show.metric;
+          xfunc = $scope.default_xfunc;
+          v.x = $.map(v.x, xfunc);
           this.push(v);
-        }, scope.show.hosts_metric);
+        }, $scope.show.hosts_metric);
       }
     );
   }
@@ -36,6 +37,8 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
         scope.show.host_metrics=[];
         angular.forEach(res['data'], function(v, k){
           v.host = scope.show.host;
+          xfunc = $scope.default_xfunc;
+          v.x = $.map(v.x, xfunc);
           this.push(v);
         }, scope.show.host_metrics);
       }
@@ -88,21 +91,23 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
 
   // metric:{metric:, x:[], y:[]}
   // metric:{metric:, x:[], y:{host:[]}}
-  // metric:[{name,x:[],series:[{name:,type:,data:[]}]}]
+  // metric:[{metric:,x:[], xtype:'horizontal', series:[{name:,type:,data:[]}]}]
+  // metric:[{metric:,series:[{name:,type:,data:[]}]}] # pie 分布图
   $scope.make_chartOpt=function(metric){
-    //x轴转换 
     console.debug(metric);
-    xfunc = metric.xfunc || $scope.default_xfunc;
-    if(xfunc != $scope.NO_XFUNC){
-      metric.x = $.map(metric.x, xfunc);
-    }
-    
+ 
+    type = "axis";
+
     //转换null值为echart要求格式
     if(metric.series){//新的数据格式，可以绘制多个指标在同一个图
       $.each(metric.series, function(k, v){
-        metric.series[k].data = $.map(v.data, function(n){
-          return (n===null)?'-':n;
-        });
+        if(v.type == "pie"){ // 分布图已经计算好
+          type = "pie";
+        } else {
+          metric.series[k].data = $.map(v.data, function(n){
+            return (n===null)?'-':n;
+          });
+        }
       });
     } else { //旧的数据格式
       if($.isArray(metric.y)){ //单个指标
@@ -121,7 +126,8 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     function legendData(){
       if(metric.series){
         var retu = [];
-        $.each(metric.series, function(k, v){
+        var temp = type == 'pie' ? metric.series[0].data : metric.series;
+        $.each(temp, function(k, v){
           retu.push(v.name);
         }); 
         return retu;
@@ -148,28 +154,40 @@ function MonitorBaseController($scope, $rootScope, $timeout) {
     }
 
     chartOpt = {
-        tooltip : { trigger: 'axis' },
-        legend: { x:'left', data:legendData() },
+        tooltip : type == 'pie' ? { trigger: 'item' } : { trigger: 'item' },
+        legend  : type == 'pie' ? { orient:'vertical', x:'left', data:legendData() } : { x:'left', data:legendData() },
         toolbox: {
             show : true,
             feature : {
                 mark : {show: false},
-                dataView : {show: false, readOnly: false},
-                magicType : {show: true, type: ['line', 'bar', 'stack']},
+                dataView : {show: true, readOnly: true},
+                magicType : type == 'pid' ? {show: false} : {show: true, type: ['line', 'bar', 'stack']},
                 restore : {show: false},
                 saveAsImage : {show: true},
-                dataZoom:{show: true}
+                dataZoom: type == 'pie' ? {show: false} : {show: true}
             }
         },
-        dataZoom: {show:true},
+        dataZoom: type == 'pie' ? {show: false} : {show: true},
         calculable : false,
-        xAxis : [ { type : 'category', boundaryGap : true, data : metric.x } ],
-        yAxis : [ { type : 'value', splitArea : {show:true} } ],
         series : series()
     }
-    if(bool(metric.metric.unit)){
+
+    if(type != 'pie'){
+        xAxis = function() {return [ { type : 'category', boundaryGap : true, data : metric.x } ];}
+        yAxis = function() {return [ { type : 'value', splitArea : {show:true} } ];};
+        if(metric.xtype == 'horizontal') {
+          tmp = xAxis;
+          xAxis = yAxis;
+          yAxis = tmp;
+        }
+        chartOpt.xAxis=xAxis();
+        chartOpt.yAxis=yAxis();
+    }
+
+    if(bool(metric.metric) && bool(metric.metric.unit)){
       chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+metric.metric.unit }
     }
+
     return chartOpt;
   }
   
@@ -387,11 +405,10 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
       function(res){
         // data:[{name,x:[],series:[{name:,type:,data:[]}]}]
         $scope.show.all_host_overview = res['data'];
-        angular.forEach($scope.show.all_host_overview, function(v, k){
-          v.xfunc=$scope.NO_XFUNC;
-          v.chartType = 'bar';
-          console.debug(v);
-        });
+        //angular.forEach($scope.show.all_host_overview, function(v, k){
+        //  v.chartType = 'bar';
+        //  console.debug(v);
+        //});
       }
     );
   }
@@ -481,10 +498,6 @@ uhpApp.controller('MoniServiceCtrl', ['$scope', '$rootScope', '$http', '$sce','$
 
 }]);
 
-uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
-
-}]);
-
 uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
   
   $scope.$watch(function(){return $rootScope.activedSubMenu.activeTab;}, function(newValue, oldValue){
@@ -512,15 +525,8 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
           return;
 	    }
       console.log("query ok!");
-      is_refresh = !!is_refresh;
-      if(!is_refresh){
-        $scope.column = response['column']
-      }
-      if(is_refresh){
-        $scope.copy_array(response['data'], $scope.data);
-      }else{
-			  $scope.data = response['data'];
-      }
+      $scope.column = response['column']
+			$scope.data = response['data'];
       console.log($scope.data);
 	  }).error(function(data, status) {
 	  	$rootScope.alert("发送manual_query请求失败");
@@ -532,11 +538,13 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     $scope.sql = "select * from "+$scope.sql_table;
     $scope.query();
   }
+
   function query_monitor_metric() {
     $scope.sql_table = "monitor_metric";
     $scope.sql = "select * from "+$scope.sql_table;
     $scope.query();
   }
+
   function query_monitor_group() {
     $scope.sql_table = "monitor_group";
     $scope.sql = "select * from "+$scope.sql_table;
@@ -561,14 +569,21 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     $scope.query();
   }
 
-  $scope.add_table_record=function($event){
-    $scope.is_adding_new_record = true;
-  }
-  $scope.giveup_record=function($event){
-    $scope.is_adding_new_record = false;
+  $scope.add_table_record=function(){
     $scope.new_record = {};
+    $scope.recordAction="insert";
+		$("#monitorConfModal").modal();
   }
-
+  
+  $scope.ready_edit_record=function(record){
+    console.log(record);
+    $scope.recordAction="update";
+    $scope.new_record={};
+    $.each($scope.column, function(i,n){
+      $scope.new_record[n]=record[i];
+    });
+		$("#monitorConfModal").modal();
+  }
 
   function make_sql(method, table, values){
     var sql="";
@@ -584,10 +599,10 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     return sql;
   }
 
-  $scope.save_new_record=function($event){
-    console.log($scope.new_record);
-		if(!$scope.new_record) return;
-    var sql = make_sql("insert", $scope.sql_table, $scope.new_record);
+  $scope.dealRecord=function(record){
+		if(!record) return;
+    var sql = make_sql($scope.recordAction, $scope.sql_table, $scope.new_record);
+    if(!sql) return;
 		$http({
 	    method: 'POST',
 	    url: '/adminback/manual_execute',
@@ -597,7 +612,6 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
 	      	$rootScope.alert("提交失败 ("+response["msg"]+")");
           return;
 	    }
-      $scope.giveup_record();
       // 刷表格
       $scope.query(true);
 	  }).error(function(data, status) {
@@ -605,60 +619,16 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
 	  });
   }
 
-  $scope.ready_edit_record=function(record){
-    console.log(record);
-    $scope.edit_record=$scope.copy_array(record);
-    console.log($scope.edit_record);
-  }
-
-  $scope.giveup_edit_record=function(record){
-    $scope.copy_array($scope.edit_record,record);
-    $scope.edit_record=[];
-  }
-
-  $scope.copy_array=function(a,b){
-    if(!b){ 
-      var b = [];
-    }else{
-      b.splice(0, b.length)
-    }
-    for(i=0;i<a.length;i++){
-      b.push(a[i]);
-    }
-    return b;
-  }
-
-  $scope.update_record=function(idx,record){
-    console.log($scope.column);
-    console.log(record);
-    console.log($scope.edit_record);
-    var update_record = {};
-    for(i in $scope.column){
-      update_record[$scope.column[i]] = record[i];
-    }
-    console.log(update_record);
-    var sql = make_sql("update", $scope.sql_table, update_record);
-		$http({
-	    method: 'POST',
-	    url: '/adminback/manual_execute',
-	    params:  { sql : sql }
-	  }).success(function(response, status, headers, config){
-	  	if(response["ret"]!="ok"){
-	      	$rootScope.alert("提交失败 ("+response["msg"]+")");
-          return;
-	    }
-      $scope.edit_record = [];
-      $scope.is_editing[idx] = false;
-	  }).error(function(data, status) {
-	  	$rootScope.alert("发送manual update请求失败");
-	  });
+  $scope.save_new_record=function(){
+    console.log($scope.new_record);
+    $scope.dealRecord($scope.new_record)
   }
 
   $scope.delete_record=function(idx, record){
-    var update_record = {};
-    for(i in $scope.column){
-      update_record[$scope.column[i]] = record[i];
-    }
+    var update_record = {id:record[0]};
+    //for(i in $scope.column){
+    //  update_record[$scope.column[i]] = record[i];
+    //}
     console.log(update_record);
     var sql = make_sql("delete", $scope.sql_table, update_record);
 		$http({
@@ -678,7 +648,5 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
   }
 
   $scope.new_record = {};
-  $scope.edit_record = [];
-  $scope.is_editing = [];
 
 }]);

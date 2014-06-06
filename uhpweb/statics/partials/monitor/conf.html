@@ -3,44 +3,22 @@
     <thead>
       <tr>
         <th ng-repeat="col in column">[[col]]</th>
-        <th style="width:150px;">操作</th>
+        <th style="width:125px;">操作</th>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="record in data track by record[0]" ng-init="iR=$index">
         <form>
           <td style="max-width:500px;" ng-repeat="v in record track by $index" ng-init="jC=$index">
-            <span style="word-wrap:break-word;white-space:pre-wrap;" ng-show="!is_editing[iR]">[[v]]</span>
-            <!--
-            <input type="text" class="form-control" ng-show="is_editing[iR] && !$first" ng-model="record[jC]">
-            -->
-            <textarea class="form-control" rows="1" style="overflow-y:auto;resize:vertical" ng-show="is_editing[iR] && !$first" ng-model="record[jC]"></textarea>
-            <span ng-show="is_editing[iR] && $first">[[v]]</span>
+            <span style="word-break:break-all;word-wrap:break-word;white-space:pre-wrap;">[[v]]</span>
           </td>
-          <td>
-            <button type="submit" class="btn btn-primary btn-sm" ng-show="is_editing[iR]" ng-click="update_record(iR,record)">保存</button>
-            <button class="btn btn-primary btn-sm" ng-show="is_editing[iR]" ng-click="is_editing[iR]=false;giveup_edit_record(record)">取消</button>
-            <button class="btn btn-primary btn-sm" ng-show="!is_editing[iR]" ng-click="is_editing[iR]=true;ready_edit_record(record)">修改</button>
-            <button class="btn btn-warning btn-sm" ng-show="!is_editing[iR]" ng-click="delete_record(iR, record)">删除</button>
-          </td>
-        </form>
-      </tr>
-      <!-- 隐藏的一行 -->
-      <tr ng-show="is_adding_new_record">
-        <form>
-          <td ng-repeat="col in column">
-            <!--
-            <input type="text" class="form-control" name="[[col]]" ng-readonly="col=='id'" ng-model="new_record[col]">
-            -->
-            <textarea class="form-control" rows="1" style="overflow-y:auto;resize:vertical"  name="[[col]]" ng-readonly="col=='id'" ng-model="new_record[col]"></textarea>
-          </td>
-          <td>
-            <button type="submit" class="btn btn-primary btn-sm" ng-click="save_new_record()">保存</button>
-            <button class="btn btn-warning btn-sm" ng-click="giveup_record($event)">取消</button>
+          <td style="width:125px;">
+            <button class="btn btn-primary btn-sm" ng-click="ready_edit_record(record)">修改</button>
+            <button class="btn btn-warning btn-sm" ng-click="delete_record(iR, record)">删除</button>
           </td>
         </form>
       </tr>
     </tbody>
   </table>
 </div>
-<button type="button" class="btn btn-primary pull-right" ng-click="add_table_record($event)">添加</button>
+<button type="button" class="btn btn-primary pull-right" ng-click="add_table_record()">添加</button>

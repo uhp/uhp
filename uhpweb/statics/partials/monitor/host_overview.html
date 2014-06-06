@@ -1,7 +1,7 @@
 <!-- 机器信息  -->
 <div class="row" ng-repeat="group_metric in show.all_host_overview">
   <!--  可以双击放大 -->
-  <div class="col-md-8">
+  <div class="col-md-12">
 
     <div class="panel panel-info" ng-dblclick="showBig(group_metric)" ng-init="ID=formatIdName()">
       <div class="panel-heading"><h3 class="panel-title">[[group_metric.metric]]</h3></div>
@@ -11,7 +11,7 @@
     </div>
 
   </div>
-
+  <!--
   <div class="col-md-4" ng-init="DIST=calculateDistribution(group_metric)">
 
     <div class="panel panel-info" ng-dblclick="showBigDistribution(DIST)" ng-init="ID2=formatIdName()">
@@ -22,5 +22,5 @@
     </div>
 
   </div>
-
+  -->
 </div>
