@@ -77,7 +77,7 @@ class NamenodeChecker():
     def get_nm_and_check(self,host,port):
 
         url = "http://%s:%s/dfshealth.jsp" % (host,port)
-        html = util.get_http(url,2)
+        html = util.get_http(url,5)
         if html == None :
             self.update_result("ERROR",u"不能连接到%s:%s。" % (host,port) )
             return ("",0)
@@ -93,7 +93,7 @@ class NamenodeChecker():
         #get live datanode status
         # {"name","pcremaining","volfails"}
         url = "http://%s:%s/dfsnodelist.jsp?whatNodes=LIVE" % (host,port)
-        html = util.get_http(url,2)
+        html = util.get_http(url,5)
         if html == None :
             self.update_result("ERROR",u"不能连接到%s:%s。" % (host,port) )
             return (ha_state,tid)

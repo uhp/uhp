@@ -757,8 +757,8 @@ class AdminBackHandler(BaseHandler):
         if search != "" :
             search='%'+search+'%'
             query = query.filter(or_(Task.id.like(search),Task.taskType.like(search),Task.service.like(search), \
-                                     Task.host.like(search),Task.role.like(search),Task.status.like(search), \
-                                     Task.result.like(search)))
+                                     Task.host.like(search),Task.role.like(search),Task.task.like(search), \
+                                     Task.status.like(search), Task.result.like(search)))
         total_task = query.count();
         
         if dir=="asc":

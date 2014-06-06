@@ -109,11 +109,11 @@ class RrdWrapper(object):
 
     def get_pre_last(self, rrdfile):
         '''
-        获取最近5分钟的数据,选取最老的数据和最新的数据返回。
+        获取最近10分钟的数据,选取最老的数据和最新的数据返回。
         返回（数值pre，数值last）的二元组
-        如果,最近5分钟没有数据则返回None
+        如果,最近10分钟没有数据则返回None
         '''
-        result = self._fetch_data(rrdfile, "-300s", "now")
+        result = self._fetch_data(rrdfile, "-600s", "now")
         time_meta = result[0]
         data = result[2]
         pre_value = None
