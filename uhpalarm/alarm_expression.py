@@ -40,7 +40,9 @@ class AlarmExpManager(Manager):
         #if filter_result != None :
         #    return filter_result
 
-        real_args = self._get_args_from_ds(data_set,rule.exp_args)
+        real_args,msg = self._get_args_from_ds(data_set,rule.exp_args)
+        if real_args == None :
+            return (contants.ALARM_ERROR, msg)
         begin = time.time()
         exp_result = apply(rule.exp_func,real_args)
         end = time.time()
@@ -66,8 +68,10 @@ class AlarmExpManager(Manager):
         real_args = []
         for arg in args:
             (value,msg) = self.exp_parser.get_exp_value(arg,data_set)
+            if value == None :
+                return (None,msg)    
             real_args.append(value)
-        return real_args
+        return (real_args,"")
     
 class AlarmExpMap:
     '''

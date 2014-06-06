@@ -24,7 +24,7 @@ def resourcemanager_web(host,port):
 
     #state list:DECOMMISSIONED,LOST,NEW,REBOOTED,RUNNING,UNHEALTHY,
     url = "http://%s:%s/ws/v1/cluster/nodes?state=unhealthy" % (host,port)
-    nodes = util.get_http_json(url,2)
+    nodes = util.get_http_json(url,5)
     if nodes != None :
         if nodes["nodes"] != None :
             for node in nodes["nodes"]["node"] :
@@ -34,7 +34,7 @@ def resourcemanager_web(host,port):
         return ("ERROR",u"不能连接到RM %s:%s" % (host,port) )
 
     url = "http://%s:%s/ws/v1/cluster/nodes?state=lost" % (host,port)
-    nodes = util.get_http_json(url,2)
+    nodes = util.get_http_json(url,5)
     if nodes != None :
         if nodes["nodes"] != None :
             for node in nodes["nodes"]["node"] :
