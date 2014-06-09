@@ -1,4 +1,4 @@
-uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$rootScope,$http){
+uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http','$timeout',function($scope,$rootScope,$http,$timeout){
 	//初始化各种数据
 	$scope.$watch('tab',function(newValue,oldValue){
 		if(newValue=="host")$scope.initHost();
@@ -235,49 +235,17 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	$rootScope.alert("发送请求失败");
 	    });
 	}
-	$scope.readySendRepo=function(){
-		$scope.chosenHostStr=$scope.getChosenHostStr();
-		if( $scope.chosenHostStr.length == 0 ){
-			$rootScope.alert("请选择机器", "now")
-			return;
-		}
-		$("#sendRepoModal").modal()
-	}
-	$scope.sendRepo=function(){
-		var instanceList = [] ; 
-		for(var host in $scope.chosenHost){
-			if( $scope.chosenHost[host]) {
-				instanceList.push(host+"(prepare)");
-			}
-		}
-		$http({
-	        method: 'GET',
-	        url: '/adminback/send_action',
-	        params:{
-        		"service" : "prepare",
-        		"taskName" : "repo",
-        		"actionType" : "instance",
-        		"instances" : instanceList.join(",")
-	        }
-	    }).success(function(response, status, headers, config){
-	    	if(response["ret"] !="ok" ){
-	        	$rootScope.alert("提交失败:"+response["msg"]);
-	        }
-	    	
-	    }).error(function(data, status) {
-	    	$rootScope.alert("发送请求失败");
-	    });
-	}
-    //TODO
-	$scope.readyMoveLog=function(){
+    $scope.readySendServiceAction=function(action,display){
+        $scope.todoAction = action
+        $scope.todoDisplay = display
         $scope.chosenHostStr=$scope.getChosenHostStr();
 		if( $scope.chosenHostStr.length == 0 ){
 			$rootScope.alert("请选择机器", "now")
 			return;
 		}
-		$("#sendMoveLogModal").modal()
+        $("#serviceActionModal").modal();
     }
-    $scope.sendMoveLog=function(){
+    $scope.sendAction=function(){
         var instanceList = [] ; 
 		for(var host in $scope.chosenHost){
 			if( $scope.chosenHost[host]) {
@@ -289,7 +257,7 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	        url: '/adminback/send_action',
 	        params:{
         		"service" : "prepare",
-        		"taskName" : "movelog",
+        		"taskName" : $scope.todoAction,
         		"actionType" : "instance",
         		"instances" : instanceList.join(",")
 	        }
@@ -297,12 +265,16 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 	    	if(response["ret"] !="ok" ){
 	        	$rootScope.alert("提交失败:"+response["msg"]);
 	        }
+            else{
+               $timeout(function(){
+                    window.location.href="#/admin-task"
+               },1000)
+            }
 	    	
 	    }).error(function(data, status) {
 	    	$rootScope.alert("发送请求失败");
 	    });
     }
-	
 	//角色相关的函数
 	$scope.filterHostBySearch=function(hosts,search){
 		if(search==null||search=="") return hosts;
@@ -480,6 +452,12 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http',function($scope,$ro
 		$scope.initHost();
 		$scope.initRole();
 	}
+    $scope.actions = [
+        {"name":"repo","display":"分发仓库文件","tooptip":""},
+        {"name":"movelog","display":"移动日志","tooptip":""},
+        {"name":"deployhosts","display":"分发hosts","tooptip":""},
+        {"name":"jmxetric","display":"分发jmxetric","tooptip":""}
+    ]
 	
 	//tab操作和跳转
 	$rootScope.menu="admin";

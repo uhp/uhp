@@ -67,7 +67,7 @@ class AlarmExpManager(Manager):
     def _get_args_from_ds(self, data_set, args):
         real_args = []
         for arg in args:
-            (value,msg) = self.exp_parser.get_exp_value(arg,data_set)
+            value,msg = self.exp_parser.get_exp_value(arg,data_set)
             if value == None :
                 return (None,msg)    
             real_args.append(value)

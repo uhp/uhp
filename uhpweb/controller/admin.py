@@ -912,7 +912,7 @@ class AdminBackHandler(BaseHandler):
         content = self.get_argument("content")
         filePath = os.path.join(config.template_dir,dir,file)
         fd = open(filePath,"w")
-        fd.write(content);
+        fd.write(content.encode('utf8'));
         time.sleep(2)
         self.ret("ok","")
                 
