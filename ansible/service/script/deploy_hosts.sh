@@ -9,4 +9,4 @@ host=$1
 auto_add=$2
 
 cd $UHP_HOME/ansible/service/
-ansible-playbook -i $UHP_HOME/inventor/mysqlinventory.py deploy_hosts.yml -e "{'WANT_HOST':'$host','AUTO_ADD':'$auto_add'}"
+ansible-playbook -i $UHP_HOME/inventor/mysqlinventory.py deploy_hosts.yml -e '{"WANT_HOST":"$host","AUTO_ADD":"$auto_add"}'
