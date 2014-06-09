@@ -1,4 +1,4 @@
 
-- hosts: hadoop3
+- hosts: hadoop2
   tasks: 
-  - include: roles/jar/tasks/hive.yml
+  - include: roles/prepare/tasks/deployhosts.yml

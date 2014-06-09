@@ -68,4 +68,4 @@ class AlarmCallbackMap:
         now = time.strftime("%Y-%m-%d %H:%M:%S")
         if state != contants.ALARM_OK:
             mail_center.add_alarm_info({"ts": now,"name":self.rule.name,"host":self.host,"state":state,"msg":msg})
-            log.info("send mail %s %s %s" % (self.rule.name, state, msg) )
+            log.error("send mail %s %s %s" % (self.rule.name, state, msg) )

@@ -1,0 +1,9 @@
+#用于web生成配置文件查看不能直接执行，请执行script/depoly_hosts.sh
+---
+
+- name: template the host file
+  template: src=../../conf/templates/machine/hosts.j2 dest=/tmp/build_hosts
+
+- name: sed the /etc/hosts file
+  sudo: yes
+  script: replace_file.sh /etc/hosts /tmp/build_hosts

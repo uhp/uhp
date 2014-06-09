@@ -56,21 +56,6 @@
         <mbean name="java.lang:type=Threading" pname="Threading" >
             <attribute name="ThreadCount" type="int16"  slope="both" />
         </mbean>
-        <!-- master -->
-        <mbean name="hadoop:service=Master,name=MasterStatistics" pname="master" >
-            <attribute name="splitTimeNumOps"  type="int32" slope="both" />
-            <attribute name="splitTimeAvgTime" type="int32" slope="both" />
-            <attribute name="splitTimeMinTime" type="int32" slope="both" />
-            <attribute name="splitTimeMaxTime" type="int32" slope="both" />
-
-            <attribute name="splitSizeNumOps"  type="int32" slope="both" />
-            <attribute name="splitSizeAvgTime" type="int32" slope="both" />
-            <attribute name="splitSizeMinTime" type="int32" slope="both" />
-            <attribute name="splitSizeMaxTime" type="int32" slope="both" />
-
-            <attribute name="cluster_requests"  type="double" slope="both" />
-
-        </mbean>
     </sample>
     <ganglia mode="unicast" />
 </jmxetric-config>

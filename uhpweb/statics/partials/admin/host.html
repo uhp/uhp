@@ -22,8 +22,18 @@
             <div class="col-md-5">
               <button type="button" class="btn btn-primary" ng-click="readyAddHost()">添加机器</button>
               <button type="button" class="btn btn-danger" ng-click="readyDelHost()">删除机器</button>
-              <button type="button" class="btn btn-primary" ng-click="readySendRepo()">分发仓库文件</button>
-              <button type="button" class="btn btn-primary" ng-click="readyMoveLog()">移动日志</button>
+              <!-- 下拉选择操作  -->
+              <div class="btn-group" ng-show="actions.length!=0">
+                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                  选择机器操作<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li ng-repeat="action in actions" ng-click="readySendServiceAction(action.name,action.display)" tooltip="[[action.tooptip]]">
+                  <a href="javascript:void(0)">[[action.display]]</a>
+                  </li>
+                </ul>
+              </div>
+              <!-- -->
             </div>
             <div class="col-md-3">
               <input type="text" class="form-control" ng-model="settingRack" placeholder="选择机器并设置机架" >
@@ -155,44 +165,24 @@
           </div>
         </div>
 
-        <!-- 发送Repo文件的模式对话框 -->
-        <div id="sendRepoModal" class="modal fade" role="dialog" aria-hidden="true" data-backdrop="static">
+        <!-- 提交机器操作的模式对话框 -->
+        <div id="serviceActionModal" class="modal fade" role="dialog" aria-hidden="true" data-backdrop="static">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h4 class="modal-title">确认分发REPO文件</h4>
+                <h4 class="modal-title">确认提交机器操作</h4>
               </div>
               <div class="modal-body">
-                确认针对以下机器分发REPO文件:	
+                确认针对以下机器执行[[todoDisplay]]([[todoAction]])操作:	
                 [[chosenHostStr]]
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sendRepo()" >确定</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sendAction()" >确定</button>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- 发送moveLog文件的模式对话框 -->
-        <div id="sendMoveLogModal" class="modal fade" role="dialog" aria-hidden="true" data-backdrop="static">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h4 class="modal-title">确认移动REPO文件</h4>
-              </div>
-              <div class="modal-body">
-                确认针对以下机器移动日志文件夹:	
-                [[chosenHostStr]]
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sendMoveLog()" >确定</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- 角色 -->	
         <div class="tab-pane fade [[tabClass('role','in')]] ">
           <div class="row">

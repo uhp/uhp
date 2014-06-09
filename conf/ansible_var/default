@@ -17,9 +17,27 @@ HIVE_HOME: /usr/lib/hive
 #自动添加到所有服务启动的参数
 SERVER_OPTS: "-Xmx1024m -XX:OnOutOfMemoryError='kill;-9;%p' -Dcom.sun.management.jmxremote -Djava.net.preferIPv4Stack=true -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:-CMSConcurrentMTEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:+DisableExplicitGC -XX:+UseCMSCompactAtFullCollection -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN" 
 
+local_repo_enabled: "true"
+services_log_root: "/home/hadoop/log"
+
 #以下是各个服务的配置
 #格式服务__变量名字 : 值
 
+
+#for ganglia
+ganglia__data_source: uhpmonitor
+ganglia__gmond_port: 8649
+ganglia__gmetad_xml_port: 8651
+ganglia__cluster_name: "test_hadoop"
+ganglia__gmond_python: ""
+ganglia__gmetad_rras: 
+    - RRA:AVERAGE:0.5:4:120
+    - RRA:AVERAGE:0.5:40:1008
+    - RRA:AVERAGE:0.5:240:336
+    - RRA:AVERAGE:0.5:5760:376
+
+
+#for zookeeper
 zookeeper__ZOOKEEPER_OPTS: "-Xmx1024m"
 zookeeper__zookeeper_client_port: "2181"
 zookeeper__zookeeper_leader_port: "2888"
@@ -38,6 +56,9 @@ hdfs__HADOOP_BALANCER_OPTS: " -Xmx1024m"
 hdfs__HADOOP_CLIENT_OPTS: " -Xmx256m "
 
 #Variables for <core-site_xml>
+
+hdfs__fs_trash_interval : 4320
+hdfs__fs_trash_checkpoint_interval: 60
 
 hdfs__net_topology_script_file_name: "/etc/hadoop/conf/get_rack.py"
 hdfs__nameservice_id: "mycluster"
@@ -81,6 +102,12 @@ hdfs__dfs_namenode_shared_edits_dir: "journalhdfs1"
 hdfs__dfs_datanode_data_dir:
     - /uhp/all_data_dir
         
+
+#FOR httpfs port
+hdfs__httpfs_http_port: 14000
+hdfs__httpfs_admin_port: 14001
+
+#FOR YARN opts
 yarn__YARN_RESOURCEMANAGER_OPTS: " -Xmx1024m "
 yarn__YARN_NODEMANAGER_OPTS: " -Xmx1024m "
 yarn__HADOOP_JOBTRACKER_OPTS: " "
@@ -158,9 +185,21 @@ hbase__hbase_master_handler_count: 25
 hbase__hbase_resigionserver_port: 50620
 hbase__hbase_resigionserver_info_port: 50630
 hbase__hbase_regionserver_handler_count: 10
+hbase__hbase_regionserver_codecs: snappy
 
+# hbase replcation
+hbase__hbase_replication: "true"
+hbase__hbase_replication_source_ratio: "1.0"
+hbase__replication_source_nb_capacity: 1000
 
-    
+hbase__zookeeper_znode_parent: "/hbase"
+ 
+# hive OPTS
+hive__HIVE_CLI_OPTS: " -Xmx1024m "
+hive__HIVE_METASTORE_OPTS: " -Xmx1024m "
+hive__HIVE_SERVER_OPTS: " -Xmx1024m"
+hive__HIVE_SERVER2_OPTS: " -Xmx1024m"
+
 hive__mysql_host: hadoop1
 hive__mysql_port: 3306
 hive__mysql_database: uhp_hive
@@ -186,5 +225,34 @@ impala__impala_server_web_port: 25000
 impala__impala_server_beeswax_port: 21000
 impala__impala_server_hs2_port: 21050
 impala__impala_server_mem_limit: 2G
+
+#FOR HUE
+hue__web_port: 8888
+hue__time_zone: Asia/Shanghai
+
+hue__smtp_host: mail.ucweb.com
+hue__smtp_port: 587
+hue__smtp_user: hadoop
+hue__smtp_passwd: Ucweb5527604
+hue__smtp_from: hadoop@ucweb.com
+
+
+hue__beeswax_server_port: 8002
+hue__beeswax_meta_server_port: 8003
+
+#postgresql_psycopg2, mysql, or sqlite3
+hue__database_type: mysql
+hue__database_host: hadoop2
+hue__database_port: 3306
+hue__database_user: hue
+hue__database_password: hue
+hue__database_db: hue
+
+#for hue search
+hue__hue_search: "false"
+
+#FOR search
+search__solr_port: 8983
+search__solr_admin_port: 8984
 
 

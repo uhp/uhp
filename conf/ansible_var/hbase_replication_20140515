@@ -1,5 +1,0 @@
-
-# hbase replcation
-hbase__hbase_replication: "true"
-hbase__hbase_replication_source_ratio: "1.0"
-hbase__replication_source_nb_capacity: 1000

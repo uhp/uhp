@@ -1,6 +1,0 @@
-
-#FOR search
-search__solr_port: 8983
-search__solr_admin_port: 8984
-
-
