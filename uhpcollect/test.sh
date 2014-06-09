@@ -1,13 +1,24 @@
 set -e
 
+
+# sudo -u hdfs hdfs dfs -mkdir /user/$USER
+# sudo -u hdfs hdfs dfs -chown $USER:$USER /user/$USER
+
 DIR=$(cd $(dirname "$0"); pwd)
 cd $DIR
 
-f=words.txt
-in=/user/$user/test/wordcount/input
-out=/user/$user/test/wordcount/output
 
-[ -e $f ] || echo -e "abc\ndef\njbc\ncdh\nok" > $f
+f=words.txt
+in=/user/$USER/test/wordcount/input
+out=/user/$USER/test/wordcount/output
+
+[ $1 == "r" ] && {
+    rm -rf $f
+    hdfs dfs -rm -R -skipTrash $in
+}
+
+#[ -e $f ] || echo -e "abc\ndef\njbc\ncdh\nok" > $f
+[ -e $f ] || seq 1 10000000 > $f #约 88 M
 
 hdfs dfs -mkdir -p $in
 

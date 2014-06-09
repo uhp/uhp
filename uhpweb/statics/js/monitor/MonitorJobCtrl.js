@@ -584,6 +584,26 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.rmQuery();
         $scope.appQuery();
     }
+    
+    $scope.needKillApp = function(appId){
+      $scope.needKillAppIds = [appId];
+      $('#killAppIdModal').modal();
+    };
+
+    $scope.killApp = function(){
+      $rootScope.myHttp('GET', '/monitorback/kill_app', {needKillAppIds:$scope.needKillAppIds}, 
+        function(res){
+          $scope.loadRunningApp();
+          $scope.killAppInfos=res['data'];
+          $('#killAppIdFinishModal').modal();
+        }
+        //,
+        //function(){
+        //  $scope.killAppInfo="删除失败";
+        //  $('#killAppIdFinishModal').modal();
+        //}
+      );
+    };
 
     $scope.init();
 }]);

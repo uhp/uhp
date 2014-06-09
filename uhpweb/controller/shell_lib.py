@@ -7,6 +7,9 @@ import random
 import commands
 import time
 
+commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
+sys.path.append(commondir)
+
 import config
 
 app_log = logging.getLogger("tornado.application")
@@ -57,4 +60,5 @@ def kill_app(application_id):
 if __name__ == '__main__':
     #print get_template_file("hadoop1","hbase","hbase-env.sh")
     #print download_template_file("hadoop1","hadoop")
-    print kill_app("application_1401883144361_0019")
+    #print kill_app("application_1401883144361_0019")
+    print kill_app("application_1401865571843_0025")

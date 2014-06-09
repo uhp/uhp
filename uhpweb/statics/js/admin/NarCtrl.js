@@ -10,7 +10,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
 	$rootScope.activedSubMenu={} //激活的第二菜单, monitor使用
   
   //公共函数
-  $rootScope.myHttp=function(method, url, params, func){
+  $rootScope.myHttp=function(method, url, params, func, efunc){
 		$http({
 	    method: method,
 	    url: url,
@@ -22,6 +22,7 @@ uhpApp.controller('NarCtrl',['$scope','$rootScope','$interval','$http','$locatio
       }
       func(response);
 	  }).error(function(data, status) {
+      if(bool(efunc)){ return efunc(data, status); }
 	  	$rootScope.alert("发送请求失败:" + data + ":" + status);
 	  });
   }   

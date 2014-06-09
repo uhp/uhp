@@ -23,6 +23,7 @@ from rrd import RrdWrapper
 import util
 import callback_lib
 import mm
+import shell_lib
 from controller import BaseHandler
 from controller import shell_lib
 from model.instance import Instance
@@ -157,6 +158,7 @@ class MonitorBackHandler(BaseHandler):
             active = []
             for service in session.query(Service):
                 if service.status != Service.STATUS_ACTIVE : continue
+                if service.service == 'client': continue
                 instances = session.query(Instance).filter(Instance.service == service.service)
                 service = {'name':service.service, 'roles':{}}
                 for ins in instances:
@@ -430,7 +432,8 @@ class MonitorBackHandler(BaseHandler):
                 role_health = {'name':role, 'display':role}
                 y = []
                 for host in hosts:
-                    ins_health = self._service_instance_current_health(rrd_wrapper, cluster_name, service['name'], role, host) 
+                    ins_health = self._service_instance_current_health(rrd_wrapper, cluster_name, service['name'], role, host)
+                    if(ins_health < 0): ins_health = 0
                     y.append(ins_health)
                 role_health['x'] = hosts
                 role_health['y'] = y
@@ -605,6 +608,54 @@ class MonitorBackHandler(BaseHandler):
         self.ret("ok", "", ret);
 
     # 获取最新报警列表数据
+    def query_alarms(self):
+        search  = self.get_argument("search", "")
+        orderby = self.get_argument("orderby", "id")
+        dir     = self.get_argument("dir", "desc")
+        offset  = self.get_argument("offset", "0")
+        limit   = self.get_argument("limit", "50")
+        offset  = int(offset)
+        limit   = int(limit)
+
+        session = database.getSession()
+        try:
+            columns = []
+            columns = [col.name for col in AlarmList.__table__.columns]
+            data    = []
+
+            query = session.query(AlarmList)
+            if search:
+                search = '%' + search + '%'
+                qf = None 
+                for col in columns:
+                    qf = qf | Task.__dict__[col].like(search)
+                query = query.filter(qf)
+        
+            total = query.count();
+
+            if dir == "asc":
+                query = query.order_by(asc(orderby))[offset:offset+limit]
+            else:
+                query = query.order_by(desc(orderby))[offset:offset+limit]
+                
+            for record in query:
+                temp = []
+                for col in columns:
+                    v = getattr(record, col)
+                    # 特别的，时间转化
+                    if col == 'ctime':
+                        t = time.localtime(v)
+                        v = time.strftime("%Y-%m-%d %H:%M:%S", t)
+                    temp.append(v)
+                data.append(temp)
+
+            # alarms
+            alarms = {'columns':columns, 'rows':data, 'total': total, 'totalPage':int(total/limit)+1}
+            self.ret("ok", "", {"data": alarms})
+        finally:
+            session.close()
+   
+    # 根据条件查询报警列表数据
     def fetch_last_alarm_list(self):
         session = database.getSession()
         try:
@@ -778,7 +829,10 @@ class MonitorBackHandler(BaseHandler):
                 load_percent_group['75-100%'] += 1
             else:
                 load_percent_group['100%+'] += 1
-
+        # 过滤0值
+        for name, numb in load_percent_group.items():
+            if numb <= 0:
+                del load_percent_group[name]
         load_metric_dist['series'][0]['data'] = [{'name':k, 'value':v} for k,v in load_percent_group.iteritems()]
 
         data.append(load_metric_dist)
@@ -1088,3 +1142,11 @@ class MonitorBackHandler(BaseHandler):
         result={"applist":queryResult,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
         self.ret("ok","",result)
 
+    def kill_app(self):
+        needKillAppIds = self.get_arguments("needKillAppIds")
+        result={}
+        for appId in needKillAppIds:
+            (status, output) = shell_lib.kill_app(appId)
+            result[appId]=(status, output)
+        result={"data":result}
+        self.ret("ok","",result)

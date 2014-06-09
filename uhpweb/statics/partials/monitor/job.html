@@ -40,7 +40,7 @@
 
           <div class="panel-collapse in collapse">
 
-            <table class="table table-bordered table-striped table-hover" style="font-size:14px;">
+            <table class="table table-bordered table-striped table-hover" style="font-size:12px;">
               <thead>
                 <tr>
                   <th>应用Id</th>
@@ -52,6 +52,7 @@
                   <th>Am运行</th>
                   <th colspan="6">Map(总数,待运行,正运行,失败,杀死,成功)</th>
                   <th colspan="6">Reduce(总数,待运行,正运行,失败,杀死,成功)</th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,6 +76,9 @@
                   <td>[[ info['failedReduceAttempts'] ]]</td>
                   <td>[[ info['killedReduceAttempts'] ]]</td>
                   <td>[[ info['successfulReduceAttempts'] ]]</td>
+                  <td>
+                    <button class="btn btn-danger" ng-click="needKillApp(appid)">终止</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -118,3 +122,40 @@
   </div>
 
 </div>
+
+<!-- Kill App确认 -->
+<div class="modal fade" id="killAppIdModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">准备删除Application</h4>
+      </div>
+      <div class="modal-body">
+        <p ng-repeat="appId in needKillAppIds">[[appId]]</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="killApp()">确定</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Kill App 完成确认 -->
+<div class="modal fade" id="killAppIdFinishModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">删除Application</h4>
+      </div>
+      <div class="modal-body">
+        <p ng-repeat="(appId, info) in killAppInfos">【[[appId]]】 【[[ info[0] ]]】 [[ info[1] ]]</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
