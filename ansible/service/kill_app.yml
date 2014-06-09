@@ -1,5 +1,8 @@
-#用于web杀死app,不能直接执行,请执行script/kill_app.sh
 ---
+
+
+#用于web杀死app,不能直接执行,请执行script/kill_app.sh
+
 - hosts: RESOURCEMANAGER 
   tasks:
   - name: kill the application
