@@ -583,6 +583,11 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         
         $scope.rmQuery();
         $scope.appQuery();
+
+        //定时刷新正在运行的作业
+        timer = $interval(function(){
+          $scope.runningQuery();
+        },10000);
     }
     
     $scope.needKillApp = function(appId){
@@ -593,9 +598,9 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
     $scope.killApp = function(){
       $rootScope.myHttp('GET', '/monitorback/kill_app', {needKillAppIds:$scope.needKillAppIds}, 
         function(res){
-          $scope.loadRunningApp();
           $scope.killAppInfos=res['data'];
           $('#killAppIdFinishModal').modal();
+          $scope.runningQuery();
         }
         //,
         //function(){

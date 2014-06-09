@@ -77,7 +77,7 @@
                   <td>[[ info['killedReduceAttempts'] ]]</td>
                   <td>[[ info['successfulReduceAttempts'] ]]</td>
                   <td>
-                    <button class="btn btn-danger" ng-click="needKillApp(appid)">终止</button>
+                    <button class="btn btn-danger btn-xs" ng-click="needKillApp(appid)">终止</button>
                   </td>
                 </tr>
               </tbody>
@@ -98,7 +98,7 @@
   <div class="panel panel-info">
     <div class="panel-heading"><h3 class="panel-title">等待的应用</h3></div>
 
-    <table class="table table-bordered table-striped table-hover" style="font-size:14px">
+    <table class="table table-bordered table-striped table-hover" style="font-size:12px">
       <thead>
         <tr>
           <th>应用id</th>
@@ -106,6 +106,7 @@
           <th>名称</th>
           <th>队列</th>
           <th>提交至今时间</th>
+          <th>操作</th>
         </tr>
       </thead>
       <tbody>
@@ -115,6 +116,9 @@
           <td style="width:350px;word-break:break-all;">[[ app['name'] ]]</td>
           <td>[[ app['queue'] ]]</td>
           <td>[[ app['elapsedTime'] ]]</td>
+          <td>
+            <button class="btn btn-danger btn-xs" ng-click="needKillApp(app['id'])">终止</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -151,7 +155,7 @@
         <h4 class="modal-title">删除Application</h4>
       </div>
       <div class="modal-body">
-        <p ng-repeat="(appId, info) in killAppInfos">【[[appId]]】 【[[ info[0] ]]】 [[ info[1] ]]</p>
+        <p ng-repeat="(appId, info) in killAppInfos" ng-init="msg=info[0]=='OK'?'':info[1]">【[[appId]]】 【[[ info[0] ]]】 [[ msg ]]</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
