@@ -8,6 +8,9 @@ uhphome = os.getenv('UHP_HOME')
 install_manager = True
 install_monitor = False
 
+# 是否执行ansible操作。对于仅使用监控的系统可以把这部分关闭。
+ansible_run = True
+
 template_dir = os.path.join(uhphome,"ansible","service","roles","conf","templates")
 
 jar_dir = os.path.join(uhphome,"ansible","service","roles","jar","files")
@@ -60,10 +63,3 @@ mail_interval = 60
 collect_interval = 600
 collect_yarn_rm_webapp_port_varname = 'yarn_rm_webapp_port'
 
-#USE FOR DEBUG
-
-#fade_add_del=True
-fade_add_del=False
-
-#fade_windows=True
-fade_windows=False

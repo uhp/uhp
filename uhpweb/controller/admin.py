@@ -267,23 +267,24 @@ class AdminBackHandler(BaseHandler):
         if actionType=="service":
             #针对服务的操作
             self.update_with_service_action(session,service,taskName)
-            
-            task = Task(taskType,service,"","",taskName);
-            session.add(task)
-            session.flush()
-            running_id.append(task.id)
+            #task = Task(taskType,service,"","",taskName);
+            #session.add(task)
+            #session.flush()
+            #running_id.append(task.id)
+            taskid = database.build_task(session,taskType,service,"","",taskName)
+            running_id.append(taskid)
             
         elif actionType=="instance":
             for instance in instances.split(","):
                 (host,role) = Instance.split_instance_name(instance) 
                 if host != None and role != None : 
-                    task = Task(taskType,service,host,role,taskName);    
-                    session.add(task)
-                    
                     self.update_with_instance_action(session,service,host,role,taskName)
-                    
-                    session.flush()
-                    running_id.append(task.id)
+                    #task = Task(taskType,service,host,role,taskName);    
+                    #session.add(task)
+                    #session.flush()
+                    #running_id.append(task.id)
+                    taskid = database.build_task(session,taskType,service,host,role,taskName)
+                    running_id.append(taskid)
                 else:
                     self.ret("error","split instance name %s error" % instance) 
                     return
@@ -601,15 +602,12 @@ class AdminBackHandler(BaseHandler):
         add_running_id = self.add_instance( add_instance )
         del_running_id = self.del_instance( del_instance )
        
-#         async.async_run(async.add_del_service,(addRunningId,delRunningId))
         for taskid in add_running_id:
             callback_lib.add_callback(session,taskid,"dealAddInstance")
             
         for taskid in del_running_id:
             callback_lib.add_callback(session,taskid,"dealDelInstance")
         session.close()  
-        if config.fade_add_del:
-            async.async_run(async.fade_add_del_service,(add_running_id,del_running_id))
         
         #发送消息到MQ
         msg = ','.join([str(id) for id in (add_running_id + del_running_id)])
@@ -651,10 +649,12 @@ class AdminBackHandler(BaseHandler):
         running_id=[]
         for delInst in delInstance:
             tempService = static_config.get_service_from_role(delInst["role"])
-            newTask = Task("ansible",tempService,delInst["host"],delInst["role"],"remove")
-            session.add(newTask)
-            session.flush();
-            running_id.append(newTask.id)
+            #newTask = Task("ansible",tempService,delInst["host"],delInst["role"],"remove")
+            #session.add(newTask)
+            #session.flush();
+            #running_id.append(newTask.id)
+            new_taskid = database.build_task("ansible",tempService,delInst["host"],delInst["role"],"remove")
+            running_id.append(new_taskid)
             
         session.commit()
         session.close()

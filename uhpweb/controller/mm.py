@@ -18,8 +18,9 @@ import config
 
 
 def send(msg, ttl=None):
-    if config.fade_windows:
-        return True;
+    #delete the fade windows conf
+    #if config.fade_windows:
+    #    return True;
     link = snakemq.link.Link()
     link.add_connector((config.mq_host, config.mq_port))
     packeter = snakemq.packeter.Packeter(link)
