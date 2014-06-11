@@ -114,12 +114,6 @@
     sudo: yes
     shell: rm {{item}}/* -rf
     with_items: hdfs__dfs_datanode_data_dir
-  - name: register the dir
-    shell: dirname {{ hdfs__dfs_domain_socket_path }}
-    register: domain_socket_path
-  - name: mkdir short cut dir
-    sudo: yes
-    file: path={{ domain_socket_path.stdout }} owner=hdfs group=hdfs mode=755 state=directory
     
 
 - hosts: QJM
