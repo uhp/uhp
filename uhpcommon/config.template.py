@@ -32,6 +32,9 @@ web_log_file = "uhpweb.log"
 web_bind_host = "0.0.0.0"
 web_bind_port = 59990
 
+# for instance to display unknow
+max_unknow_time = 120
+
 # for worker
 service_path = os.path.join(uhphome,"ansible","service")
 ansible_host_list = os.path.join(uhphome,"inventor/mysqlinventory.py")
