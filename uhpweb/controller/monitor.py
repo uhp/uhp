@@ -328,68 +328,92 @@ class MonitorBackHandler(BaseHandler):
         self.ret("ok", "", ret);
     
     # 显示单机的主要指标
-    def show_host_metrics(self):
+    def show_host_main_metrics(self):
         precision    = self.get_argument("precision")
         host         = self.get_argument("host")
+
         precision    = self._sure_str(precision)
         host         = self._sure_str(host)
         
         cluster_name = self._query_var('all', 'cluster_name')
         cluster_name = self._sure_str(cluster_name)
-        rrd_wrapper     = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
+        rrd_wrapper  = RrdWrapper(config.ganglia_rrd_dir , config.rrd_image_dir)
 
         sec = int(precision[1:])
         start = "-%ds" % sec
         end = "now" 
 
-        data = []
       
         # 负载 3个 # CPU 3个 # 网络 # 磁盘 # 内存
         load_metric = {'metric':'负载','x':[],'series':[]}
         cpu_metric  = {'metric':'CPU', 'x':[],'series':[]}
-        net_metric  = {'metric':'网络','x':[],'series':[]}
         mem_metric  = {'metric':'内存','x':[],'series':[]}
+        net_metric  = {'metric':'网络','x':[],'series':[]}
         disk_metric = {'metric':'磁盘','x':[],'series':[]}
+      
+        line_area_style = {'itemStyle':{'normal': {'areaStyle': {'type': 'default'}}}}
+        line_stack_style ={'stack':'total'}
+
+        def _fetch_m(metric, metrics, style=None):
+            (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
+            metric['x'] = x
+            for m,y in zip(metrics,ys):
+                item = {'name':m, 'type':'line', 'data':y}
+                if style: item.update(style)
+                metric['series'].append(item) 
+            
+        # 负载
+        metrics = ['load_one', 'load_five', 'load_fifteen', 'proc_run', 'cpu_num']
+        _fetch_m(load_metric, metrics, line_area_style)
+        item = load_metric['series'][len(metrics)-1]
+        del item['itemStyle']
        
-        metrics = ['load_one','load_five','load_fifteen','proc_run','cup_num']
-        (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics) 
+        # CPU 
+        metrics = ['cpu_user','cpu_system','cpu_wio']
+        _fetch_m(cpu_metric, metrics, line_stack_style)
+
+        # Mem
+        metrics = ['mem_used','mem_free','swap_used']
+        _fetch_m(mem_metric, metrics, line_stack_style)
+
+        # Net
+        metrics = ['bytes_in', 'bytes_out']
+        _fetch_m(net_metric, metrics, line_area_style)
         
+        # Disk
+        metrics = ['disk_used','disk_free']
+        _fetch_m(disk_metric, metrics, line_stack_style)
 
-        rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
 
-        metrics = [] 
-        try:
-            metrics = rrd_wrapper.get_all_rrd_names(clusterName=cluster_name)
-        except:
-            app_log.exception('')
-        
-        groups_metrics = self._checkout_groups_metrics(group_names)
+        data = []
+        data.append(load_metric)
+        data.append(cpu_metric )
+        data.append(mem_metric )
+        data.append(net_metric )
+        data.append(disk_metric)
 
-        for metric in metrics:
-            if metric not in groups_metrics: continue
-            metric = self._sure_str(metric)
-            try:
-                rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
-            except Exception, e:
-                if 'RRD File not exists' in str(e): continue
-                raise e
-            xy = rrd.convert_to_xy(rrd_metric)
-            data.append({'metric':metric, 'x':xy[0], 'y':xy[1]})
         ret = {"data":data}
+
         self.ret("ok", "", ret);
 
-    # None: 未获取
-    def _fetch_host_metrics(self, rrd_wrapper, cluster_name, host, metrics):
+    def _fetch_host_metrics(self, rrd_wrapper, cluster_name, host, metrics, start, end):
         """获取同一个机器上的多个指标。获取后根据时间合并
+        @return (x, ys) 
         """
-        host   = self._sure_str(host)
-        metric = self._sure_str(metric)
-        (ts, value) = (None, None)
-        try:
-            (ts, value) = rrd_wrapper.query_last(metric, hostname=host, clusterName=cluster_name)
-        except:
-            pass
-        return value
+        
+        ts = []
+        values = []
+        for metric in metrics:
+            try:
+                rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
+                (x,y) = rrd.convert_to_xy(rrd_metric)
+                if x is not None: ts = x
+                values.append(y)
+            except Exception, e:
+                app_log.exception('')
+                values.append([])
+        
+        return (ts, values)
 
     # None: 未获取
     def _fetch_host_last_metric(self, rrd_wrapper, cluster_name, host, metric):
