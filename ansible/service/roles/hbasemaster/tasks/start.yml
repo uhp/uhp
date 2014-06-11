@@ -2,10 +2,11 @@
 
 - include: ../../conf/tasks/hbase.yml
 
+- name: use the env var classpath to replace the -classpath jvm params
+  sudo: yes
+  copy: src=hbase dest=/usr/lib/hbase/bin/hbase mode=0755
+
 - name: start hbase master
   sudo: yes
   service: name=hbase-master state=started
 
-- name: use the env var classpath to replace the -classpath jvm params
-  sudo: yes
-  copy: src=hbase dest=/usr/lib/hbase/bin/hbase mode=0755
