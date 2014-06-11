@@ -1,4 +1,4 @@
 
 - hosts: hadoop2
   tasks: 
-  - include: roles/prepare/tasks/deployhosts.yml
+  - include: roles/jar/tasks/resourcemanager.yml

@@ -137,7 +137,7 @@ services = [
               {"role":"historyserver","port":"mapreduce_jobhistory_webapp_port"}]
      },
     {"name":"hbase",
-     "role":["hbasemaster","regionserver"],
+     "role":["hbasemaster","regionserver","hbaseserver"],
      "actions":[{"name":"init","display":"初始化","tooptip":"创建hbase所需要的hdfs目录。"},
                 {"name":"start","display":"启动","tooptip":""},
                 {"name":"stop","display":"停止","tooptip":""},

@@ -1,0 +1,7 @@
+---
+
+- name: remove hbase thrift
+  sudo: yes
+  service: name=hbase-thrift state=removed
+
+

@@ -7,4 +7,4 @@
   with_items: 
   - hbase-master
 
-
+- include: ../../jar/tasks/hbase.yml
