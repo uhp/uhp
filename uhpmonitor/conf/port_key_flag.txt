@@ -72,7 +72,7 @@
         },
         "hiveserver": {
             "hive_server_thrift_port": true,
-            "key":"HiveServer"
+            "key":"HiveServer\b"
         },
         "hiveserver2": {
             "hive_server2_thrift_port": true,
