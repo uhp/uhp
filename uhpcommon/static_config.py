@@ -34,6 +34,7 @@ if config.install_monitor:
             {"name":"mHost", "display":"机器", "href":"#/monitor/host",
                 "tabs": [
                     {"name":"mtHostsOverview", "display":"概览", "href":"/statics/partials/monitor/host_overview.html"},
+                    {"name":"mtHostMainMetrics", "display":"重要指标", "href":"/statics/partials/monitor/host_main.html"},
                     {"name":"mtHostsMetric", "display":"监控指标", "href":"/statics/partials/monitor/host.html"},
                     {"name":"mtHostMetrics", "display":"监控机器", "href":"/statics/partials/monitor/host_host.html"}
                 ]

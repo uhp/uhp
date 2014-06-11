@@ -1,10 +1,47 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="pull-left">导航：</div>
+    <ul class="list-inline">
+      <li style="min-width:0px;" ng-repeat="gm in show.all_host_overview">
+      <a href="javascript:void(0);" ng-click="gotoa($index)"><span class="label label-default">[[gm.metric]]</span></a>
+      </li>
+    </ul>
+  </div>
+</div>
+
 <!-- 机器信息  -->
+<div class="row">
+  <!--  可以双击放大 -->
+  <div class="col-md-4">
+
+    <div class="panel panel-info">
+      <div class="panel-heading"><h3 class="panel-title">基本信息</h3></div>
+      <div class="panel-body">
+        <ul class="list-inline">
+          <li style="min-width:300px;" ng-repeat="ho in show.hostOverview">[[ho.name]]：<strong>[[ho.value]] [[ho.unit]]</strong></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-md-8" ng-repeat="group_metric in show.loadDist">
+    <div class="panel panel-info" ng-dblclick="showBig(group_metric)" ng-init="ID=formatIdName()">
+      <div class="panel-heading"><h3 class="panel-title">[[group_metric.metric]]</h3></div>
+      <div class="panel-body">
+        <div id="[[ID]]" ng-init="draw('#'+ID,group_metric)"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div class="row" ng-repeat="group_metric in show.all_host_overview">
   <!--  可以双击放大 -->
   <div class="col-md-12">
 
     <div class="panel panel-info" ng-dblclick="showBig(group_metric)" ng-init="ID=formatIdName()">
-      <div class="panel-heading"><h3 class="panel-title">[[group_metric.metric]]</h3></div>
+      <div class="panel-heading"><h3 class="panel-title"><a id="[[$index]]">[[group_metric.metric]]</a></h3></div>
       <div class="panel-body">
         <div id="[[ID]]" ng-init="draw('#'+ID,group_metric)"></div>
       </div>
@@ -23,4 +60,56 @@
 
   </div>
   -->
+</div>
+
+<!-- 磁盘详细信息 -->
+<div class="row">
+  <!--  可以双击放大 -->
+  <div class="col-md-12">
+    <div class="panel panel-info">
+      <div class="panel-heading"><h3 class="panel-title">磁盘详细</h3></div>
+      <div class="panel-body">
+        <!-- 标签页 --> 
+        <ul class="nav nav-tabs">
+          <li class="[[item.active]]" ng-click="activeItem(item, show.diskData)" ng-repeat="item in show.diskData" >
+          <a href="javascript:void(0)">[[item.metric]]</a>
+          </li>
+        </ul>
+
+        <div class="tab-content" style="margin-top:20px;">
+
+          <div class="tab-pane fade" ng-class="group_metric.active && 'in active'" ng-repeat="group_metric in show.diskData">
+
+            <div class="panel panel-info">
+              <div class="panel-heading"><h3 class="panel-title">[[group_metric.info.overview]]</h3></div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-6" ng-repeat="(disk, diskInfo) in group_metric.info.disks">
+                    <div class="panel panel-info">
+                      <div class="panel-heading"><h3 class="panel-title">[[disk]]</h3></div>
+                      <div class="panel-body">
+                        <ul>
+                          <li ng-repeat="info in diskInfo">
+                          [[info.name]]：<strong>[[info.value]] [[info.unit]]</strong>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel-info" ng-dblclick="showBig(group_metric)" ng-init="ID=formatIdName()">
+              <div class="panel-body">
+                <div id="[[ID]]" ng-init="draw('#'+ID,group_metric)"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
