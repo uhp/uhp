@@ -26,5 +26,7 @@ done
 
 [ "$ok" == "true" ] && exit 0
 
-echo "Stop OK"
-exit 1
+echo "kill -9 $pid"
+kill -9 $pid
+rm -rf ${UHP_HOME}/pids/${app}/*.pid
+sleep 1
