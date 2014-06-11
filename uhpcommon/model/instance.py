@@ -1,10 +1,14 @@
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+import time
+
 from sqlalchemy import Column, Integer, String, Text, schema,SmallInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey, DateTime, Boolean, func,Index, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
+
+import config
 from models import UHPBase
-import time
 
 BASE = declarative_base()
 
@@ -95,7 +99,7 @@ class Instance(BASE, UHPBase):
         #health加入关闭状态和unknow状态的修正
         #monitor_time 加入 >3600 修正
         if isinstance(ret["monitor_time"],(int,long)) :
-            if ret["monitor_time"] > 60 :
+            if ret["monitor_time"] > config.max_unknow_time :
                 ret["health"] = Instance.HEALTH_UNKNOW
             if ret["monitor_time"] < 0 :
                 ret["monitor_time"] = 0

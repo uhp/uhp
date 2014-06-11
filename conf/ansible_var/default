@@ -186,6 +186,7 @@ hbase__hbase_resigionserver_port: 50620
 hbase__hbase_resigionserver_info_port: 50630
 hbase__hbase_regionserver_handler_count: 10
 hbase__hbase_regionserver_codecs: snappy
+hbase__hbase_thrift_info_port: 59001
 
 # hbase replcation
 hbase__hbase_replication: "true"

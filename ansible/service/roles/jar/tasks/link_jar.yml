@@ -1,20 +1,29 @@
 
 - name: register jar var
-  shell: ls {{ WANT_HOME }} | grep {{ NEW_JAR }} |wc -l
+  shell: ls {{ WANT_HOME }} | grep {{ NEW_JAR }}.jar |wc -l
   register: new_jar
 
-- name: remove all the old one
+- name: remove the old one
   sudo: yes
-  shell: rm -f {{ WANT_HOME }}/{{ JAR_PREFIX }}*.jar ;
+  shell: rm -f {{ WANT_HOME }}/{{ JAR_PREFIX }}.jar ;
+  when: new_jar.stdout|int == 0
 
-#  when: new_jar.stdout|int == 0
+- name: remove the fix version jar
+  sudo: yes
+  shell: rm -f {{ WANT_HOME }}/{{ JAR_PREFIX }}-[0-9]*.jar ;
+  when: new_jar.stdout|int == 0
+
+- name: remove the fix version jar
+  sudo: yes
+  shell: rm -f {{ WANT_HOME }}/{{ JAR_PREFIX }}-[0-9]*-*.jar ;
+  when: new_jar.stdout|int == 0
 
 - name: copy the wanted jar
   sudo: yes
-  copy: src={{ NEW_JAR }} dest={{WANT_HOME}}
+  copy: src={{ NEW_JAR }}.jar dest={{WANT_HOME}}
   when: new_jar.stdout|int == 0
 
 - name: ln new one
   sudo: yes
-  shell: cd {{ WANT_HOME }} ; ln -sf {{ NEW_JAR }} {{ JAR_PREFIX }}.jar
-  when: new_jar.stdout|int == 0
+  shell: cd {{ WANT_HOME }} ; ln -sf {{ NEW_JAR }}.jar {{ JAR_LINK }}.jar
+  when: JAR_LINK is defined

@@ -1,6 +1,0 @@
-
-
-- hosts: DATANODE
-  tasks:
-  - include: roles/jar/tasks/hadoop.yml
-

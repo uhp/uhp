@@ -1,0 +1,4 @@
+
+- name: stop hbase thrift
+  sudo: yes
+  service: name=hbase-thrift state=stopped

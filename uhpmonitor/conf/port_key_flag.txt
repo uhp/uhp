@@ -63,6 +63,10 @@
             "hbase_resigionserver_info_port": true,
             "hbase_resigionserver_port": true,
             "key":"hbase.*regionserver"
+        },
+        "hbaseserver": {
+            "hbase_thrift_info_port" : true,
+            "key":"hbase.*thrift.*ThriftServer"
         }
     },
     "hive": {

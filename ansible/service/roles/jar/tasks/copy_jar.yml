@@ -1,0 +1,10 @@
+
+- name: register jar var
+  shell: ls {{ WANT_HOME }} | grep {{ NEW_JAR }} |wc -l
+  register: new_jar
+
+- name: copy the wanted jar
+  sudo: yes
+  copy: src={{ NEW_JAR }} dest={{WANT_HOME}}
+  when: new_jar.stdout|int == 0
+

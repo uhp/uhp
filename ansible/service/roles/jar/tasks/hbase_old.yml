@@ -1,22 +1,24 @@
 
 
-- name: register jar var
-  shell: ls {{HBASE_HOME}}|grep "hbase-0.94.2-cdh4.2.1-security.jar" |wc -l
-  register: new_jar
+- { include : link_jar.yml , WANT_HOME : "{{ HBASE_HOME }}", NEW_JAR : "hbase-0.94.2-cdh4.2.1-security" , JAR_prefix : "hbase-0.94.2-cdh4.2.1-security" }
 
-- name: copy the hdfs's jar
-  sudo: yes
-  copy: src={{item}} dest={{HBASE_HOME}}
-  with_items:
-    - hbase-0.94.2-cdh4.2.1-security.jar
-  when: new_jar.stdout|int == 0
-
-- name: remove the old one
-  sudo: yes
-  shell: rm -f {{ HBASE_HOME }}/hbase-0.94.2-cdh4.2.1-security-20140515.jar ;
-  when: new_jar.stdout|int == 0
-
-- name: ln new one
-  sudo: yes
-  shell: cd {{ HBASE_HOME }} ; ln -sf hbase-0.94.2-cdh4.2.1-security.jar hbase.jar 
-  when: new_jar.stdout|int == 0
+#- name: register jar var
+#  shell: ls {{HBASE_HOME}}|grep "hbase-0.94.2-cdh4.2.1-security.jar" |wc -l
+#  register: new_jar
+#
+#- name: copy the hdfs's jar
+#  sudo: yes
+#  copy: src={{item}} dest={{HBASE_HOME}}
+#  with_items:
+#    - hbase-0.94.2-cdh4.2.1-security.jar
+#  when: new_jar.stdout|int == 0
+#
+#- name: remove the old one
+#  sudo: yes
+#  shell: rm -f {{ HBASE_HOME }}/hbase-0.94.2-cdh4.2.1-security-20140515.jar ;
+#  when: new_jar.stdout|int == 0
+#
+#- name: ln new one
+#  sudo: yes
+#  shell: cd {{ HBASE_HOME }} ; ln -sf hbase-0.94.2-cdh4.2.1-security.jar hbase.jar 
+#  when: new_jar.stdout|int == 0

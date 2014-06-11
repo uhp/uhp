@@ -1,0 +1,12 @@
+
+- include: ../../conf/tasks/hbase.yml
+
+- name: copy hbase-thrift
+  sudo: yes
+  template: src=hbase-thrift dest=/etc/init.d/hbase-thrift
+
+- name: start hbase thrift
+  sudo: yes
+  service: name=hbase-thrift state=started
+
+

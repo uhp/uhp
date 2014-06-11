@@ -157,12 +157,16 @@ def get_conf_from_host(session,host_list,service,name):
 #一些有用的数据库操作封装
 #增加活动记录
 def build_task(session,taskType,service,host,role,task):
-    newTask = Task(taskType,service,host,role,task)
-    session.add(newTask)
+    new_task = Task(taskType,service,host,role,task)
+    if config.ansible_run == False :
+        new_task.status = Task.STATUS_FINISH
+        new_task.result = Task.RESULT_SUCCESS
+        new_task.msg = "fade success"
+    session.add(new_task)
     session.flush()
-    newId = newTask.id
+    newid = new_task.id
     session.commit()
-    return newId
+    return newid
     
 def update_task(session,taskId,status,result,msg):
     session.query(Task).filter(Task.id==taskId) \

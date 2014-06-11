@@ -110,11 +110,13 @@ def add_host(asyncId,hosts,login):
         taskId = idMap[host] 
         database.update_task(session,taskId,Task.STATUS_RUNNING,Task.RESULT_UNFINISH,"") 
     
-    if config.fade_windows:
-        ret=fade_connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
-    else:
-        import ansible_lib
-        ret=ansible_lib.connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
+    #即使不实际执行ansible
+    #也可以获取相关的信息
+    #要求信息是准确可用的
+    import ansible_lib
+    ret=ansible_lib.connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
+    #假连接
+    #ret=fade_connect_host(hosts,newlogin[0],newlogin[1],newlogin[2],newlogin[3])
     app_log.info("connect with"+str(hosts)+" with :"+str(newlogin) )
         
     #处理结果
@@ -213,6 +215,9 @@ def fade_connect_host(hosts,user,port,passwd,sudopasswd):
 
 #fade的增删服务,10秒后修改任务未完成状态
 def fade_add_del_service(addRunningId,delRunningId,msg=""):
+    '''
+    已经弃用
+    '''
     time.sleep(5)
     session=database.getSession()
     for id in addRunningId:

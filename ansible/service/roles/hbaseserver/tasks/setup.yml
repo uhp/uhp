@@ -1,10 +1,10 @@
 ---
-# Hbase region servers
 
-- name: Install the hbase regionserver packages
+- name: Install the datanode packages
   sudo: yes
   yum: name={{item}} state=installed
   with_items: 
-  - hbase-regionserver
+   - hbase
+   - hbase-thrift
 
 - include: ../../jar/tasks/hbase.yml

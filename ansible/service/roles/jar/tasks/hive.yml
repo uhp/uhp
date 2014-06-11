@@ -1,19 +1,4 @@
 
 
-- name: register jar var
-  shell: ls {{HIVE_HOME}}/lib/ |grep "hive-exec-0.10.0-cdh4.2.1-20140213-2" |wc -l
-  register: new_jar
-
-- name: copy the hive's jar
-  sudo: yes
-  copy: src={{item}} dest={{HIVE_HOME}}/lib/{{ item }}
-  with_items:
-    - mysql-connector-java-5.1.16-bin.jar
-    - hive-exec-0.10.0-cdh4.2.1-20140213-2.jar
-  when: new_jar.stdout|int == 0
-
-- name: remove the old one
-  sudo: yes
-  shell: rm -f {{ HIVE_HOME }}/lib/hive-exec-0.10.0-cdh4.2.1.jar 
-
-#  when: new_jar.stdout|int == 0
+- { include : link_jar.yml , WANT_HOME : "{{ HIVE_HOME }}/lib", NEW_JAR : "hive-exec-0.10.0-cdh4.2.1-2014021302" , JAR_PREFIX : "hive-exec-0.10.0-cdh4.2.1" }
+- { include : copy_jar.yml , WANT_HOME : "{{ HIVE_HOME }}/lib", NEW_JAR : "mysql-connector-java-5.1.16-bin"  }
