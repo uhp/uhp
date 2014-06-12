@@ -1,29 +1,39 @@
-html { overflow-y: scroll; }
-body { padding-top: 55px; }
+html                                    { overflow-y: scroll; }
+body                                    { padding-top: 55px; }
 .table>thead>tr>th,
-.table>tbody>tr>th, 
-.table>tfoot>tr>th, 
-.table>thead>tr>td, 
-.table>tbody>tr>td, 
-.table>tfoot>tr>td { vertical-align: middle; }
-.table>thead>tr>th { text-align: center; }
-.cbtable>tbody>tr>td:first-child { text-align: center; }
-td, th { max-width: 600px; }
-td>pre { margin:0px 0px; }
-select.form-control { -webkit-appearance: menulist; }
-.input-group-addon {background-color:#5bc0de; border:0px;}
-thead tr {background-color: #d9edf7;}
-.input-group .select {margin-bottom:0px;}
+.table>tbody>tr>th,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>tbody>tr>td,
+.table>tfoot>tr>td                      { vertical-align: middle; }
+.table>thead>tr>th                      { text-align: center; }
+.cbtable>tbody>tr>td:first-child        { text-align: center; }
+td, th                                  { max-width: 600px; }
+td>pre                                  { margin:0px 0px; }
+select.form-control                     { -webkit-appearance: menulist; }
+.input-group-addon                      { background-color:#5bc0de; border:0px;}
+thead tr                                { background-color:#d9edf7;}
+.input-group .select                    { margin-bottom:0px;}
 .input-group .select button:first-child { border-radius: 0 4px 4px 0; }
-.input-group .form-control:last-child { border-left:0; }
-.select .btn .filter-option { color:#415b76;}
-.w6e {width:6em;}
-.w7e {width:7em;}
-.input-group, .select, .select .btn {width:100%;}
-/*.form-group { margin-bottom: 0px; }*/
+.input-group .form-control:last-child   { border-left:0; }
+.select .btn .filter-option             { color:#415b76;}
+.w6e                                    { width:6em;}
+.w7e                                    { width:7em;}
+.input-group, .select, .select .btn     { width:100%;}
+/*.form-group                           { margin-bottom: 0px; }*/
 
-blue { color:blue }
-red { color:red }
+blue                                    { color:blue }
+red                                     { color:red }
 
-.smalltd{ padding:1px !important; }
+.smalltd                                { padding:1px !important; }
+
+.success                                { background-color:#5cb85c; }
+.info                                   { background-color:#5bc0de; }
+.warning                                { background-color:#f0ad4e; }
+.danger                                 { background-color:#d9534f; }
+
+.font-success                           { color:#5cb85c; }
+.font-info                              { color:#5bc0de; }
+.font-warning                           { color:#f0ad4e; }
+.font-danger                            { color:#d9534f; }
 

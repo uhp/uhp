@@ -203,6 +203,24 @@ class MonitorBackHandler(BaseHandler):
                 if name == service['name']:
                     return service
             return None
+        
+        # zookeeper
+        service = _service(u'zookeeper', services)
+        if service:
+            # zookeeper
+            hosts = service['roles']['zookeeper']
+            ori_host_metrics = [
+                {'name':'zookeeper_memory_memHeapMax',            'display' :'JVM最大堆内存B'},
+                {'name':'zookeeper_memory_memHeapCommitted',      'display' :'JVM申请堆内存B'},
+                {'name':'zookeeper_memory_memHeapUsed',           'display' :'JVM使用堆内存B'},
+                {'name':'zookeeper_memory_memNonHeapMax',         'display' :'JVM最大非堆内存B'},
+                {'name':'zookeeper_memory_memNonHeapCommitted',   'display' :'JVM使用非堆内存B'},
+                {'name':'zookeeper_memory_memNonHeapUsed',        'display' :'JVM提交非堆内存B'},
+                {'name':'zookeeper_Threading_ThreadCount',        'display' :'线程数'},
+            ]
+            
+            service_metrics = _multi_host_metrics('Zookeeper', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
             
         # hdfs
         service = _service(u'hdfs', services)
@@ -210,32 +228,32 @@ class MonitorBackHandler(BaseHandler):
             # nn
             hosts = service['roles']['namenode']
             ori_host_metrics = [
-                {'name':'dfs.namenode.BlockReportAvgTime', 'display':'块汇报的平均时间'},
-                {'name':'dfs.namenode.SyncsAvgTime', 'display':'Syncs操作平均时间'},
-                {'name':'dfs.namenode.TransactionsAvgTime', 'display':'事务平均时间'},
-                {'name':'dfs.NameNode.QueuedEditsSize', 'display':'QueuedEditsSize'}, 
-                {'name':'dfs.namenode.transactionsBatchedInSync', 'display':'同步的事务数量'},
-                {'name':'dfs.FSNamesystem.BlockCapacity', 'display':'通过计算得到block'},
-                {'name':'dfs.FSNamesystem.BlocksTotal', 'display':'总的块数量'},
-                {'name':'dfs.FSNamesystem.CapacityRemainingGB', 'display':'可用空间GB'},
-                {'name':'dfs.FSNamesystem.CapacityTotalGB', 'display':'总存储量GB'},
-                {'name':'dfs.FSNamesystem.CapacityUsedGB', 'display':'总使用量GB'},
-                {'name':'dfs.FSNamesystem.CorruptBlocks', 'display':'损坏的块数'},
-                {'name':'dfs.FSNamesystem.ExcessBlocks', 'display':'过量的块的数量'},
-                {'name':'dfs.FSNamesystem.ExpiredHeartbeats', 'display':'超时心跳的数量'},
-                {'name':'dfs.FSNamesystem.FilesTotal', 'display':'总的inode数量'},
-                {'name':'dfs.FSNamesystem.MissingBlocks', 'display':'丢失块的数量'},
-                {'name':'dfs.FSNamesystem.PendingDataNodeMessageCount', 'display':'待发送给datanode的命令的数量。'},
-                {'name':'dfs.FSNamesystem.PendingDeletionBlocks', 'display':'待删除的块的数量'},
-                {'name':'dfs.FSNamesystem.PendingReplicationBlocks', 'display':'待复制的块数量'},
-                {'name':'dfs.FSNamesystem.TotalFiles', 'display':'获取总的文件数量'},
-                {'name':'dfs.FSNamesystem.UnderReplicatedBlocks', 'display':'小于副本数的块数量'},
-                {'name':'dfs.FSNamesystem.CorruptReplicaBlocks', 'display':'丢失的块的数量'},
-                {'name':'dfs.FSNamesystem.HAState', 'display':'HA的状态'},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM', 'display':'Heap Mem Used MB'},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM', 'display':'Heap Mem Committed MB'},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapUsedM','display':'Non-Heap Mem Used MB'},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapCommittedM','display':'Non-Heap Mem Committed MB'},
+                {'name':'dfs.namenode.BlockReportAvgTime',                          'display' :'块汇报的平均时间'},
+                {'name':'dfs.namenode.SyncsAvgTime',                                'display' :'Syncs操作平均时间'},
+                {'name':'dfs.namenode.TransactionsAvgTime',                         'display' :'事务平均时间'},
+                {'name':'dfs.NameNode.QueuedEditsSize',                             'display' :'QueuedEditsSize'},
+                {'name':'dfs.namenode.transactionsBatchedInSync',                   'display' :'同步的事务数量'},
+                {'name':'dfs.FSNamesystem.BlockCapacity',                           'display' :'通过计算得到block'},
+                {'name':'dfs.FSNamesystem.BlocksTotal',                             'display' :'总的块数量'},
+                {'name':'dfs.FSNamesystem.CapacityRemainingGB',                     'display' :'可用空间GB'},
+                {'name':'dfs.FSNamesystem.CapacityTotalGB',                         'display' :'总存储量GB'},
+                {'name':'dfs.FSNamesystem.CapacityUsedGB',                          'display' :'总使用量GB'},
+                {'name':'dfs.FSNamesystem.CorruptBlocks',                           'display' :'损坏的块数'},
+                {'name':'dfs.FSNamesystem.ExcessBlocks',                            'display' :'过量的块的数量'},
+                {'name':'dfs.FSNamesystem.ExpiredHeartbeats',                       'display' :'超时心跳的数量'},
+                {'name':'dfs.FSNamesystem.FilesTotal',                              'display' :'总的inode数量'},
+                {'name':'dfs.FSNamesystem.MissingBlocks',                           'display' :'丢失块的数量'},
+                {'name':'dfs.FSNamesystem.PendingDataNodeMessageCount',             'display' :'待发送给datanode的命令的数量。'},
+                {'name':'dfs.FSNamesystem.PendingDeletionBlocks',                   'display' :'待删除的块的数量'},
+                {'name':'dfs.FSNamesystem.PendingReplicationBlocks',                'display' :'待复制的块数量'},
+                {'name':'dfs.FSNamesystem.TotalFiles',                              'display' :'获取总的文件数量'},
+                {'name':'dfs.FSNamesystem.UnderReplicatedBlocks',                   'display' :'小于副本数的块数量'},
+                {'name':'dfs.FSNamesystem.CorruptReplicaBlocks',                    'display' :'丢失的块的数量'},
+                {'name':'dfs.FSNamesystem.HAState',                                 'display' :'HA的状态'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM',    'display' :'JVM申请堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM',         'display' :'JVM使用堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapCommittedM', 'display' :'JVM申请堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapUsedM',      'display' :'JVM使用堆内存MB'},
             ]
             
             service_metrics = _multi_host_metrics('HDFS/NameNode', hosts, ori_host_metrics)
@@ -261,7 +279,7 @@ class MonitorBackHandler(BaseHandler):
                 {'name':'dfs.datanode.WriteBlockOpNumOps','display':'写块总次数'},
                 {'name':'dfs.datanode.WritesFromLocalClient','display':'写本地次数'},
                 {'name':'dfs.datanode.WritesFromRemoteClient','display':'写远程次数'},
-                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM','display':'JVM提交堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM','display':'JVM申请堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapUsedM','display':'JVM堆内存使用MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapCommittedM','display':'JVM提交非堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapUsedM','display':'JVM非堆内存使用MB'},
@@ -292,7 +310,7 @@ class MonitorBackHandler(BaseHandler):
                 {'name':'yarn.QueueMetrics.Queue=root.AppsSubmitted',                      'display' :'提交的APP'},
                 {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersAllocated',       'display' :'总共申请的Container'},
                 {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersReleased',        'display' :'总共释放的Container'},
-                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapCommittedM',    'display' :'JVM提交堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapCommittedM',    'display' :'JVM申请堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapUsedM',         'display' :'JVM使用堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存MB'},
@@ -314,7 +332,7 @@ class MonitorBackHandler(BaseHandler):
                 {'name':'yarn.NodeManagerMetrics.ContainersLaunched',                  'display' :'登录的container数量'},
                 {'name':'yarn.NodeManagerMetrics.ContainersRunning',                   'display' :'正在运行的Container'},
                 {'name':'yarn.NodeManagerMetrics.ContainersFailed',                    'display' :'container失败的数量'},
-                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM',    'display' :'JVM提交堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM',    'display' :'JVM申请堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapUsedM',         'display' :'JVM使用堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存MB'},
                 {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存MB'},
@@ -334,12 +352,12 @@ class MonitorBackHandler(BaseHandler):
             # hivemetastore
             hosts = service['roles']['hivemetastore']
             ori_host_metrics = [
-                {'name':'hivemetastore_memory_memHeapCommitted',    'display':'JVM提交堆内存MB'},
-                {'name':'hivemetastore_memory_memHeapMax',          'display':'JVM最大堆内存MB'},
-                {'name':'hivemetastore_memory_memHeapUsed',         'display':'JVM使用堆内存MB'},
-                {'name':'hivemetastore_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存MB'},
-                {'name':'hivemetastore_memory_memNonHeapMax',       'display':'JVM最大非堆内存MB'},
-                {'name':'hivemetastore_memory_memNonHeapUsed',      'display':'JVM使用非堆内存MB'},
+                {'name':'hivemetastore_memory_memHeapCommitted',    'display':'JVM申请堆内存B'},
+                {'name':'hivemetastore_memory_memHeapMax',          'display':'JVM最大堆内存B'},
+                {'name':'hivemetastore_memory_memHeapUsed',         'display':'JVM使用堆内存B'},
+                {'name':'hivemetastore_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存B'},
+                {'name':'hivemetastore_memory_memNonHeapMax',       'display':'JVM最大非堆内存B'},
+                {'name':'hivemetastore_memory_memNonHeapUsed',      'display':'JVM使用非堆内存B'},
                 {'name':'hivemetastore_Threading_ThreadCount',      'display':'线程数'},
             ]
         
@@ -349,12 +367,12 @@ class MonitorBackHandler(BaseHandler):
             # hiveserver
             hosts = service['roles']['hiveserver']
             ori_host_metrics = [
-                {'name':'hiveserver_memory_memHeapCommitted',       'display':'JVM提交堆内存MB'},
-                {'name':'hiveserver_memory_memHeapMax',             'display':'JVM最大堆内存MB'},
-                {'name':'hiveserver_memory_memHeapUsed',            'display':'JVM使用堆内存MB'},
-                {'name':'hiveserver_memory_memNonHeapCommitted',    'display':'JVM提交非堆内存MB'},
-                {'name':'hiveserver_memory_memNonHeapMax',          'display':'JVM最大非堆内存MB'},
-                {'name':'hiveserver_memory_memNonHeapUsed',         'display':'JVM使用非堆内存MB'},
+                {'name':'hiveserver_memory_memHeapCommitted',       'display':'JVM申请堆内存B'},
+                {'name':'hiveserver_memory_memHeapMax',             'display':'JVM最大堆内存B'},
+                {'name':'hiveserver_memory_memHeapUsed',            'display':'JVM使用堆内存B'},
+                {'name':'hiveserver_memory_memNonHeapCommitted',    'display':'JVM提交非堆内存B'},
+                {'name':'hiveserver_memory_memNonHeapMax',          'display':'JVM最大非堆内存B'},
+                {'name':'hiveserver_memory_memNonHeapUsed',         'display':'JVM使用非堆内存B'},
                 {'name':'hiveserver_Threading_ThreadCount',         'display':'线程数'},
             ]
         
@@ -377,7 +395,7 @@ class MonitorBackHandler(BaseHandler):
                 {'name':'hbasemaster_master_splitTimeMinTime',    'display':'splitlog的时间最小值'},
                 {'name':'hbasemaster_master_splitTimeNumOps',     'display':'splitlog的次数'},
                 {'name':'hbasemaster_memory_memHeapMax',          'display':'JVM最大堆内存B'},
-                {'name':'hbasemaster_memory_memHeapCommitted',    'display':'JVM提交堆内存B'},
+                {'name':'hbasemaster_memory_memHeapCommitted',    'display':'JVM申请堆内存B'},
                 {'name':'hbasemaster_memory_memHeapUsed',         'display':'JVM使用堆内存B'},
                 {'name':'hbasemaster_memory_memNonHeapMax',       'display':'JVM最大非堆内存B'},
                 {'name':'hbasemaster_memory_memNonHeapUsed',      'display':'JVM使用非堆内存B'},
@@ -415,7 +433,7 @@ class MonitorBackHandler(BaseHandler):
                 {'name':'regionserver_rs_flushTimeNumOps',           'display':'执行flush的次数'},
                 {'name':'regionserver_rs_slowHLogAppendCount',       'display':'慢HLog Append数'},
                 {'name':'regionserver_memory_memHeapMax',            'display':'JVM最大堆内存B'},
-                {'name':'regionserver_memory_memHeapCommitted',      'display':'JVM提交堆内存B'},
+                {'name':'regionserver_memory_memHeapCommitted',      'display':'JVM申请堆内存B'},
                 {'name':'regionserver_memory_memHeapUsed',           'display':'JVM使用堆内存B'},
                 {'name':'regionserver_memory_memNonHeapUsed',        'display':'JVM使用非堆内存B'},
                 {'name':'regionserver_memory_memNonHeapCommitted',   'display':'JVM提交非堆内存B'},
@@ -574,7 +592,7 @@ class MonitorBackHandler(BaseHandler):
         groups_metrics = self._checkout_groups_metrics(group_names)
 
         for metric in metrics:
-            # if metric not in groups_metrics: continue
+            if metric not in groups_metrics: continue
             metric = self._sure_str(metric)
             try:
                 rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
@@ -833,10 +851,10 @@ class MonitorBackHandler(BaseHandler):
                 jobs_healths['group'].append({'name':'','display':'作业运行数',"value":apps_running})
                 if allocated_mb is not None:
                     allocated_mb = allocated_mb / 1024.0
-                    jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2dG" % allocated_mb})
+                    jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
                 if available_mb is not None:
                     available_mb = available_mb / 1024.0
-                    jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%dG" % available_mb})
+                    jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
         
         data.append(jobs_healths)
 
