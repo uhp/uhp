@@ -170,6 +170,265 @@ class MonitorBackHandler(BaseHandler):
             return active
         finally:
             session.close()
+    
+    # services overview 简单列表信息
+    def services_metrics2(self):
+        # [{name:, roles:{role:[instance]}}]
+        services         = self._query_active_services()
+        cluster_name     = self._query_var('all', 'cluster_name')
+        cluster_name     = self._sure_str(cluster_name)
+    
+        rrd_wrapper = RrdWrapper(config.ganglia_rrd_dir, config.rrd_image_dir)
+   
+        # 获取多个host的metrics，分别封装
+        # @return: {name:,hosts:[{host:$host, info:[{name:,value:,unit:}]}]}
+        def _multi_host_metrics(name, hosts, ori_host_metrics):
+            service_metrics = {'name':name, 'hosts':[]}
+            for host in hosts:
+                # host = self._sure_str(host)
+                host_metrics = copy.deepcopy(ori_host_metrics)
+                for host_metric in host_metrics:
+                    value = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, host_metric['name'])
+                    host_metric.update({'value':value})
+                service_metrics['hosts'].append({'host':host, 'info':host_metrics})
+            return service_metrics
+       
+        # [{name:,hosts:[{host:$host, info:[{name:,value:,unit:,}]}]}] 
+        services_metrics = []
+
+        # my_services = ['hdfs','yarn','hive','hbase']
+
+        def _service(name, services):
+            for service in services:
+                if name == service['name']:
+                    return service
+            return None
+            
+        # hdfs
+        service = _service(u'hdfs', services)
+        if service:
+            # nn
+            hosts = service['roles']['namenode']
+            ori_host_metrics = [
+                {'name':'dfs.namenode.BlockReportAvgTime', 'display':'块汇报的平均时间'},
+                {'name':'dfs.namenode.SyncsAvgTime', 'display':'Syncs操作平均时间'},
+                {'name':'dfs.namenode.TransactionsAvgTime', 'display':'事务平均时间'},
+                {'name':'dfs.NameNode.QueuedEditsSize', 'display':'QueuedEditsSize'}, 
+                {'name':'dfs.namenode.transactionsBatchedInSync', 'display':'同步的事务数量'},
+                {'name':'dfs.FSNamesystem.BlockCapacity', 'display':'通过计算得到block'},
+                {'name':'dfs.FSNamesystem.BlocksTotal', 'display':'总的块数量'},
+                {'name':'dfs.FSNamesystem.CapacityRemainingGB', 'display':'可用空间GB'},
+                {'name':'dfs.FSNamesystem.CapacityTotalGB', 'display':'总存储量GB'},
+                {'name':'dfs.FSNamesystem.CapacityUsedGB', 'display':'总使用量GB'},
+                {'name':'dfs.FSNamesystem.CorruptBlocks', 'display':'损坏的块数'},
+                {'name':'dfs.FSNamesystem.ExcessBlocks', 'display':'过量的块的数量'},
+                {'name':'dfs.FSNamesystem.ExpiredHeartbeats', 'display':'超时心跳的数量'},
+                {'name':'dfs.FSNamesystem.FilesTotal', 'display':'总的inode数量'},
+                {'name':'dfs.FSNamesystem.MissingBlocks', 'display':'丢失块的数量'},
+                {'name':'dfs.FSNamesystem.PendingDataNodeMessageCount', 'display':'待发送给datanode的命令的数量。'},
+                {'name':'dfs.FSNamesystem.PendingDeletionBlocks', 'display':'待删除的块的数量'},
+                {'name':'dfs.FSNamesystem.PendingReplicationBlocks', 'display':'待复制的块数量'},
+                {'name':'dfs.FSNamesystem.TotalFiles', 'display':'获取总的文件数量'},
+                {'name':'dfs.FSNamesystem.UnderReplicatedBlocks', 'display':'小于副本数的块数量'},
+                {'name':'dfs.FSNamesystem.CorruptReplicaBlocks', 'display':'丢失的块的数量'},
+                {'name':'dfs.FSNamesystem.HAState', 'display':'HA的状态'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM', 'display':'Heap Mem Used MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM', 'display':'Heap Mem Committed MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapUsedM','display':'Non-Heap Mem Used MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapCommittedM','display':'Non-Heap Mem Committed MB'},
+            ]
+            
+            service_metrics = _multi_host_metrics('HDFS/NameNode', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+
+            # dn
+            hosts = service['roles']['datanode']
+            ori_host_metrics= [
+                {'name':'dfs.datanode.BlockReportsAvgTime', 'display':'块报告平均时间'},
+                {'name':'dfs.datanode.BlockReportsNumOps', 'display':'块报告次数'},
+                {'name':'dfs.datanode.HeartbeatsAvgTime', 'display':'向namenode汇报平均时间'},
+                {'name':'dfs.datanode.HeartbeatsNumOps', 'display':'向namenode汇报总次数'},
+                {'name':'dfs.datanode.BlocksGetLocalPathInfo', 'display':'BlocksGetLocalPathInfo'},
+                {'name':'dfs.datanode.BlocksRemoved','display':'删除块数目'},
+                {'name':'dfs.datanode.BlocksVerified','display':'块验证总次数'},
+                {'name':'dfs.datanode.BlocksWritten','display':'向硬盘写块总次数'},
+                {'name':'dfs.datanode.BytesWritten','display':'写入总字节数'},
+                {'name':'dfs.datanode.FlushNanosAvgTime','display':'文件系统Flush平均时间(纳秒)'},
+                {'name':'dfs.datanode.FlushNanosNumOps','display':'文件系统Flush次数'},
+                {'name':'dfs.datanode.PacketAckRoundTripTimeNanosAvgTime','display':'包确认平均时间(纳秒)'},
+                {'name':'dfs.datanode.PacketAckRoundTripTimeNanosNumOps','display':'包确认次数'},
+                {'name':'dfs.datanode.WriteBlockOpAvgTime','display':'写块平均时间(纳秒)'},
+                {'name':'dfs.datanode.WriteBlockOpNumOps','display':'写块总次数'},
+                {'name':'dfs.datanode.WritesFromLocalClient','display':'写本地次数'},
+                {'name':'dfs.datanode.WritesFromRemoteClient','display':'写远程次数'},
+                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM','display':'JVM提交堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapUsedM','display':'JVM堆内存使用MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapCommittedM','display':'JVM提交非堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapUsedM','display':'JVM非堆内存使用MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=DataNode.ThreadsTimedWaiting','display':'ThreadsTimedWaiting'},
+            ]
+
+            service_metrics = _multi_host_metrics('HDFS/DataNode', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+
+        # yarn
+        service = _service(u'yarn', services)
+        if service:
+            # rm
+            hosts = service['roles']['resourcemanager']
+            ori_host_metrics = [
+                {'name':'yarn.ClusterMetrics.NumActiveNMs',                                'display' :'活跃的NodeManager'},
+                {'name':'yarn.ClusterMetrics.NumLostNMs',                                  'display' :'丢失的NodeManager'},
+                {'name':'yarn.QueueMetrics.Queue=root.AvailableMB',                        'display' :'可用内存MB'},
+                {'name':'yarn.QueueMetrics.Queue=root.AllocatedMB',                        'display' :'分配内存MB'},
+                {'name':'yarn.QueueMetrics.Queue=root.ActiveApplications',                 'display' :'活跃的App'},
+                {'name':'yarn.QueueMetrics.Queue=root.ActiveUsers',                        'display' :'活跃的用户'},
+                {'name':'yarn.QueueMetrics.Queue=root.AllocatedContainers',                'display' :'分配Container'},
+                {'name':'yarn.QueueMetrics.Queue=root.AppsCompleted',                      'display' :'完成的App'},
+                {'name':'yarn.QueueMetrics.Queue=root.AppsFailed',                         'display' :'失败的App'},
+                {'name':'yarn.QueueMetrics.Queue=root.AppsKilled',                         'display' :'Kill的App'},
+                {'name':'yarn.QueueMetrics.Queue=root.AppsPending',                        'display' :'挂起的APP'},
+                {'name':'yarn.QueueMetrics.Queue=root.AppsRunning',                        'display' :'运行的APP'},
+                {'name':'yarn.QueueMetrics.Queue=root.AppsSubmitted',                      'display' :'提交的APP'},
+                {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersAllocated',       'display' :'总共申请的Container'},
+                {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersReleased',        'display' :'总共释放的Container'},
+                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapCommittedM',    'display' :'JVM提交堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapUsedM',         'display' :'JVM使用堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.ThreadsWaiting',       'display' :'ThreadsWaiting'},
+            ]
+        
+            service_metrics = _multi_host_metrics('YARN/ResourceManager', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+
+            # nm
+            hosts = service['roles']['nodemanager']
+            ori_host_metrics = [
+                {'name':'yarn.NodeManagerMetrics.AllocatedGB',                         'display' :'分配内存GB'},
+                {'name':'yarn.NodeManagerMetrics.AvailableGB',                         'display' :'剩下可用内存GB'},
+                {'name':'yarn.NodeManagerMetrics.AllocatedContainers',                 'display' :'分配Container'},
+                {'name':'yarn.NodeManagerMetrics.ContainersCompleted',                 'display' :'Container完成的数量'},
+                {'name':'yarn.NodeManagerMetrics.ContainersIniting',                   'display' :'正在Init的Container'},
+                {'name':'yarn.NodeManagerMetrics.ContainersKilled',                    'display' :'container终止的数量'},
+                {'name':'yarn.NodeManagerMetrics.ContainersLaunched',                  'display' :'登录的container数量'},
+                {'name':'yarn.NodeManagerMetrics.ContainersRunning',                   'display' :'正在运行的Container'},
+                {'name':'yarn.NodeManagerMetrics.ContainersFailed',                    'display' :'container失败的数量'},
+                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM',    'display' :'JVM提交堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapUsedM',         'display' :'JVM使用堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存MB'},
+                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.ThreadsTimedWaiting',  'display' :'ThreadsTimedWaiting'},
+                {'name':'mapred.ShuffleMetrics.ShuffleConnections',                    'display' :'Shuffle连接数'},
+                {'name':'mapred.ShuffleMetrics.ShuffleOutputBytes',                    'display' :'Shuffle输出Bytes'},
+                {'name':'mapred.ShuffleMetrics.ShuffleOutputsOK',                      'display' :'Shuffle输出成功数'},
+            ]
+        
+            service_metrics = _multi_host_metrics('YARN/NodeManager', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+        
+        
+        # hive
+        service = _service(u'hive', services)
+        if service:
+            # hivemetastore
+            hosts = service['roles']['hivemetastore']
+            ori_host_metrics = [
+                {'name':'hivemetastore_memory_memHeapCommitted',    'display':'JVM提交堆内存MB'},
+                {'name':'hivemetastore_memory_memHeapMax',          'display':'JVM最大堆内存MB'},
+                {'name':'hivemetastore_memory_memHeapUsed',         'display':'JVM使用堆内存MB'},
+                {'name':'hivemetastore_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存MB'},
+                {'name':'hivemetastore_memory_memNonHeapMax',       'display':'JVM最大非堆内存MB'},
+                {'name':'hivemetastore_memory_memNonHeapUsed',      'display':'JVM使用非堆内存MB'},
+                {'name':'hivemetastore_Threading_ThreadCount',      'display':'线程数'},
+            ]
+        
+            service_metrics = _multi_host_metrics('Hive/HiveMetaStore', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+            
+            # hiveserver
+            hosts = service['roles']['hiveserver']
+            ori_host_metrics = [
+                {'name':'hiveserver_memory_memHeapCommitted',       'display':'JVM提交堆内存MB'},
+                {'name':'hiveserver_memory_memHeapMax',             'display':'JVM最大堆内存MB'},
+                {'name':'hiveserver_memory_memHeapUsed',            'display':'JVM使用堆内存MB'},
+                {'name':'hiveserver_memory_memNonHeapCommitted',    'display':'JVM提交非堆内存MB'},
+                {'name':'hiveserver_memory_memNonHeapMax',          'display':'JVM最大非堆内存MB'},
+                {'name':'hiveserver_memory_memNonHeapUsed',         'display':'JVM使用非堆内存MB'},
+                {'name':'hiveserver_Threading_ThreadCount',         'display':'线程数'},
+            ]
+        
+            service_metrics = _multi_host_metrics('Hive/HiveServer', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+        
+        # hbase
+        service = _service(u'hbase', services)
+        if service:
+            # hbasemaster
+            hosts = service['roles']['hbasemaster']
+            ori_host_metrics = [
+                {'name':'hbasemaster_master_cluster_requests',    'display':'当前机器整体request的个数'},
+                {'name':'hbasemaster_master_splitSizeAvgTime',    'display':'splitSizeAvgTime'},
+                {'name':'hbasemaster_master_splitSizeMaxTime',    'display':'splitSizeMaxTime'},
+                {'name':'hbasemaster_master_splitSizeMinTime',    'display':'splitSizeMinTime'},
+                {'name':'hbasemaster_master_splitSizeNumOps',     'display':'splitlog次数'},
+                {'name':'hbasemaster_master_splitTimeAvgTime',    'display':'splitlog的时间平均值'},
+                {'name':'hbasemaster_master_splitTimeMaxTime',    'display':'splitlog的时间最大值'},
+                {'name':'hbasemaster_master_splitTimeMinTime',    'display':'splitlog的时间最小值'},
+                {'name':'hbasemaster_master_splitTimeNumOps',     'display':'splitlog的次数'},
+                {'name':'hbasemaster_memory_memHeapMax',          'display':'JVM最大堆内存B'},
+                {'name':'hbasemaster_memory_memHeapCommitted',    'display':'JVM提交堆内存B'},
+                {'name':'hbasemaster_memory_memHeapUsed',         'display':'JVM使用堆内存B'},
+                {'name':'hbasemaster_memory_memNonHeapMax',       'display':'JVM最大非堆内存B'},
+                {'name':'hbasemaster_memory_memNonHeapUsed',      'display':'JVM使用非堆内存B'},
+                {'name':'hbasemaster_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存B'},
+                {'name':'hbasemaster_Threading_ThreadCount',      'display':'线程数量'},
+            ]
+            
+            service_metrics = _multi_host_metrics('HBase/HBaseMaster', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+            
+            # regionserver
+            hosts = service['roles']['regionserver']
+            ori_host_metrics = [
+                {'name':'regionserver_rs_blockCacheHitRatio',        'display':'blockCache命中比例'},
+                {'name':'regionserver_rs_blockCacheSize',            'display':'blockCache大小'},
+                {'name':'regionserver_rs_compactionQueueSize',       'display':'compaction Queue的大小'},
+                {'name':'regionserver_rs_flushQueueSize',            'display':'flush Queue的大小'},
+                {'name':'regionserver_rs_memstoreSizeMB',            'display':'memstore大小'},
+                {'name':'regionserver_rs_readRequestsCount',         'display':'读请求的数量'},
+                {'name':'regionserver_rs_regions',                   'display':'region的个数'},
+                {'name':'regionserver_rs_requests',                  'display':'请求的数量'},
+                {'name':'regionserver_rs_storefiles',                'display':'所有的Storefiles的个数'},
+                {'name':'regionserver_rs_stores',                    'display':'Store的个数'},
+                {'name':'regionserver_rs_blockCacheFree',            'display':'blockcache中空闲的内存大小'},
+                {'name':'regionserver_rs_blockCacheCount',           'display':'BlockCache中缓存的block个数'},
+                {'name':'regionserver_rs_blockCacheHitCachingRatio', 'display':'cacheblock的cache比率'},
+                {'name':'regionserver_rs_writeRequestsCount',        'display':'写请求的数量'},
+                {'name':'regionserver_rs_compactionSizeAvgTime',     'display':'平均执行一次Compaction的数据大小'},
+                {'name':'regionserver_rs_compactionSizeNumOps',      'display':'执行compaction的次数'},
+                {'name':'regionserver_rs_compactionTimeAvgTime',     'display':'平均执行一次Compaction的时间'},
+                {'name':'regionserver_rs_compactionTimeNumOps',      'display':'执行compaction的次数'},
+                {'name':'regionserver_rs_flushSizeAvgTime',          'display':'平均执行一次flush的数据大小'},
+                {'name':'regionserver_rs_flushSizeNumOps',           'display':'执行flush的次数'},
+                {'name':'regionserver_rs_flushTimeAvgTime',          'display':'平均执行一次flush的时间'},
+                {'name':'regionserver_rs_flushTimeNumOps',           'display':'执行flush的次数'},
+                {'name':'regionserver_rs_slowHLogAppendCount',       'display':'慢HLog Append数'},
+                {'name':'regionserver_memory_memHeapMax',            'display':'JVM最大堆内存B'},
+                {'name':'regionserver_memory_memHeapCommitted',      'display':'JVM提交堆内存B'},
+                {'name':'regionserver_memory_memHeapUsed',           'display':'JVM使用堆内存B'},
+                {'name':'regionserver_memory_memNonHeapUsed',        'display':'JVM使用非堆内存B'},
+                {'name':'regionserver_memory_memNonHeapCommitted',   'display':'JVM提交非堆内存B'},
+                {'name':'regionserver_memory_memNonHeapMax',         'display':'JVM最大非堆内存B'},
+                {'name':'regionserver_Threading_ThreadCount',        'display':'线程数'},
+            ]
+            
+            service_metrics = _multi_host_metrics('HBase/Regionserver', hosts, ori_host_metrics)
+            services_metrics.append(service_metrics)
+
+        ret = {"data":services_metrics}
+        self.ret("ok", "", ret);
+
 
     # services overview
     def services_metrics(self):
@@ -373,8 +632,22 @@ class MonitorBackHandler(BaseHandler):
         _fetch_m(cpu_metric, metrics, line_stack_style)
 
         # Mem
-        metrics = ['mem_used','mem_free','swap_used']
-        _fetch_m(mem_metric, metrics, line_stack_style)
+        metrics = ['mem_total', 'mem_free', 'swap_total', 'swap_free']
+        (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
+        mem_metric['x'] = x
+        def _my_sub(a, b):
+            a = self._none_2_0(a)
+            b = self._none_2_0(b)
+            a = int(a/1024)
+            b = int(b/1024)
+            return a - b  
+        mem_used  = map(_my_sub, ys[0], ys[1]) 
+        mem_free  = map(lambda x: int(self._none_2_0(x)/1024), ys[1])
+        swap_used = map(_my_sub, ys[2], ys[3])
+        
+        mem_metric['series'].append({'name':'mem_used',  'type':'line', 'stack':'total', 'data':mem_used}) 
+        mem_metric['series'].append({'name':'mem_free',  'type':'line', 'stack':'total', 'data':mem_free}) 
+        mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used}) 
 
         # Net
         metrics = ['bytes_in', 'bytes_out']
@@ -532,14 +805,38 @@ class MonitorBackHandler(BaseHandler):
             services_healths['group'].append(service_health)
        
         data.append(services_healths)
-       
-        # Job : 最近失败比率
-        # TODO 数据后续确定
+      
+        # 作业健康度 : 最近失败比率
+        # {'name':'yarn.QueueMetrics.Queue=root.AppsFailed',                         'display' :'失败的App'},
+        # {'name':'yarn.QueueMetrics.Queue=root.AppsCompleted',                      'display' :'完成的App'},
+        # {'name':'yarn.QueueMetrics.Queue=root.AppsRunning',                        'display' :'运行的APP'},
+        # {'name':'yarn.QueueMetrics.Queue=root.AvailableMB',                        'display' :'可用内存MB'},
+        # {'name':'yarn.QueueMetrics.Queue=root.AllocatedMB',                        'display' :'分配内存MB'},
         jobs_healths =  {'type':'multi', 'name':'job','display':'作业健康度', 'group':[]}
-        jobs_healths['group'].append({'name':'','display':'作业健康度',"value":"90"})
-        jobs_healths['group'].append({'name':'','display':'作业运行数',"value":"30"})
-        jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"3"})
-        jobs_healths['group'].append({'name':'','display':'资源使用数',"value":"40/40G"})
+        rm_service = None
+        for service in services:
+            if u'yarn' == service['name']:
+                rm_service = service
+                break
+        if rm_service: 
+            hosts = service['roles']['resourcemanager']
+            if hosts:
+                host = hosts[0]
+                apps_failed    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsFailed')
+                apps_completed = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsCompleted')
+                apps_running   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsRunning')
+                allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
+                available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
+
+                jobs_healths['group'].append({'name':'','display':'作业失败数',"value":apps_failed})
+                jobs_healths['group'].append({'name':'','display':'作业完成数',"value":apps_completed})
+                jobs_healths['group'].append({'name':'','display':'作业运行数',"value":apps_running})
+                if allocated_mb is not None:
+                    allocated_mb = allocated_mb / 1024.0
+                    jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2dG" % allocated_mb})
+                if available_mb is not None:
+                    available_mb = available_mb / 1024.0
+                    jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%dG" % available_mb})
         
         data.append(jobs_healths)
 
@@ -1074,6 +1371,7 @@ class MonitorBackHandler(BaseHandler):
     def app_running_state(self):
         url = "http://%s:%s/ws/v1/cluster/metrics" % (self._get_rmhost(),self._get_rmport())
         metrics = util.get_http_json(url)
+        if metrics is None: metrics = {}
         self.ret("ok","",metrics)
         #retu = {'data':{'url':url, 'metrics':metrics}}
         #self.ret("ok","",retu)
@@ -1095,10 +1393,12 @@ class MonitorBackHandler(BaseHandler):
     def app_waitting(self):
         url = "http://%s:%s/ws/v1/cluster/apps?state=ACCEPTED" %(self._get_rmhost(),self._get_rmport() )
         waittingApp = util.get_http_json(url)
-        if waittingApp.has_key("apps") and waittingApp["apps"] != None :
-            apps = waittingApp["apps"]
-        else:
-            apps = []
+        
+        apps = []
+        if waittingApp is not None:
+            if waittingApp.has_key("apps") and waittingApp["apps"] != None :
+                apps = waittingApp["apps"]
+
         result={"waitting":apps,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
         self.ret("ok","",result) 
 
