@@ -1,9 +1,0 @@
-
-- hosts: GMETAD
-  tasks:
-  - include: roles/gmetad/tasks/stop.yml
-
-- hosts: GMOND
-  tasks:
-  - include:  roles/gmond/tasks/stop.yml
-
