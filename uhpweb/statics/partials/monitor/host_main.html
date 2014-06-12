@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-md-3">
+    <div class="input-group">
+      <span class="input-group-addon">时间</span>
+      <select class="select-block" ng-model="show.precision" required ng-options="v.name as v.display for v in show.precisions"></select>
+    </div>
+  </div>
+  <div class="col-md-3 col-md-offset-6">
+    <div class="input-group">
+      <span class="input-group-addon">机器</span>
+      <select class="select-block" ng-model="show.host" ng-options="host for host in show.hosts"></select>
+    </div>
+  </div>
+</div>
+
+<div class="row" style="margin-top:20px;">
+  <div class="col-md-6 pull-left" ng-dblclick="showBig(host_metric)" ng-repeat="host_metric in show.host_main_metrics" ng-init="ID=formatIdName()">
+
+    <!-- panel -->
+    <div class="panel panel-info">
+      <div class="panel-heading"><h3 class="panel-title">[[host_metric.metric]]</h3></div>
+      <div class="panel-body">
+        <div id="[[ID]]" ng-init="draw('#'+ID, host_metric)"></div>
+      </div>
+    </div>
+    <!-- ~panel -->
+
+  </div>
+</div>
+<script>
+  $(function(){
+    $("select").selectpicker();
+  })
+</script>
