@@ -20,7 +20,7 @@
         <!-- 标签页 --> 
         <ul class="nav nav-tabs">
           <li class="[[item.active]]" ng-click="activeItem(item, service_metrics.hosts)" ng-repeat="item in service_metrics.hosts" >
-          <a href="javascript:void(0)">[[item.host]]</a>
+          <a href="javascript:void(0)">[[item.host]]<span ng-show="item.state">([[item.state]])</span></a>
           </li>
         </ul>
 

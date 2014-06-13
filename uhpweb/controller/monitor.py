@@ -152,7 +152,8 @@ class MonitorBackHandler(BaseHandler):
         self.ret("ok", "", ret);
   
     # [{name:, roles:{role:[instance]}}]
-    def _query_active_services(self):
+    # ext==True: [{name:, roles:{role:[instance]}, instances:{role:[ins obj]}}]
+    def _query_active_services(self, ext=False):
         session = database.getSession()
         try:
             active = []
@@ -161,10 +162,15 @@ class MonitorBackHandler(BaseHandler):
                 if service.service == 'client': continue
                 instances = session.query(Instance).filter(Instance.service == service.service)
                 service = {'name':service.service, 'roles':{}}
+                if ext: service['instances'] = {}
                 for ins in instances:
                     if ins.role not in service['roles']:
                         service['roles'][ins.role] = []
                     service['roles'][ins.role].append(ins.host)
+                    if ext:
+                        if ins.role not in service['instances']:
+                            service['instances'][ins.role] = []
+                        service['instances'][ins.role].append(ins)
                     
                 active.append(service)
             return active
@@ -173,8 +179,8 @@ class MonitorBackHandler(BaseHandler):
     
     # services overview 简单列表信息
     def services_metrics2(self):
-        # [{name:, roles:{role:[instance]}}]
-        services         = self._query_active_services()
+        # [{name:, roles:{role:[instance]}, instances:{role:[ins obj]}}]
+        services         = self._query_active_services(ext=True)
         cluster_name     = self._query_var('all', 'cluster_name')
         cluster_name     = self._sure_str(cluster_name)
     
@@ -193,7 +199,7 @@ class MonitorBackHandler(BaseHandler):
                 service_metrics['hosts'].append({'host':host, 'info':host_metrics})
             return service_metrics
        
-        # [{name:,hosts:[{host:$host, info:[{name:,value:,unit:,}]}]}] 
+        # [{name:,hosts:[{host:$host, state:'leader', info:[{name:,value:,unit:,}]}]}] 
         services_metrics = []
 
         # my_services = ['hdfs','yarn','hive','hbase']
@@ -203,6 +209,23 @@ class MonitorBackHandler(BaseHandler):
                 if name == service['name']:
                     return service
             return None
+
+        def _ext_state(service_metrics, inss, state1='leader', state2='follower'):
+            for host in service_metrics['hosts']:
+                # 补充state
+                state = "unknown"
+                host_ins = None
+                for ins in inss:
+                    if ins.host == host['host']:
+                        host_ins = ins
+                        break
+                if host_ins and host_ins.msg:
+                    msg = json.loads(host_ins.msg)
+                    if 'leader' in msg and msg['leader']:
+                        state = state1
+                    else:
+                        state = state2
+                host['state'] = state
         
         # zookeeper
         service = _service(u'zookeeper', services)
@@ -220,6 +243,8 @@ class MonitorBackHandler(BaseHandler):
             ]
             
             service_metrics = _multi_host_metrics('Zookeeper', hosts, ori_host_metrics)
+            inss = service['instances']['zookeeper']
+            _ext_state(service_metrics, inss, 'leader', 'follower')
             services_metrics.append(service_metrics)
             
         # hdfs
@@ -257,6 +282,8 @@ class MonitorBackHandler(BaseHandler):
             ]
             
             service_metrics = _multi_host_metrics('HDFS/NameNode', hosts, ori_host_metrics)
+            inss = service['instances']['namenode']
+            _ext_state(service_metrics, inss, 'active', 'standby')
             services_metrics.append(service_metrics)
 
             # dn
@@ -404,6 +431,8 @@ class MonitorBackHandler(BaseHandler):
             ]
             
             service_metrics = _multi_host_metrics('HBase/HBaseMaster', hosts, ori_host_metrics)
+            inss = service['instances']['hbasemaster']
+            _ext_state(service_metrics, inss, 'active', 'standby')
             services_metrics.append(service_metrics)
             
             # regionserver
@@ -846,9 +875,12 @@ class MonitorBackHandler(BaseHandler):
                 allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
                 available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
 
-                jobs_healths['group'].append({'name':'','display':'作业失败数',"value":apps_failed})
-                jobs_healths['group'].append({'name':'','display':'作业完成数',"value":apps_completed})
-                jobs_healths['group'].append({'name':'','display':'作业运行数',"value":apps_running})
+                if apps_failed is None: apps_completed = 0
+                jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"%.2f" % apps_failed})
+                if apps_completed is None: apps_completed = 0
+                jobs_healths['group'].append({'name':'','display':'作业完成数',"value":"%.2f" % apps_completed})
+                if apps_running is None: apps_running = 0
+                jobs_healths['group'].append({'name':'','display':'作业运行数',"value": "%.2f" % apps_running})
                 if allocated_mb is not None:
                     allocated_mb = allocated_mb / 1024.0
                     jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
