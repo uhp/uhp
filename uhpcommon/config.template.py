@@ -35,6 +35,10 @@ web_bind_port = 59990
 # for instance to display unknow
 max_unknow_time = 120
 
+# for upload dir for aux jar
+upload_dir = os.path.join(uhphome, "upload")
+aux_upload_dir = os.path.join(upload_dir, "aux")
+
 # for worker
 service_path = os.path.join(uhphome,"ansible","service")
 ansible_host_list = os.path.join(uhphome,"inventor/mysqlinventory.py")

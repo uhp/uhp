@@ -55,6 +55,9 @@ hdfs__HADOOP_DATANODE_OPTS: " -Xmx1024m "
 hdfs__HADOOP_BALANCER_OPTS: " -Xmx1024m"
 hdfs__HADOOP_CLIENT_OPTS: " -Xmx256m "
 
+# for hadoop metrics2
+hdfs__metrics_ganglia_period: "60"
+
 #Variables for <core-site_xml>
 
 hdfs__fs_trash_interval : 4320
@@ -210,6 +213,8 @@ hive__hive_metastore_warehouse_dir: /user/hive/warehouse
 hive__hive_metastore_port: 19083
 hive__hive_semantic_analyzer_hook: ""
 hive__hive_support_concurrency: "false"
+
+hive__hive_aux_jars_path: []
 
 hive__hive_server_thrift_port: 59200
 hive__hive_server2_thrift_port: 59300

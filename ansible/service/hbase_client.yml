@@ -1,0 +1,5 @@
+---
+
+- hosts: HBASE-CLIENT
+  tasks:
+    - include: roles/hbase-client/tasks/config.yml

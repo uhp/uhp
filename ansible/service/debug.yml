@@ -1,4 +1,7 @@
 
-- hosts: hadoop2
+- hosts: hadoop3
   tasks: 
-  - include: roles/jar/tasks/resourcemanager.yml
+  - name: copy the jar
+    copy: src=/home/qiujw/kafka-0.7.2-incubating-src.after.tar.gz dest=/home/qiujw/temp/temp.tar.gz
+
+#  - include: roles/jar/tasks/resourcemanager.yml
