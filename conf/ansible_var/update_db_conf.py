@@ -15,34 +15,6 @@ import static_config
 from model.host_group_var import GroupHost,Host,GroupVar,HostVar
 from model.instance import Instance
 
-
-#将ansible的变量转换为数据库的变量和组关系
-def conf_to_db(file):
-    print "import %s into db" % file
-    
-    session=database.getSession()
-    stream=open(file,"r")
-    vars=yaml.load(stream)
-    group="all"
-    for name in vars:
-        value = vars[name]
-        
-        if name.find("__") > 0:
-            (service,new_name) = name.split("__")
-        else:
-            service=""
-            new_name=name
-
-        if isinstance(value,list):
-            gv = GroupVar(group,service,new_name,",".join(value),1,"") 
-        else:
-            gv = GroupVar(group,service,new_name,value,0,"")
-
-        session.merge(gv)
-    session.commit()
-
-    session.close()
-
 def load_special_conf():
     print "import special var"
     #session=database.getSession()
@@ -61,15 +33,18 @@ def get_diff_result(default_file):
     file_conf = load_file_conf(default_file) 
     for db_index in db_conf:
         if file_conf.has_key(db_index):
-            v1 = db_conf[db_index]
-            v2 = file_conf[db_index]
-            if v1 == v2 :
-                diff_result["same"].append({"name":db_index,"value":v1})
+            v1 = db_conf[db_index]['value']
+            v2 = file_conf[db_index]['value']
+            t1 = db_conf[db_index]['type']
+            t2 = file_conf[db_index]['type']
+            if v1 == v2 and t1 == t2 :
+                diff_result["same"].append({"name":db_index,"value":v1,"type":t1 })
             else:
-                diff_result["value_diff"].append({"name":db_index,"value_db":v1,"value_file":v2})
+                diff_result["value_diff"].append({"name":db_index,"value_db":v1,"type_db":t1,"value_file":v2,"type_file":t2})
         else:
-            v1 = db_conf[db_index]
-            diff_result["db_only"].append({"name":db_index,"value":v1})
+            v1 = db_conf[db_index]['value']
+            t1 = db_conf[db_index]['type']
+            diff_result["db_only"].append({"name":db_index,"value":v1,"type":t1})
     for file_index in file_conf:
         if db_conf.has_key(file_index):
             continue
@@ -80,8 +55,9 @@ def get_diff_result(default_file):
             #else:
             #    diff_result["value_diff"].append({"name":file_index,"value_file":v1,"value_db":v2})
         else:
-            v1 = file_conf[file_index]
-            diff_result["file_only"].append({"name":file_index,"value":v1})
+            v1 = file_conf[file_index]['value']
+            t1 = file_conf[file_index]['type']
+            diff_result["file_only"].append({"name":file_index,"value":v1,"type":t1})
     return diff_result
 
 def load_db_conf():
@@ -93,7 +69,7 @@ def load_db_conf():
                 name = "%s__%s" % (gv.service,gv.name)
             else:
                 name = gv.name
-            conf[name] = gv.value
+            conf[name] = { "value": gv.value , "type": gv.type }
 
     session.close()
     return conf
@@ -106,9 +82,9 @@ def load_file_conf(file):
         value = vars[name]
         
         if isinstance(value,list):
-            conf[name] = ",".join(value)
+            conf[name] = { "value": ",".join(value) , "type" : 1 }
         else:
-            conf[name] = str(value)
+            conf[name] = { "value": str(value) , "type" : 0 }
     return conf
 
 def print_diff_result(diff_result):
@@ -127,6 +103,7 @@ def update_db(diff_result):
     for temp in file_only:
         name = temp["name"]
         value = temp["value"]
+        type = temp["type"]
         print "import name:%s value: %s" % (name,value)       
         if name.find("__") > 0:
             (service,new_name) = name.split("__")
@@ -134,8 +111,8 @@ def update_db(diff_result):
             service=""
             new_name=name
 
-        if isinstance(value,list):
-            gv = GroupVar(group,service,new_name,",".join(value),1,"") 
+        if type == 1 :
+            gv = GroupVar(group,service,new_name,value,1,"") 
         else:
             gv = GroupVar(group,service,new_name,value,0,"")
 
