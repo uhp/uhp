@@ -33,7 +33,7 @@
               选择服务操作<span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-              <li ng-repeat="action in actions" ng-click="readySendServiceAction(action.name,action.display)" tooltip="[[action.tooptip]]">
+              <li ng-repeat="action in actions" ng-click="readySendServiceAction(action.name,action.display)" tooltip="[[action.tooptip]]" tooltip-trigger="mouseenter" tooltip-placement="right" tooltip-animation="false" > 
               <a href="javascript:void(0)">[[action.display]]</a>
               </li>
             </ul>
@@ -53,6 +53,8 @@
           </div>
 
           <button class="btn" ng-click="configFairScheduler()" ng-show="nowService=='yarn'">配置调度器</button>
+
+          <button class="btn" ng-click="configAuxJar()" ng-show="nowService=='hive'">配置aux包</button>
 
           <div class="panel panel-info" style="margin-top:20px;">
           <div class="panel-heading"><h3 class="panel-title">概况</h3></div>
@@ -84,7 +86,7 @@
                 选择实例操作<span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li ng-repeat="instanceAction in instanceActions" ng-click="readySendInstanceAction(instanceAction.name)" tooltip="[[instanceAction.tooptip]]">
+                <li ng-repeat="instanceAction in instanceActions" ng-click="readySendInstanceAction(instanceAction.name)" tooltip="[[instanceAction.tooptip]]" tooltip-trigger="mouseenter" tooltip-placement="right" tooltip-animation="false">
                 <a href="javascript:void(0)">[[instanceAction.display]]</a>
                 </li>
               </ul>
@@ -561,6 +563,90 @@
   </div>
   -->
 
+  <!-- 配置aux的模式对话框 -->
+  <div id="configAux" class="modal fade" data-backdrop="static" aria-hidden="true" sytle="">  
+    <!--  style="width:950px;left:auto;margin-left:0px;" -->
+    <div class="modal-dialog" style="min-width:800px">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h4>配置hive的aux的jar包</h4>
+        </div>
+
+        <div class="modal-body">
+          <input ng-file-select type="file" multiple />
+          <p>文件数量: [[ uploader.queue.length ]]</p>
+          <table class="table">
+              <thead>
+                  <tr>
+                      <th width="50%">Name</th>
+                      <th ng-show="uploader.isHTML5">Size</th>
+                      <th ng-show="uploader.isHTML5">Progress</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr ng-repeat="item in uploader.queue">
+                      <td><strong>[[ item.file.name ]]</strong></td>
+                      <td ng-show="uploader.isHTML5" nowrap>[[ item.file.size/1024/1024|number:2 ]] MB</td>
+                      <td ng-show="uploader.isHTML5">
+                          <div class="progress" style="margin-bottom: 0;">
+                              <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                          </div>
+                      </td>
+                      <td class="text-center">
+                          <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                          <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                          <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                      </td>
+                      <td nowrap>
+                          <!-- <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                              <span class="glyphicon glyphicon-upload"></span> Upload
+                          </button>
+                          <button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+                              <span class="glyphicon glyphicon-ban-circle"></span> Cancel
+                          </button>
+                          -->
+                          <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+                              <span class="glyphicon glyphicon-trash"></span> Remove
+                          </button>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+          <p>
+              上传进度:
+              <div class="progress" style="">
+                  <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+              </div>
+          </p>
+          
+          <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+              <span class="glyphicon glyphicon-upload"></span>上传所有
+          </button>
+
+          <button type="button" class="btn btn-warning btn-s" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading">
+              <span class="glyphicon glyphicon-ban-circle"></span>取消上传
+          </button>
+
+          <!-- <button type="button" class="btn btn-info btn-s" ng-click="" tooltip="同步文件并且分发配置。请自行重启hiveserver。" tooltip-trigger="mouseenter" tooltip-placement="right" tooltip-animation="false">
+              <span class="glyphicon glyphicon-refresh"></span>同步文件
+            </button> -->
+          <!--
+          <button type="button" class="btn btn-danger btn-s" ng-click="uploader.clearQueue()" ng-disabled="!uploader.queue.length">
+              <span class="glyphicon glyphicon-trash"></span> Remove all
+            </button>
+            -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn " data-dismiss="modal" >返回</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- ~配置公平调度器的模式对话框 -->
 </div>
 
 <script>

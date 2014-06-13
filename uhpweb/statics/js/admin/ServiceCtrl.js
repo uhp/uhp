@@ -1,6 +1,6 @@
 
 
-uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$timeout',function($scope,$rootScope,$http,$timeout){
+uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$fileUploader','$timeout',function($scope,$rootScope,$http,$fileUploader,$timeout){
 	
 	
 	$scope.init=function(){
@@ -420,6 +420,68 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$timeout',functi
 	    });
 		
 	}
+  //bellow is for configAuxJar
+  $scope.configAuxJar=function(){
+      $scope.initAux()
+	    $("#configAux").modal()
+  }
+  //以下是文件上传相关
+  $scope.uploader = $fileUploader.create({
+      scope: $scope,                          // to automatically update the html. Default: $rootScope
+      url: 'adminback/aux_upload',
+      formData: [
+          { key: 'value' }
+      ],
+      filters: [
+          function (item) {                    // first user filter
+              console.info('filter1');
+              return true;
+          }
+      ]
+  });
+  $scope.uploader.bind('completeall', function (event, item) {
+      $scope.initAux()
+      //console.info('After  a file', item);
+  });
+  $scope.initAux = function(){
+		  $http({
+	        method: 'GET',
+	        url: '/adminback/aux_get'
+	        //url: '/statics/static_data/admin/aux_get.json'
+	    }).success(function(response, status, headers, config){
+	    	if(response["ret"]!="ok"){
+	        	$rootScope.alert("提交失败 ("+response["msg"]+")");
+	      }
+        else{
+            $scope.uploader.queue = []
+            for(var index in response['files']){
+              var file = response['files'][index];
+              var item = {"file":file,"progress":100,"isUploaded":true,"isSuccess":true}
+              item.remove=function(){
+		              $http({
+	                    method: 'GET',
+	                    url: '/adminback/aux_delete',
+	                    params:  {"filename" : this["file"]["name"]}
+	                }).success(function(response, status, headers, config){
+	                	if(response["ret"]!="ok"){
+	                    	$rootScope.alert("提交失败 ("+response["msg"]+")");
+	                  }
+                    else{
+	                	  $scope.initAux();
+                    }
+	                }).error(function(data, status) {
+	                	$rootScope.alert("提交 aux_delete 请求失败");
+	                });
+              }
+              $scope.uploader.queue.push(item);
+            }
+            $scope.uploader.progress = 100;
+        }
+	    }).error(function(data, status) {
+	    	$rootScope.alert("提交 aux_get 请求失败");
+	    });
+  }
+  //del service
 	$scope.sendDelService=function(){
 		$http({
 	        method: 'GET',

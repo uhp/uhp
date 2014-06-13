@@ -13,7 +13,8 @@ adminmenus = {
             {"name":"host", "display":"机器", "href":"#admin-host"},
             {"name":"task", "display":"任务", "href":"#admin-task"},
             {"name":"setting", "display":"设置", "href":"#admin-setting"},
-            {"name":"template", "display":"模板", "href":"#admin-template"}
+            {"name":"template", "display":"模板", "href":"#admin-template"},
+            #{"name":"jar", "display":"拓展包", "href":"#admin-jar"}
         ]
     }]
 }
@@ -158,7 +159,9 @@ services = [
                 {"name":"start","display":"启动","tooptip":""},
                 {"name":"stop","display":"停止","tooptip":""},
                 {"name":"restart","display":"重启","tooptip":""},
-                {"name":"check","display":"检查","tooptip":"执行hive的sql语句，检查hive是否可用。"}], 
+                {"name":"check","display":"检查","tooptip":"执行hive的sql语句，检查hive是否可用。"}, 
+                {"name":"aux","display":"同步AUX文件","tooptip":"同步aux文件,且修改hive_aux_jars_path变量。请自行部署配置或重启hiveserver。"}
+                ], 
      "instanceActions":[{"name":"start","display":"启动","tooptip":""},
                         {"name":"stop","display":"停止","tooptip":""},
                         {"name":"restart","display":"重启","tooptip":""}],
@@ -211,7 +214,13 @@ services = [
      },
      {"name":"client",
      "role":["zookeeper-client","hadoop-client","hbase-client","hive-client","impala-client","search-client"],
-     "actions":[], 
+     "actions":[{"name":"zookeeper","display":"分发zookeeper配置","tooptip":""},
+                {"name":"hadoop","display":"分发hadoop配置","tooptip":""},
+                {"name":"hbase","display":"分发hbase配置","tooptip":""},
+                {"name":"hive","display":"分发hive配置","tooptip":""},
+                {"name":"impala","display":"分发impala配置","tooptip":""},
+                {"name":"search","display":"分发search配置","tooptip":""}
+                ], 
      "instanceActions":[{"name":"config","display":"分发配置","tooptip":"分发配置文件"}],
      "dependence" : []
      },       

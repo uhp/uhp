@@ -267,10 +267,6 @@ class AdminBackHandler(BaseHandler):
         if actionType=="service":
             #针对服务的操作
             self.update_with_service_action(session,service,taskName)
-            #task = Task(taskType,service,"","",taskName);
-            #session.add(task)
-            #session.flush()
-            #running_id.append(task.id)
             taskid = database.build_task(session,taskType,service,"","",taskName)
             running_id.append(taskid)
             
@@ -279,10 +275,6 @@ class AdminBackHandler(BaseHandler):
                 (host,role) = Instance.split_instance_name(instance) 
                 if host != None and role != None : 
                     self.update_with_instance_action(session,service,host,role,taskName)
-                    #task = Task(taskType,service,host,role,taskName);    
-                    #session.add(task)
-                    #session.flush()
-                    #running_id.append(task.id)
                     taskid = database.build_task(session,taskType,service,host,role,taskName)
                     running_id.append(taskid)
                 else:
@@ -337,9 +329,11 @@ class AdminBackHandler(BaseHandler):
         session.close()    
         self.ret("ok", retMsg, {"taskid":newTaskid} )
     
-    #进行状态管理
-    #接收一个action，进行状态更新
     def update_with_service_action(self,session,service,taskName):
+        '''
+        收一个action，进行状态更新
+        进行状态管理
+        '''
         if taskName == "start" :
             session.query(Instance).filter(Instance.service==service) \
                     .update({Instance.status:Instance.STATUS_START,\
@@ -349,6 +343,18 @@ class AdminBackHandler(BaseHandler):
             session.query(Instance).filter(Instance.service==service) \
                     .update({Instance.status:Instance.STATUS_STOP,
                              Instance.uptime:0})
+            session.commit();
+        if taskName == "aux" and service == "hive" :
+            upload_path = config.aux_upload_dir
+            aux_list = []
+            for file in os.listdir(upload_path):
+                if file.startswith('.'):
+                    continue
+                file_path = os.path.join(upload_path,file)
+                if os.path.isfile(file_path):
+                    aux_list.append("file://" + file_path)
+            session.query(GroupVar).filter( and_((GroupVar.service==service),(GroupVar.name=="hive_aux_jars_path")) ) \
+                    .update({GroupVar.value : ','.join(aux_list) })
             session.commit();
             
     def update_with_instance_action(self,session,service,host,role,taskName):
@@ -959,3 +965,38 @@ class AdminBackHandler(BaseHandler):
         session.close()
         self.ret("ok","")
         
+
+    #以下是aux 相关的配置
+    def aux_get(self):
+        upload_path = config.aux_upload_dir
+        file_list = []
+        for file in os.listdir(upload_path):
+            if file.startswith('.'):
+                continue
+            file_path = os.path.join(upload_path,file)
+            if os.path.isfile(file_path):
+                size = os.path.getsize(file_path)
+                file_list.append({"name":file,"size":size})
+        self.ret("ok","",{"files":file_list})
+
+    def aux_upload(self):
+        upload_path = config.aux_upload_dir 
+        file_metas = self.request.files['file']
+        result = {}
+        for meta in file_metas:
+            filename = meta['filename']
+            filepath = os.path.join(upload_path,filename)
+            with open(filepath,'wb') as up:
+                up.write(meta['body'])
+            result[filename] = "ok"
+        self.ret("ok", "", {"result":result})
+    
+    def aux_delete(self):
+        upload_path = config.aux_upload_dir 
+        file_name = self.get_argument("filename")
+        file_path = os.path.join(upload_path, file_name)
+        try:
+            os.remove(file_path)
+            self.ret("ok","")
+        except:
+            self.ret("error","delete file %s error" % file_path)

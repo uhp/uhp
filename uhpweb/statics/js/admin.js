@@ -1,5 +1,5 @@
 //use base.js
-var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ngSanitize']);
+var uhpApp = angular.module('uhpApp', ['ngRoute', 'ngAnimate', 'ngSanitize','angularFileUpload','ui.bootstrap']);
 //,'ui.bootstrap'
 //'$cookiesProvider',
 //,'localytics.directives'
@@ -31,6 +31,11 @@ uhpApp.config(['$routeProvider', "$interpolateProvider",'$rootScopeProvider', fu
         {
             controller: 'SettingCtrl',
             templateUrl: '/statics/partials/admin/template.html'
+        })
+        .when('/admin-jar',
+        {
+            controller: 'JarCtrl',
+            templateUrl: '/statics/partials/admin/jar.html'
         })
         .when('/admin-manual',
         {
