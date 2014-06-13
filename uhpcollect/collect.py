@@ -68,7 +68,7 @@ class Collector:
         for inst in insts:
             self.rmhost = inst.host;
 
-        self.rmport=database.get_service_conf(session,"yarn","yarn_nm_webapp_port")
+        self.rmport=database.get_service_conf(session,"yarn","yarn_rm_webapp_port")
         insts = session.query(Instance).filter(Instance.role=="historyserver")
         for inst in insts:
             self.hshost = inst.host;
