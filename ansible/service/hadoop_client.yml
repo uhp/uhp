@@ -1,0 +1,5 @@
+---
+
+- hosts: HADOOP-CLIENT
+  tasks:
+    - include: roles/hadoop-client/tasks/config.yml

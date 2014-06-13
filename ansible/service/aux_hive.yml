@@ -1,0 +1,11 @@
+---
+
+- hosts:
+  - HIVE-CLIENT
+  - HIVESERVER
+  - HIVESERVER2
+  vars:
+    upload_dir: "{{ lookup('env', 'UHP_HOME') + '/upload' }}"
+  tasks:
+  - include: roles/hive/tasks/aux.yml
+

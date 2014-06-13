@@ -1,0 +1,11 @@
+---
+
+- name: mkdir the dir
+  sudo: yes
+  file: path={{ HIVE_HOME }}/aux owner=root group=root mode=0777 state=directory
+
+- name: depoly the hive aux
+  sudo: yes
+  copy: src={{item}} dest={{ HIVE_HOME }}/aux/{{item|basename}}
+  with_fileglob:
+      - "{{upload_dir}}/aux/*"

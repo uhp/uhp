@@ -1,0 +1,5 @@
+---
+
+- hosts: HIVE-CLIENT
+  tasks:
+    - include: roles/hive-client/tasks/config.yml

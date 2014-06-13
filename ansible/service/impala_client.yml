@@ -1,0 +1,5 @@
+---
+
+- hosts: IMPALA-CLIENT
+  tasks:
+    - include: roles/impala-client/tasks/config.yml

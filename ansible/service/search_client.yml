@@ -1,0 +1,5 @@
+---
+
+- hosts: SEARCH-CLIENT
+  tasks:
+    - include: roles/search-client/tasks/config.yml
