@@ -694,16 +694,23 @@ class MonitorBackHandler(BaseHandler):
         
         mem_metric['series'].append({'name':'mem_used',  'type':'line', 'stack':'total', 'data':mem_used}) 
         mem_metric['series'].append({'name':'mem_free',  'type':'line', 'stack':'total', 'data':mem_free}) 
-        mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used}) 
+        mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used})
+        for temp in mem_metric['series']: temp.update(line_area_style)
 
         # Net
         metrics = ['bytes_in', 'bytes_out']
         _fetch_m(net_metric, metrics, line_area_style)
         
         # Disk
-        metrics = ['disk_used','disk_free']
-        _fetch_m(disk_metric, metrics, line_stack_style)
-
+        metrics = ['disk_total','disk_free']
+        (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
+        disk_metric['x'] = x
+        disk_total = map(lambda x:self._none_2_0(x), ys[0])
+        disk_free  = map(lambda x:self._none_2_0(x), ys[1])
+        disk_used  = map(lambda x,y:x-y, disk_total, disk_free)
+        disk_metric['series'].append({'name':'disk_used',  'type':'line', 'stack':'total', 'data':disk_used}) 
+        disk_metric['series'].append({'name':'disk_free',  'type':'line', 'stack':'total', 'data':disk_free}) 
+        for temp in disk_metric['series']: temp.update(line_area_style)
 
         data = []
         data.append(load_metric)
