@@ -970,6 +970,7 @@ class AdminBackHandler(BaseHandler):
     def aux_get(self):
         upload_path = config.aux_upload_dir
         file_list = []
+        os.makedirs(upload_path)
         for file in os.listdir(upload_path):
             if file.startswith('.'):
                 continue
