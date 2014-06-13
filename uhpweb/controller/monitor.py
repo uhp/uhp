@@ -875,7 +875,7 @@ class MonitorBackHandler(BaseHandler):
                 allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
                 available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
 
-                if apps_failed is None: apps_completed = 0
+                if apps_failed is None: apps_failed = 0
                 jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"%.2f" % apps_failed})
                 if apps_completed is None: apps_completed = 0
                 jobs_healths['group'].append({'name':'','display':'作业完成数',"value":"%.2f" % apps_completed})
