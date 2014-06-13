@@ -1,6 +1,6 @@
 // 概览
-uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', '$interval', function($scope, $rootScope, $http, $sce, $timeout, $interval){
-  MonitorBaseController($scope, $rootScope, $timeout);
+uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', '$interval', '$location', 'anchorSmoothScroll', function($scope, $rootScope, $http, $sce, $timeout, $interval, $location, anchorSmoothScroll){
+  MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSmoothScroll);
  
   var labelColor = ['label-danger','label-warning','label-success'];
 

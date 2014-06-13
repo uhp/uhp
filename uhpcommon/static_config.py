@@ -28,7 +28,7 @@ if config.install_monitor:
             {"name":"mOverview", "display":'概览', "href":"#/monitor/overview",
                 "tabs": [
                     {"name":"mtCurent", "display":"当前状态", "href":"/statics/partials/monitor/overview.html"},
-                    {"name":"mtHistory", "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
+                    #{"name":"mtHistory", "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
                     {"name":"mtAlarmList", "display":"告警列表", "href":"/statics/partials/monitor/overview_alarms.html"}
                 ]
             },

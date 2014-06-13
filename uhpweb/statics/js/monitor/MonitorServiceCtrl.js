@@ -1,26 +1,25 @@
 // 服务 Service
-uhpApp.controller('MoniServiceCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', function($scope, $rootScope, $http, $sce, $timeout){
-  MonitorBaseController($scope, $rootScope, $timeout);
+uhpApp.controller('MoniServiceCtrl', ['$scope', '$rootScope', '$http', '$sce','$timeout', '$location', 'anchorSmoothScroll', function($scope, $rootScope, $http, $sce, $timeout, $location, anchorSmoothScroll){
+  MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSmoothScroll);
   $scope.groups = ['hadoop-dfs-namenode','hadoop-dfs-datanode','hadoop-dfs-datanode',
     'hadoop-mapred', 'hadoop-yarn-nodemanager',
     'hbase-master', 'hbase-regionserver'];
 
   // services
   $scope.init=function(){
-    console.debug("----------------------");
     $scope.showInfo();
-    /**
-     * show.services_metrics = [
-     *   { name:,metrics:[{name:,display:,value:}] }  
-     * ]
-     * show.service = ''
-     */
-    $rootScope.myHttp('GET', '/monitorback/services_metrics', 
+
+    //show.services_metrics = [{ name:,metrics:[{name:,display:,value:}] } ]
+    $rootScope.myHttp('GET', '/monitorback/services_metrics2', 
       {}, 
       function(res){
-        //[ {name:hdfs, show:[{}]}, {name:yarn, show:[{}]} ]
+        // [{name:,hosts:[{host:$host, info:[{name:,value:,unit:,}]}]}] 
         $scope.show.services_metrics=res['data'];
-        console.debug($scope.show.services_metrics);
+        if($scope.show.services_metrics){
+          $.each($scope.show.services_metrics, function(k, v){
+            if(v.hosts.length > 0) $scope.activeIdx(0, v.hosts);
+          });
+        }
       }
     );
   }

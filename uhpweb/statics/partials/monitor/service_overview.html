@@ -1,35 +1,42 @@
-<div class="row" style="margin-top:20px;" ng-repeat="service_metrics in show.services_metrics">
+<div class="row">
+  <div class="col-md-12">
+    <div class="pull-left">导航：</div>
+    <ul class="list-inline">
+      <li style="min-width:0px;" ng-repeat="sm in show.services_metrics">
+      <a href="javascript:void(0);" ng-click="gotoa($index)"><span class="label label-default">[[sm.name]]</span></a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row" style="margin-top:0px;" ng-repeat="service_metrics in show.services_metrics">
   <div class="col-md-12">
     <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">[[service_metrics.name]]</h3></div>
+      <div class="panel-heading"><h3 class="panel-title"><a id="[[$index]]">[[service_metrics.name]]</a></h3></div>
       <div class="panel-body">
 
-        <div ng-repeat="show_metric in service_metrics.show">
-          <div ng-switch='show_metric.type'>
-            <!-- instance-status -->
-            <div ng-switch-when='instance-status'>
-              <div class="row" style="margin-top:20px;">
-                <div class="col-md-3"><h6>[[show_metric.display]]：</h6></div>
-                <div class="col-md-9">
-                  <span style="margin-right:10px;" ng-repeat="v in show_metric.instance-status">[[ v[0] ]] : [[ v[1] ]]</span>
-                </div>
-              </div>
-            </div>
-            <!-- ~instance-status -->
+        <!-- State 简单的列表，展示状态 -->
 
-            <div ng-switch-default>
-              <!-- list -->
-              <h6>[[show_metric.display]]：</h6>
-              <ul class="list-group">
-                <li class="list-group-item" ng-repeat="metric in show_metric.list">[[ metric[0].display ]]<span class="badge">[[ metric[1] ]]</span></li>
-              </ul>
-              <!-- ~list -->
-            </div>
+        <!-- 标签页 --> 
+        <ul class="nav nav-tabs">
+          <li class="[[item.active]]" ng-click="activeItem(item, service_metrics.hosts)" ng-repeat="item in service_metrics.hosts" >
+          <a href="javascript:void(0)">[[item.host]]<span ng-show="item.state">([[item.state]])</span></a>
+          </li>
+        </ul>
+
+        <div class="tab-content" style="margin-top:20px;">
+
+          <div class="tab-pane fade" ng-class="host_metrics.active && 'in active'" ng-repeat="host_metrics in service_metrics.hosts">
+
+            <ul class="list-inline">
+              <li style="min-width:430px" ng-show="info.value != null" ng-repeat="info in host_metrics.info">
+              [[info.display]]：<strong>[[info.value]]</strong>
+              </li>
+            </ul>
+
           </div>
-          <!-- ~ ng-switch-when -->
 
         </div>
-        <!-- ~ show s -->
 
       </div>
     </div>

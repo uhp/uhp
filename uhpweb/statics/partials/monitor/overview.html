@@ -1,16 +1,21 @@
 <!-- 整体状态 -->
 <div class="row">
-  <div class="col-md-4" ng-repeat="health in show.healths">
+  <div class="col-md-4" ng-repeat="health in show.healths" ng-init="fI=$index">
     <div class="panel panel-info" ng-switch="health.type">
       <div class="panel-heading"><h3 class="panel-title">[[health.display]]</h3></div>
       
       <div class="panel-body" ng-switch-when="single">
-        <span class="center-block text-center" style="font-size:500%;color:RGB(26,188,156);">[[health.value]]</span>
+        <span class="center-block text-center [[item.value < 60 && 'font-danger' || ( item.value < 80 && 'font-warning' || 'font-success')]]" style="font-size:500%;">[[health.value]]</span>
       </div>
       
       <div class="panel-body" ng-switch-default>
         <ul class="list-group">
-          <li class="list-group-item" ng-repeat="item in health.group">[[item.display]]<span class="badge">[[item.value]]</span></li>
+          <li class="list-group-item" ng-repeat="item in health.group">
+          <a href="javascript:void(0);" ng-click="gotoa(item.display)" ng-show="fI==1">[[item.display]]</a>
+          <span ng-show="fI!=1">[[item.display]]</span>
+          <span class="badge [[item.value < 60 && 'danger' || ( item.value < 80 && 'warning' || 'success')]]" ng-show="fI==1">[[item.value]]</span>
+          <span class="badge info" ng-show="fI!=1">[[item.value]]</span>
+          </li>
         </ul>
       </div>
     </div>
@@ -18,7 +23,7 @@
 </div>
 
 <!-- 实体健康度  -->
-<div class="row" style="margin-top:20px;" ng-show="health.type == 'single' || health.group[0].roles" ng-repeat="health in show.healths">
+<div class="row" style="margin-top:0px;" ng-show="health.type == 'single' || health.group[0].roles" ng-repeat="health in show.healths">
   <div class="col-md-12">
     <div class="panel panel-info" ng-switch="health.type">
       <div class="panel-heading"><h3 class="panel-title">[[health.display]]</h3></div>
@@ -37,7 +42,7 @@
       <ul class="list-group" ng-switch-default>
         <li class="list-group-item" ng-repeat="item in health.group">
         <!-- service -->
-        <h6>[[item.display]]</h6>
+        <h6><a id="[[item.display]]">[[item.display]]</a></h6>
           <!-- roles -->
           <div class="panel panel-info" ng-repeat="role in item.roles">
             <div class="panel-heading"><h3 class="panel-title">[[role.display]]</h3></div>

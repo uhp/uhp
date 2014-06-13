@@ -43,6 +43,7 @@ import lockfile.pidlockfile
 sys.path.append(os.path.join(os.getenv('UHP_HOME'), "uhpcommon"))
 
 import config 
+import util
 import database
 from model.instance import Instance
 from sqlalchemy import and_
@@ -126,6 +127,16 @@ def update_ins_health(ins, health, msg):
     except Exception, e:
         log.exception("")
 
+def check_nn_active(host, port):
+    url = "http://%s:%s/dfshealth.jsp" % (host,port)
+    html = util.get_http(url,5)
+    if not html: return False
+    ha_state = ''
+    pattern = re.compile("<h1>NameNode '.*?' \((.*?)\)</h1>",re.S)
+    m = pattern.search(html)
+    if m: ha_state = m.group(1)
+    return ha_state == 'active'
+
 def test():
     inv = ansible.inventory.Inventory(config.ansible_host_list)
     #check_one_instance(1, 'hadoop2', ['9922'])
@@ -140,8 +151,8 @@ def check_one_host(host, ins_ports_key_list):
 def check_one_host_(host, ins_ports_key_list):
     """对同一台机器上的所有实例进行监控
 
-    @param host          : 机器
-    @param ins_ports_key : [(ins obj, [ports], key)]
+    @param host               : 机器
+    @param ins_ports_key_list : [(ins obj, [ports], key)]
     """
 
     log.debug("check all instance on host[%s]", host)
@@ -187,11 +198,20 @@ def check_one_host_(host, ins_ports_key_list):
         for insid_state_msg in insid_state_msg_list:
 
             insid = insid_state_msg['insid']
+            ins   = ins_dict[insid]
             state = insid_state_msg['state']
-            msg   = insid_state_msg['msg']
-            msg   = json.dumps(msg)
+            msg_o = insid_state_msg['msg']
 
-            ins    = ins_dict[insid]
+            # Leader 判断
+            if ins.role in leader_port:
+                port = leader_port[ins.role]
+                if ins.role == u'zookeeper' or ins.role == u'hbasemaster':
+                    msg_o['leader'] = port in msg_o['exist_port']
+                elif ins.role == u'namenode':
+                    msg_o['leader'] = check_nn_active(ins.host, port)
+
+            msg    = json.dumps(msg_o)
+
             health = Instance.HEALTH_UNKNOW
 
             if state == 0: # ok
@@ -202,6 +222,8 @@ def check_one_host_(host, ins_ports_key_list):
                 health = Instance.HEALTH_DOWN
 
             update_ins_health(ins, health, msg)
+            
+
     except:
         log.exception("")
     
@@ -238,6 +260,8 @@ def check():
     一个角色可能有多个端口
     主服务端口来自约定
     """
+    global leader_port
+    leader_port.clear()
 
     inv = ansible.inventory.Inventory(config.ansible_host_list)
 
@@ -267,7 +291,12 @@ def check():
                     # 跳过此ins
                     raise FoundException("special key[%s] not exists for host[%s]" % (host_vars_find_key, ins.host))
                 port = host_vars[host_vars_find_key]
-       
+                if port_key == 'dfs_namenode_http_address_port' or \
+                   port_key == 'zookeeper_leader_port' or \
+                   port_key == 'hbase_master_info_port':
+                       if ins.role not in leader_port:
+                           leader_port[ins.role] = int(port)
+                
                 if not flag: port = "-" + port
                 ports.append(port)
 
@@ -276,6 +305,16 @@ def check():
         except FoundException, e:
             log.exception(e)
     
+    ## 存leader的特别端口
+    #for ins, (ports, key) in instance_ports.iteritems():
+    #    if ins.role == u'zookeeper' or ins.role == u'hbasemaster':
+    #        if ins.role in leader_port: continue
+    #        for port in ports:
+    #            if port[0] == '-':
+    #                lport = int(port[1:])
+    #                log.debug("%s, save leader port %d" % (ins.role, lport))
+    #                leader_port[ins.role] = lport
+
     # 同一个host上的instance同时检查
     host_ins_map = {} # {host:[(ins,[port],key)]}
     for ins, (ports, key) in instance_ports.items():
@@ -356,6 +395,7 @@ log   = logging.getLogger(APP)
 pool  = None
 #ins_process_map = {} # {ins:[p, start-time, end-time]}
 process_queue = Queue.Queue() # Queue((time, p))
+leader_port = {} # zookeeper, hbasemaster 等的特别端口记录，{role:port}
 
 def main():
     log.info("start...")
