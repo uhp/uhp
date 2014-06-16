@@ -1383,7 +1383,7 @@ class MonitorBackHandler(BaseHandler):
                 info_disk.append({'name':'Seek_Error_Rate','value':disk_smartctl_seek_error_rate,'unit':''})
                 info_disk.append({'name':'Raw_Read_Error_Rate','value':disk_smartctl_raw_read_error_rate,'unit':''})
                 info_disk.append({'name':'UDMA CRC错误','value':disk_smartctl_udma_crc_error_count,'unit':'次'})
-                info['disks'][dev2] = info_disk
+                info['disks'][dev] = info_disk
                 
             disks['series'].append({'name':'disk_used','type':'bar','stack':'disk','data':disk_useds})
             disks['series'].append({'name':'disk_free','type':'bar','stack':'disk','data':disk_frees})
