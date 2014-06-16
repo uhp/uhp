@@ -189,10 +189,10 @@ def init():
     #默认分组
     insert(Group("all","no chinise"))
     #关键分组变量
-    insert(GroupVar("all","","ansible_ssh_user","qiujw",0,u"*用于登录到其它机器的用户名称"))
-    insert(GroupVar("all","","ansible_ssh_port","9922",0,u"*ssh的登录端口"))
-    insert(GroupVar("all","","ansible_ssh_pass","just4test",0,u"*ssh的登录密码"))
-    insert(GroupVar("all","","ansible_sudo_pass","just4test",0,u"*ssh登录后的sudo密码"))
+    insert(GroupVar("all","","ansible_ssh_user","hadoop",0,u"*用于登录到其它机器的用户名称"))
+    insert(GroupVar("all","","ansible_ssh_port","22",0,u"*ssh的登录端口"))
+    insert(GroupVar("all","","ansible_ssh_pass","132456",0,u"*ssh的登录密码"))
+    insert(GroupVar("all","","ansible_sudo_pass","123456",0,u"*ssh登录后的sudo密码"))
     insert(GroupVar("all","","local_repo_enabled","true",0,u"*是否使用本地仓库。如果，使用本地仓库，请填写local_http_url"))
     insert(GroupVar("all","","local_http_url","http://localhost:8080/uhp",0,u"*本地仓库的HTTP服务local_http_url"))
     
