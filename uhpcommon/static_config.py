@@ -57,10 +57,10 @@ if config.install_monitor:
             },
             {"name":"mConf", "display":"配置", "href":"#/monitor/conf",
                 "tabs": [
-                    {"name":"mtMetric",         "display":"监控项",       "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_metric()"},
-                    {"name":"mtMetricGroup",    "display":"监控组",       "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_group()"},
-                    {"name":"mtMetricHost",     "display":"监控部署",     "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_host()"},
-                    {"name":"mtMetricPubVar",   "display":"监控公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_global_variate()"},
+                    #{"name":"mtMetric",         "display":"监控项",       "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_metric()"},
+                    #{"name":"mtMetricGroup",    "display":"监控组",       "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_group()"},
+                    #{"name":"mtMetricHost",     "display":"监控部署",     "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_host()"},
+                    #{"name":"mtMetricPubVar",   "display":"监控公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_global_variate()"},
                     {"name":"mtAlarm",          "display":"告警配置",     "href":"/statics/partials/monitor/conf.html", "func":"query_alarm()"},
                     {"name":"mtAlarmAssist",    "display":"告警公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_alarm_assist()"}
                 ]
