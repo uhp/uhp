@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import tornado
+import re
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import and_
 
@@ -37,6 +38,29 @@ class LoginHandler(BaseHandler):
     def post(self):
         username = self.get_argument('useranme')
         password = self.get_argument('password')
+
+        # valid: 强制密码修改为高强度口令（12位以上，需包括大小写字母和数字混合）
+        def valid_passwd(pw):
+            MIN_LEN = 12
+            if(len(pw)<12):raise Exception("password too short, min length is %d" % MIN_LEN)
+            has_A = False
+            has_a = False
+            has_0 = False
+            for c in password:
+                if not has_A and c >= 'A' and c <= 'Z':
+                    has_A = True
+                    continue
+                if not has_a and c >= 'a' and c <= 'z':
+                    has_a = True
+                    continue
+                if not has_0 and c >= '0' and c <= '9':
+                    has_0 = True
+                    continue
+            if not has_A: raise Exception("password must at last has one upper char")
+            if not has_a: raise Exception("password must at last has one little char")
+            if not has_0: raise Exception("password must at last has one number char")
+
+        valid_passwd(password)
         session = database.getSession()
         user = session.query(User).filter(and_(User.name == username, User.password == password)).first()
         session.close()
