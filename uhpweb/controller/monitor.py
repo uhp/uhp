@@ -804,6 +804,8 @@ class MonitorBackHandler(BaseHandler):
         session = database.getSession()
         for instance in session.query(Instance).filter(and_(Instance.service==service, Instance.role==role,
             Instance.host==host)):
+            if instance.status != 'start':
+                return 100
             if instance.health == Instance.HEALTH_HEALTHY:
                 return 100
             if instance.health == Instance.HEALTH_UNKNOW:
