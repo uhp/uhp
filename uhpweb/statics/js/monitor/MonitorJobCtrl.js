@@ -175,6 +175,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
       return metrics;
     }
 
+
     //for rm query
     $scope.rmQuery=function(){
         var fields = $scope.getRmFieldParams();
@@ -191,7 +192,14 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             console.log("todo print rm data")
             $scope.rm = response
             // 数据格式转换 [[]] => [{}]
+            // [ {metric:,x:[],y:[]} ]
             $scope.rm.metrics = convertResult(fields, $scope.rm.result);
+            xfunc=function(n){
+                return $scope.rm_time>1440 ? date('n-j/H:i', n): date('H:i', n);
+            }
+            $.each($scope.rm.metrics, function(i, n){
+                n.x = $.map(n.x, xfunc);
+            });
             console.debug($scope.rm.metrics);
         }).error(function(data, status) {
             $rootScope.alert("发送app_running请求失败");
@@ -302,7 +310,14 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             $scope.nm = response
             // 数据格式转换 [[]] => [{}]
             // 同一指标，多实体对比
+            // [ {metric:,x:[],y:[]} ]
             $scope.nm.metrics = convertResultForMultiHost(fields, $scope.selected_nm_hosts, $scope.nm.result);
+            xfunc=function(n){
+                return $scope.nm_time>1440 ? date('n-j/H:i', n): date('H:i', n);
+            }
+            $.each($scope.nm.metrics, function(i, n){
+                n.x = $.map(n.x, xfunc);
+            });
             console.debug($scope.nm.metrics);
         }).error(function(data, status) {
             $rootScope.alert("发送app_nmquery请求失败");
