@@ -52,6 +52,7 @@ coms=(
     "ansible"
     "python-rrdtool"
     "lockfile"
+    "simpleparse"
     )
 
 for com in ${coms[@]}; do
