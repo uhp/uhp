@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-md-12">
-    <div class="pull-left">导航：</div>
+    <div class="pull-left" ng-show="show.services_metrics">导航：</div>
     <ul class="list-inline">
       <li style="min-width:0px;" ng-repeat="sm in show.services_metrics">
       <a href="javascript:void(0);" ng-click="gotoa($index)"><span class="label label-default">[[sm.name]]</span></a>
@@ -30,7 +30,7 @@
 
             <ul class="list-inline">
               <li style="min-width:430px" ng-show="info.value != null" ng-repeat="info in host_metrics.info">
-              [[info.display]]：<strong>[[info.value]]</strong>
+              [[info.display]]：<strong>[[info.value]][[info.unit]]</strong>
               </li>
             </ul>
 
