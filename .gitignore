@@ -1,3 +1,10 @@
+# my
+vpy/
+logs/
+pids/
+db/
+uhpcollect/words.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -8,9 +15,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 uhpcommon/config.py
-vpy/
-logs/
-pids/
 #build/
 develop-eggs/
 dist/
