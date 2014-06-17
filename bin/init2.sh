@@ -21,6 +21,7 @@ coms=(
     "cairo-devel"
     "pango-devel"
     "libxml2-devel"
+    "libxslt-devel"
     "rrdtool-devel"
     "make"
     "python2-devel"
@@ -34,9 +35,13 @@ for com in ${coms[@]}; do
     sudo yum install -y $com
 done 
 
+echo "install vpy ..."
+
 python lib/virtualenv-*.py --no-site-packages $VIRTUAL_ENV
 echo "export PATH=$VIRTUAL_ENV/bin:\$PATH" >> ~/.bash_profile
 export PATH=$VIRTUAL_ENV/bin:$PATH
+
+echo "pip install ..."
 
 PIP="$VIRTUAL_ENV/bin/pip"
 
@@ -53,6 +58,7 @@ coms=(
     "python-rrdtool"
     "lockfile"
     "simpleparse"
+    "lxml"
     )
 
 for com in ${coms[@]}; do
@@ -60,15 +66,12 @@ for com in ${coms[@]}; do
     echo "# install: $com"
     echo "###############################################"
     sudo $PIP install $com
+    echo "###############################################"
 done 
 
-rm -f $UHP_HOME/vpy/lib/python2.*/site-packages/rrdtoolmodule.so
-cp $UHP_HOME/lib/rrdtoolmodule.so ./vpy/lib/python2.*/site-packages/rrdtoolmodule.so
+#rm -f $UHP_HOME/vpy/lib/python2.*/site-packages/rrdtoolmodule.so
+#cp $UHP_HOME/lib/rrdtoolmodule.so ./vpy/lib/python2.*/site-packages/rrdtoolmodule.so
 
-#sudo yum install -y python-pip rpm-build make python2-devel mysql-devel
-#sudo pip-python install -U pip
-#sudo yum install -y ansible
-#check ansible 
 #检查ansible安装成功
 RE=`ansible --version|grep ansible|wc -l`
 if [ "$RE" == "0" ] ; then
@@ -76,25 +79,11 @@ if [ "$RE" == "0" ] ; then
     exit 1;
 fi
 
-#ansible all -m ping
 mkdir -p $UHP_HOME/logs/web
 mkdir -p $UHP_HOME/logs/monitor
 mkdir -p $UHP_HOME/logs/worker
 
 mkdir -p $UHP_HOME/db
-
-sudo pip install ansible
-sudo pip install snakemq
-#sudo pip install mysql.connector
-sudo pip install sqlalchemy
-sudo pip install tornado
-sudo pip install daemon
-sudo pip install threadpool
-sudo pip install callbacks
-sudo pip install mysql-python
-sudo pip install lockfile
-sudo pip install python-daemon 
-sudo pip install simpleparse
 
 chmod +x $UHP_HOME/inventor/mysqlinventory.py 
 echo "All is OK!"

@@ -53,7 +53,7 @@ class NamenodeChecker():
             tids.append(tid)
         
         self.check_ha_states(hosts, ha_states)
-        self.check_tids(hosts, tids)
+        #self.check_tids(hosts, tids)
         
         return (self.state,self.msg)
 

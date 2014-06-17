@@ -225,7 +225,7 @@ class MonitorBackHandler(BaseHandler):
                     if ins.host == host['host']:
                         host_ins = ins
                         break
-                if host_ins and host_ins.uptime > uptime_limit and host_ins.msg:
+                if host_ins and host_ins.monitor_time > uptime_limit and host_ins.msg:
                     msg = json.loads(host_ins.msg)
                     if 'leader' in msg and msg['leader']:
                         state = state1
@@ -430,19 +430,20 @@ class MonitorBackHandler(BaseHandler):
             services_metrics.append(service_metrics)
             
             # hiveserver
-            hosts = service['roles']['hiveserver']
-            ori_host_metrics = [
-                {'name' : 'hiveserver_memory_memHeapCommitted',       'display' : 'JVM申请堆内存',      'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memHeapMax',             'display' : 'JVM最大堆内存',      'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memHeapUsed',            'display' : 'JVM使用堆内存',      'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memNonHeapCommitted',    'display' : 'JVM提交非堆内存',    'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memNonHeapMax',          'display' : 'JVM最大非堆内存',    'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memNonHeapUsed',         'display' : 'JVM使用非堆内存',    'func' : _f_b2m},
-                {'name' : 'hiveserver_Threading_ThreadCount',         'display' : '线程数'},
-            ]
+	    if 'hiveserver' in service['roles']:
+            	hosts = service['roles']['hiveserver']
+            	ori_host_metrics = [
+            	    {'name' : 'hiveserver_memory_memHeapCommitted',       'display' : 'JVM申请堆内存',      'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memHeapMax',             'display' : 'JVM最大堆内存',      'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memHeapUsed',            'display' : 'JVM使用堆内存',      'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memNonHeapCommitted',    'display' : 'JVM提交非堆内存',    'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memNonHeapMax',          'display' : 'JVM最大非堆内存',    'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memNonHeapUsed',         'display' : 'JVM使用非堆内存',    'func' : _f_b2m},
+            	    {'name' : 'hiveserver_Threading_ThreadCount',         'display' : '线程数'},
+            	]
         
-            service_metrics = _multi_host_metrics('Hive/HiveServer', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+            	service_metrics = _multi_host_metrics('Hive/HiveServer', hosts, ori_host_metrics)
+            	services_metrics.append(service_metrics)
         
         # hbase
         service = _service(u'hbase', services)
@@ -590,12 +591,17 @@ class MonitorBackHandler(BaseHandler):
         self.ret("ok", "", ret);
 
     # 获取所有的机器
+    # 仅获取部署了gmond的机器
     # return [host]
     def _host_list(self):
         session = database.getSession()
-        hosts = session.query(Host)
-        temp = [host.hostname for host in hosts]
-        session.close()
+	try:
+            #hosts = session.query(Host)
+            #temp = [host.hostname for host in hosts]
+            hosts = session.query(Instance).filter(and_(Instance.role=='gmond'))
+            temp = [host.host for host in hosts]
+	finally:
+            session.close()
         return temp
 
     def _sure_str(self, str):
@@ -745,7 +751,9 @@ class MonitorBackHandler(BaseHandler):
         disk_metric['x'] = x
         disk_total = map(lambda x:self._none_2_0(x), ys[0])
         disk_free  = map(lambda x:self._none_2_0(x), ys[1])
-        disk_used  = map(lambda x,y:x-y, disk_total, disk_free)
+        disk_used = []
+        if disk_total is not None and disk_free is not None:
+            disk_used  = map(lambda x,y:x is not None and y is not None and x-y or None, disk_total, disk_free)
         disk_metric['series'].append({'name':'disk_used',  'type':'line', 'stack':'total', 'data':disk_used}) 
         disk_metric['series'].append({'name':'disk_free',  'type':'line', 'stack':'total', 'data':disk_free}) 
         for temp in disk_metric['series']: temp.update(line_area_style)

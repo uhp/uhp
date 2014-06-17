@@ -25,7 +25,8 @@ services_log_root: "/home/hadoop/log"
 
 
 #for ganglia
-ganglia__data_source: uhpmonitor
+ganglia__data_source: 
+    - uhpmonitor
 ganglia__gmond_port: 8649
 ganglia__gmetad_xml_port: 8651
 ganglia__cluster_name: "test_hadoop"
@@ -239,7 +240,7 @@ hue__time_zone: Asia/Shanghai
 hue__smtp_host: mail.ucweb.com
 hue__smtp_port: 587
 hue__smtp_user: hadoop
-hue__smtp_passwd: ********
+hue__smtp_passwd: "********"
 hue__smtp_from: hadoop@ucweb.com
 
 

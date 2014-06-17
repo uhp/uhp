@@ -30,7 +30,7 @@ port=${temp%%/*}
 
 temp=${user_passwd}
 temp=${temp##*/}
-db=${temp%%?*}
+db=${temp%%\?*}
 
 #user=uhp
 #passwd=uhp
@@ -44,7 +44,8 @@ mkdir -p db
 
 dt=$( date +"%Y%m%d_%H%M%S" )
 
-mysqldump -u "$user" -p"$passwd" -h "$host" -P $port --opt --skip-lock-tables --flush-logs $db > ./db/back_${db}_${dt}.sql
+#mysqldump -u "$user" -p"$passwd" -h "$host" -P $port --opt --skip-lock-tables --flush-logs $db > ./db/back_${db}_${dt}.sql
+mysqldump -u "$user" -p"$passwd" -h "$host" -P $port --opt --skip-lock-tables $db > ./db/back_${db}_${dt}.sql
 #/usr/local/mysql/bin/mysql -u root -p123456 < /root/allbak.sql
 
 find ./db/ -name "back_*.sql" -ctime +10 -exec rm -f {} \;
