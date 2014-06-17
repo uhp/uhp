@@ -7,7 +7,7 @@
     echo "UHP_HOME not set."
     exit 1
 }
-echo "UHP_HOME=$UHP_HOME"
+#echo "UHP_HOME=$UHP_HOME"
 
 OLD_DIR=$(pwd)
 cd $UHP_HOME;
@@ -15,6 +15,10 @@ cd $UHP_HOME;
 app=`basename $0 .sh`
 # app=worker
 app=${app#*-}
+
+echo "------------------------------"
+echo "- START $app"
+echo "------------------------------"
 
 mkdir -p logs/$app pids/$app
 
@@ -42,7 +46,6 @@ for ((i=0;i<10;i++)); do
     [ -n "$pidfile" ] && {
         pid=$(cat ./pids/${app}/*.pid 2>/dev/null)
         echo "PID: $pid"
-        echo "Start OK"
         ok="true"
         break
     }
@@ -50,7 +53,11 @@ for ((i=0;i<10;i++)); do
 done
 
 cd $OLD_DIR
-[ "$ok" == "true" ] && exit 0
-
-echo "Start Fail"
-exit 1
+[ "$ok" == "true" ] && {
+    echo "Start OK"
+} || {
+    echo "Start Fail"
+}
+echo "------------------------------"
+[ "$ok" == "true" ]
+exit $?

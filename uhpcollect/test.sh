@@ -18,7 +18,8 @@ out=/user/$USER/test/wordcount/output
 }
 
 #[ -e $f ] || echo -e "abc\ndef\njbc\ncdh\nok" > $f
-[ -e $f ] || seq 1 10000000 > $f #约 88 M
+#[ -e $f ] || seq 1 10000000 > $f #约 88 M
+[ -e $f ] || seq 1 1000000 > $f #约 8 M
 
 hdfs dfs -mkdir -p $in
 

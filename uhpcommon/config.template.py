@@ -20,8 +20,7 @@ jar_dir = os.path.join(uhphome,"ansible","service","roles","jar","files")
 dbfile = os.path.join(uhphome,"db","sqlite.db")
 
 #connection = "sqlite:///"+dbfile
-#connection = "mysql://uhp:uhp@hadoop2:3306/uhp_qjw?charset=utf8"
-connection = "mysql://uhp:uhp@hadoop2:3306/uhp?charset=utf8"
+connection = "mysql://user:passwd@host_or_ip:port/dbname?charset=utf8"
 
 mq_host="localhost"
 mq_port=4000
