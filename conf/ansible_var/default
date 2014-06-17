@@ -25,7 +25,8 @@ services_log_root: "/home/hadoop/log"
 
 
 #for ganglia
-ganglia__data_source: uhpmonitor
+ganglia__data_source: 
+    - uhpmonitor
 ganglia__gmond_port: 8649
 ganglia__gmetad_xml_port: 8651
 ganglia__cluster_name: "test_hadoop"
