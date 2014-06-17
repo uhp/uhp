@@ -8,11 +8,11 @@
 
 set -e
 
-[ "$UHP_HOME" == "" ] && { echo "UHP_HOME not defined"; exit 1; }
+DIR=$(cd $(dirname "$0"); cd ..; pwd)
+cd $DIR
 
-cd $UHP_HOME/uhpcommon
 # mysql://uhp:uhp@hadoop2:3306/uhp?charset=utf8
-user_passwd=$(python -c "import config; print config.connection")
+user_passwd=$( cd $DIR/uhpcommon && python -c "import config; print config.connection" )
 
 temp=${user_passwd}
 temp=${temp##*\/\/}
@@ -39,12 +39,10 @@ db=${temp%%\?*}
 #db=uhp
 #charset=utf8
 
-cd $UHP_HOME
 mkdir -p db
 
 dt=$( date +"%Y%m%d_%H%M%S" )
 
-#mysqldump -u "$user" -p"$passwd" -h "$host" -P $port --opt --skip-lock-tables --flush-logs $db > ./db/back_${db}_${dt}.sql
 mysqldump -u "$user" -p"$passwd" -h "$host" -P $port --opt --skip-lock-tables $db > ./db/back_${db}_${dt}.sql
 #/usr/local/mysql/bin/mysql -u root -p123456 < /root/allbak.sql
 

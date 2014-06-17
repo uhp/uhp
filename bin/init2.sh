@@ -78,6 +78,7 @@ done
 
 SITE_P=$(ls -d $VIRTUAL_ENV/lib/python*/site-packages/)
 ( cd $SITE_P && sudo mv -f rrdtoolmodule.so rrdtoolmodule.so.bk && cp $DIR/lib/rrdtoolmodule.so ./rrdtoolmodule.so )
+
 #检查ansible安装成功
 RE=`ansible --version|grep ansible|wc -l`
 if [ "$RE" == "0" ] ; then
@@ -85,11 +86,10 @@ if [ "$RE" == "0" ] ; then
     exit 1;
 fi
 
-mkdir -p $UHP_HOME/logs/web
-mkdir -p $UHP_HOME/logs/monitor
-mkdir -p $UHP_HOME/logs/worker
+mkdir -p $DIR/logs/web
+mkdir -p $DIR/logs/monitor
+mkdir -p $DIR/logs/worker
+mkdir -p $DIR/db
 
-mkdir -p $UHP_HOME/db
-
-chmod +x $UHP_HOME/inventor/mysqlinventory.py 
+chmod +x $DIR/inventor/mysqlinventory.py 
 echo "All is OK!"
