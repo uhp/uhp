@@ -89,6 +89,7 @@ def get_model_from_name(name):
 
 def create_db():
     engine = getEngine()
+    CallBack.metadata.drop_all(engine)
     for model in get_all_models():
         model.metadata.create_all(engine) 
     
