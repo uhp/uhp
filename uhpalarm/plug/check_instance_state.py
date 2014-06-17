@@ -67,6 +67,8 @@ class InstanceStateChecker:
     def check_instance(self, instance):
         if instance.status == Instance.STATUS_START and instance.health == Instance.HEALTH_UNHEALTHY :  
             return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
+        if instance.status == Instance.STATUS_START and instance.health == Instance.HEALTH_DOWN :  
+            return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
         return ("OK","")
 
     def check_zk_leader(self,port,roles):
