@@ -3,6 +3,7 @@
 
 import os.path, logging, sys
 import json
+import time
 
 #for main run
 #commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
@@ -10,6 +11,7 @@ import json
 
 import util
 import database
+import config
 from model.instance import Instance
 
 def check_instance_state():
@@ -65,10 +67,17 @@ class InstanceStateChecker:
         return (self.state,self.msg)
 
     def check_instance(self, instance):
-        if instance.status == Instance.STATUS_START and instance.health == Instance.HEALTH_UNHEALTHY :  
-            return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
-        if instance.status == Instance.STATUS_START and instance.health == Instance.HEALTH_DOWN :  
-            return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
+        if instance.status == Instance.STATUS_START :
+            if instance.health == Instance.HEALTH_UNHEALTHY :  
+                return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
+            if instance.health == Instance.HEALTH_DOWN :  
+                return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
+            if instance.monitor_time == None or instance.monitor_time == 0  :
+                return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但未找到检测信息。 " % (instance.host, instance.role) )
+            else:
+                dis = int(time.time()) - instance.monitor_time
+                if dis > config.max_unknow_time :
+                    return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但检测超时%ds。" % (instance.host, instance.role, dis) )
         return ("OK","")
 
     def check_zk_leader(self,port,roles):
