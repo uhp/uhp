@@ -19,7 +19,8 @@ EOS
 
 # pid=port
 # tcp        0      0 127.0.0.1:4000              0.0.0.0:*                   LISTEN      30448/python
-check_ports=$(netstat -nplt 2>/dev/null | grep LISTEN | grep tcp | grep -v ansible | awk '{ port=sub(/.*:/,"",$4); pid=sub(/\/.*/,"",$7); if($7 != "-") printf("%s=%s\n",$7,$4);}')
+#check_ports=$(netstat -nplt 2>/dev/null | grep LISTEN | grep tcp | grep -v ansible | awk '{ port=sub(/.*:/,"",$4); pid=sub(/\/.*/,"",$7); if($7 != "-") printf("%s=%s\n",$7,$4);}')
+check_ports=$( ss -nplt 2>/dev/null | sed -e 1d | grep -v ansible | awk '{ sub(/.*:/,"",$4); sub(/.*\",/,"",$6); sub(/,.*/,"",$6); printf("%s=%s\n",$6,$4); }' | sort | uniq )
 
 retu=()
 
