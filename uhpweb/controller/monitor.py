@@ -270,7 +270,7 @@ class MonitorBackHandler(BaseHandler):
         if service:
             # zookeeper
             service_name = 'zookeeper'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name' : 'zookeeper_memory_memHeapMax',          'display' : 'JVM最大堆内存',    'func' : _f_b2m},
@@ -292,7 +292,7 @@ class MonitorBackHandler(BaseHandler):
         if service:
             # nn
             service_name = 'namenode'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name':'dfs.namenode.BlockReportAvgTime',                          'display' :'块汇报的平均时间', 'func':_f_f2f, 'unit':'MS'},
@@ -330,7 +330,7 @@ class MonitorBackHandler(BaseHandler):
 
             # dn
             service_name = 'datanode'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics= [
                     {'name':'dfs.datanode.BlockReportsAvgTime', 'display':'块报告平均时间','func':_f_f2f,'unit':'MS'},
@@ -365,7 +365,7 @@ class MonitorBackHandler(BaseHandler):
         if service:
             # rm
             service_name = 'resourcemanager'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name':'yarn.ClusterMetrics.NumActiveNMs',                                'display' :'活跃的NodeManager'},
@@ -395,7 +395,7 @@ class MonitorBackHandler(BaseHandler):
 
             # nm
             service_name = 'nodemanager'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name':'yarn.NodeManagerMetrics.AllocatedGB',                         'display' :'分配内存', 'func':_f_f2f, 'unit':'GB'},
@@ -426,7 +426,7 @@ class MonitorBackHandler(BaseHandler):
         if service:
             # hivemetastore
             service_name = 'hivemetastore'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name':'hivemetastore_memory_memHeapCommitted',    'display':'JVM申请堆内存',    'func' : _f_b2m},
@@ -443,7 +443,7 @@ class MonitorBackHandler(BaseHandler):
             
             # hiveserver
             service_name = 'hiveserver'
-	        if 'hiveserver' in service['roles']:
+            if 'hiveserver' in service['roles']:
                 hosts = service['roles'][service_name]
             	ori_host_metrics = [
             	    {'name' : 'hiveserver_memory_memHeapCommitted',       'display' : 'JVM申请堆内存',      'func' : _f_b2m},
@@ -463,7 +463,7 @@ class MonitorBackHandler(BaseHandler):
         if service:
             # hbasemaster
             service_name = 'hbasemaster'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name':'hbasemaster_master_cluster_requests',    'display':'当前机器整体request的个数'},
@@ -491,7 +491,7 @@ class MonitorBackHandler(BaseHandler):
             
             # regionserver
             service_name = 'regionserver'
-	        if service_name in service['roles']:
+            if service_name in service['roles']:
                 hosts = service['roles'][service_name]
                 ori_host_metrics = [
                     {'name':'regionserver_rs_blockCacheHitRatio',        'display':'BlockCache命中比例'},
@@ -1137,8 +1137,7 @@ class MonitorBackHandler(BaseHandler):
                 for col in columns:
                     qf = qf | Task.__dict__[col].like(search)
                 query = query.filter(qf)
-        
-            total = query.count();
+            total = query.count()
 
             if dir == "asc":
                 query = query.order_by(asc(orderby))[offset:offset+limit]
@@ -1151,7 +1150,7 @@ class MonitorBackHandler(BaseHandler):
                     v = getattr(record, col)
                     # 特别的，时间转化
                     if col == 'ctime':
-                        t = time.localtime(v)
+                        t = time.localtime(int(v))
                         v = time.strftime("%Y-%m-%d %H:%M:%S", t)
                     temp.append(v)
                 data.append(temp)
