@@ -146,7 +146,8 @@ class MonitorBackHandler(BaseHandler):
         if show_info['metrics']:
             show_info['metric'] = show_info['metrics'][0]['name']
         show_info['hosts'] = self._host_list()
-        show_info['host'] = show_info['hosts'][0]
+        if show_info['hosts']:
+            show_info['host'] = show_info['hosts'][0]
 
         ret = {"data":show_info}
         self.ret("ok", "", ret);
@@ -612,12 +613,10 @@ class MonitorBackHandler(BaseHandler):
     # return [host]
     def _host_list(self):
         session = database.getSession()
-	try:
-            #hosts = session.query(Host)
-            #temp = [host.hostname for host in hosts]
+        try:
             hosts = session.query(Instance).filter(and_(Instance.role=='gmond'))
             temp = [host.host for host in hosts]
-	finally:
+        finally:
             session.close()
         return temp
 
@@ -889,11 +888,18 @@ class MonitorBackHandler(BaseHandler):
         # host
         host_healths = {'type':'single','name':'host','display':'机器健康度'}
         hosts = self._host_list()
-        
+      
+        if not hosts:
+            ret = {"data":data}
+            self.ret("ok", "", ret);
+            return
+
         y = []
         for host in hosts:
             y.append(self._host_current_health(rrd_wrapper, cluster_name, host))
-        health = int(reduce(lambda x,y:x+y,y,0)/len(y))
+        health = -1
+        if y:
+            health = int(reduce(lambda x,y:x+y,y,0)/len(y))
         host_healths['value'] = health
         host_healths['x']     = hosts
         host_healths['y']     = y
@@ -917,7 +923,9 @@ class MonitorBackHandler(BaseHandler):
                     y.append(ins_health)
                 role_health['x'] = hosts
                 role_health['y'] = y
-                role_health_value = int(reduce(lambda x,y:x+y,y,0)/len(y)) # 平均值
+                role_health_value = 0
+                if y:
+                    role_health_value = int(reduce(lambda x,y:x+y,y,0)/len(y)) # 平均值
                 service_health_value *= role_health_value/100.0
                 service_health['roles'].append(role_health)
             service_health['value'] = int(service_health_value)
@@ -1087,6 +1095,11 @@ class MonitorBackHandler(BaseHandler):
         
         # 计算需要: 时间范围，机器，表达式
         hosts = self._host_list()
+
+        if not hosts:
+            ret = {"data":data}
+            self.ret("ok", "", ret)
+            return
         
         healths = [] # [[(ts,health)]]
         for host in hosts:
@@ -1194,6 +1207,8 @@ class MonitorBackHandler(BaseHandler):
 
         host_overview = [] #机器概述
         data = [] # 分项数据
+        disk_data = []
+        load_metric_dist = {'metric':'负载分布','series':[{'name':'负载分布','type':'pie','data':[]}]}
         
         cluster_name = self._query_var('all', 'cluster_name')
         cluster_name = self._sure_str(cluster_name)
@@ -1201,6 +1216,11 @@ class MonitorBackHandler(BaseHandler):
 
         # hosts: [host]
         hosts = self._host_list()
+        
+        if not hosts:
+            ret = {"data":data, 'diskData':disk_data, "hostOverview":host_overview, 'loadDist':load_metric_dist}
+            self.ret("ok", "", ret);
+            return
 
         # 机器概览
         total_hosts         = len(hosts)
@@ -1390,7 +1410,6 @@ class MonitorBackHandler(BaseHandler):
         
         # 存储扩展 [ { name:hadoop1磁盘, x:[sda1,sdb1], xtype:'h', series:[{ name:disk_used, type:bar, stack:disk, data:[1,2] }
         #                                                       { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
-        disk_data = []
         regex = re.compile(r'dev_(\w+)_disk_total')
         for host in hosts:
             host = self._sure_str(host)
