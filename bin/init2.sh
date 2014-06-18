@@ -1,18 +1,20 @@
 #!/bin/bash
 set -e
 
+DIR=$(cd $(dirname "$0"); cd ..; pwd)
+
 if [ "$UHP_HOME" == "" ] ; then 
-    DIR=$(cd $(dirname "$0");cd ..; pwd)
     echo "export UHP_HOME=$DIR" >> ~/.bash_profile
     echo "export ANSIBLE_CONFIG=\$HUP_HOME/conf/ansible.cfg" >> ~/.bash_profile
     echo "export PATH=\$UHP_HOME/bin:\$PATH" >> ~/.bash_profile
     export UHP_HOME=$DIR
 fi
 
-cd $UHP_HOME
+cd $DIR
+
 chmod a+x bin/*.sh
 
-export VIRTUAL_ENV="$UHP_HOME/vpy" 
+export VIRTUAL_ENV="$DIR/vpy" 
 
 sudo rm -rf $VIRTUAL_ENV
 
@@ -21,6 +23,7 @@ coms=(
     "cairo-devel"
     "pango-devel"
     "libxml2-devel"
+    "libxslt-devel"
     "rrdtool-devel"
     "make"
     "python2-devel"
@@ -32,11 +35,20 @@ for com in ${coms[@]}; do
     echo "# install: $com"
     echo "###############################################"
     sudo yum install -y $com
+    echo "###############################################"
 done 
+
+echo 
+echo "Install vpy ..."
+echo 
 
 python lib/virtualenv-*.py --no-site-packages $VIRTUAL_ENV
 echo "export PATH=$VIRTUAL_ENV/bin:\$PATH" >> ~/.bash_profile
 export PATH=$VIRTUAL_ENV/bin:$PATH
+
+echo 
+echo "pip install ..."
+echo 
 
 PIP="$VIRTUAL_ENV/bin/pip"
 
@@ -53,6 +65,7 @@ coms=(
     "python-rrdtool"
     "lockfile"
     "simpleparse"
+    "lxml"
     )
 
 for com in ${coms[@]}; do
@@ -60,15 +73,12 @@ for com in ${coms[@]}; do
     echo "# install: $com"
     echo "###############################################"
     sudo $PIP install $com
+    echo "###############################################"
 done 
 
-rm -f $UHP_HOME/vpy/lib/python2.*/site-packages/rrdtoolmodule.so
-cp $UHP_HOME/lib/rrdtoolmodule.so ./vpy/lib/python2.*/site-packages/rrdtoolmodule.so
+SITE_P=$(ls -d $VIRTUAL_ENV/lib/python*/site-packages/)
+( cd $SITE_P && sudo mv -f rrdtoolmodule.so rrdtoolmodule.so.bk && cp $DIR/lib/rrdtoolmodule.so ./rrdtoolmodule.so )
 
-#sudo yum install -y python-pip rpm-build make python2-devel mysql-devel
-#sudo pip-python install -U pip
-#sudo yum install -y ansible
-#check ansible 
 #检查ansible安装成功
 RE=`ansible --version|grep ansible|wc -l`
 if [ "$RE" == "0" ] ; then
@@ -76,25 +86,10 @@ if [ "$RE" == "0" ] ; then
     exit 1;
 fi
 
-#ansible all -m ping
-mkdir -p $UHP_HOME/logs/web
-mkdir -p $UHP_HOME/logs/monitor
-mkdir -p $UHP_HOME/logs/worker
+mkdir -p $DIR/logs/web
+mkdir -p $DIR/logs/monitor
+mkdir -p $DIR/logs/worker
+mkdir -p $DIR/db
 
-mkdir -p $UHP_HOME/db
-
-sudo pip install ansible
-sudo pip install snakemq
-#sudo pip install mysql.connector
-sudo pip install sqlalchemy
-sudo pip install tornado
-sudo pip install daemon
-sudo pip install threadpool
-sudo pip install callbacks
-sudo pip install mysql-python
-sudo pip install lockfile
-sudo pip install python-daemon 
-sudo pip install simpleparse
-
-chmod +x $UHP_HOME/inventor/mysqlinventory.py 
+chmod +x $DIR/inventor/mysqlinventory.py 
 echo "All is OK!"

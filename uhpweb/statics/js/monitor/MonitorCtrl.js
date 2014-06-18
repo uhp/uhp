@@ -186,10 +186,10 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
             feature : {
                 mark : {show: false},
                 dataView : {show: true, readOnly: true},
-                magicType : type == 'pid' ? {show: false} : {show: true, type: ['line', 'bar', 'stack']},
+                magicType : type == 'pid' ? {show: false} : {show: false, type: ['line', 'bar', 'stack']},
                 restore : {show: false},
                 saveAsImage : {show: true},
-                dataZoom: type == 'pie' ? {show: false} : {show: true}
+                dataZoom: type == 'pie' ? {show: false} : {show: false}
             }
         },
         dataZoom: type == 'pie' ? {show: false} : {show: true},

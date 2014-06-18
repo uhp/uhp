@@ -659,7 +659,7 @@ class AdminBackHandler(BaseHandler):
             #session.add(newTask)
             #session.flush();
             #running_id.append(newTask.id)
-            new_taskid = database.build_task("ansible",tempService,delInst["host"],delInst["role"],"remove")
+            new_taskid = database.build_task(session,"ansible",tempService,delInst["host"],delInst["role"],"remove")
             running_id.append(new_taskid)
             
         session.commit()

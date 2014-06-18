@@ -36,8 +36,6 @@ if __name__ == "__main__" :
     session.add(Alarm("check nmweb","namenode_web()","send_mail","cluster"))
 
     session.add(Alarm("check nm heap","max(jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM/jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM,0.8,0.9)","send_mail","namenode"))
-    session.add(Alarm("check nmweb","namenode_web()","send_mail","datanode"))
-
     session.add(Alarm("check dn heap","max(jvm.JvmMetrics.ProcessName=DataNode.MemHeapUsedM/jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM,0.8,0.9)","send_mail","datanode"))
 
     #yarn check

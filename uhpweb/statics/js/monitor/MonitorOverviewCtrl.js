@@ -107,7 +107,12 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
 			$scope.query()
 		}
 	}
-
+  $scope.nextPage=function(){
+    $scope.nowPage += 1
+  }
+  $scope.prevPage=function(){
+    $scope.nowPage -= 1
+  }
 	$scope.jump=function(wantPage){
     //var wantPage = $(':text[name=wantPage]');
     //var wantPage = wantPage.val();
