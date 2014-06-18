@@ -14,11 +14,11 @@
                 <label>一共[[alarms.total]]个告警([[alarms.totalPage]]页)，当前第[[nowPage]]页</label>
                 <div class="btn-group">
                   <button type="button" class="btn" ng-click="nowPage=1"><span class="glyphicon glyphicon-step-backward"></span></button>
-                  <button type="button" class="btn" ng-disabled="nowPage==1" ng-click="nowPage=nowPage-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
-                  <button type="button" class="btn" ng-disabled="nowPage==alarms.totalPage" ng-click="nowPage=nowPage+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn" ng-disabled="nowPage==1" ng-click="prevPage()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                  <button type="button" class="btn" ng-disabled="nowPage==alarms.totalPage" ng-click="nextPage()"><span class="glyphicon glyphicon-chevron-right"></span></button>
                   <button type="button" class="btn" ng-click="nowPage=alarms.totalPage"><span class="glyphicon glyphicon-step-forward"></span></button>
                 </div>
-                <input type="text" class="form-control" name="wantPage" value="" ng-model="wantPage">
+                <input type="text" class="form-control" style="max-width:80px" name="wantPage" value="" ng-model="wantPage">
                 <button type="button" class="btn" ng-click="jump(wantPage)">跳转</button>
               </form>
             </div>
