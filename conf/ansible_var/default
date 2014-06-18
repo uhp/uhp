@@ -236,11 +236,11 @@ impala__impala_server_mem_limit: 2G
 hue__web_port: 8888
 hue__time_zone: Asia/Shanghai
 
-hue__smtp_host: mail.ucweb.com
+hue__smtp_host: "mail.fade.com"
 hue__smtp_port: 587
-hue__smtp_user: hadoop
-hue__smtp_passwd: ********
-hue__smtp_from: hadoop@ucweb.com
+hue__smtp_user: "fade_user"
+hue__smtp_passwd: "fade_passwd"
+hue__smtp_from: "fade@fade.com"
 
 
 hue__beeswax_server_port: 8002
@@ -248,11 +248,11 @@ hue__beeswax_meta_server_port: 8003
 
 #postgresql_psycopg2, mysql, or sqlite3
 hue__database_type: mysql
-hue__database_host: hadoop2
-hue__database_port: 3306
-hue__database_user: hue
-hue__database_password: hue
-hue__database_db: hue
+hue__database_host: "fade_host"
+hue__database_port: "fade_port"
+hue__database_user: "fade_user"
+hue__database_password: "fade_passwd"
+hue__database_db: "fade_db"
 
 #for hue search
 hue__hue_search: "false"
