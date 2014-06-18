@@ -52,10 +52,10 @@
               <td>[[task.task]]</td>
               <td>[[task.status]]</td>
               <td><i class="[[ resultIconMap[task.result]['class'] ]]" style="[[ resultIconMap[task.result]['style'] ]]" ></i> [[task.result]]</td>
-              <td><button class="btn btn-info" ng-click="showTaskDetail(task.id)">msg</button></td>
+              <td><button class="btn btn-info btn-sm" ng-click="showTaskDetail(task.id)">msg</button></td>
               <td>
-                <button class="btn btn-danger" ng-click="killTask(task.id)" ng-show="task.status=='running'" >终止</button>
-                <button class="btn btn-danger" ng-click="rerunTask(task.id)" ng-show="canRerun(task)" >重跑</button>
+                <button class="btn btn-danger btn-sm" ng-click="killTask(task.id)" ng-show="task.status=='running'" >终止</button>
+                <button class="btn btn-danger btn-sm" ng-click="rerunTask(task.id)" ng-show="canRerun(task)" >重跑</button>
               </td>
             </tr>
           </tbody>	
