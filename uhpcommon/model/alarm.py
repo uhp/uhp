@@ -25,7 +25,7 @@ class Alarm(BASE, UHPBase):
     #拓展host字段的规则如下:
     #want1,want2...:except1,except2...
     #为all 或者为 机器名 或者为 cluster
-    host = Column(String(256),nullable=False)
+    host = Column(String(256,charset='latin1'),nullable=False)
 
     HOST_ALL = "all"
     
