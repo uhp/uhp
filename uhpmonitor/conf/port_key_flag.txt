@@ -118,6 +118,10 @@
             "solr_port": true,
             "solr_admin_port": false,
             "key":"solr.solr.home"
+        },
+        "hbaseindexer": {
+            "solr_admin_port": false,
+            "key":"proc_server.*hbase-indexer"
         }
     }
 }
