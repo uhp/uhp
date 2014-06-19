@@ -1591,7 +1591,7 @@ class MonitorBackHandler(BaseHandler):
             for field in fields:
                 sqlFields = sqlFields+" , sum("+field+") as " + field
         
-            sql = ("select (happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
+            sql = ("select round(happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
 
             session = database.getSession()
             cursor  = session.execute(sql)
@@ -1652,7 +1652,7 @@ class MonitorBackHandler(BaseHandler):
             
             sqlFields=",".join(["sum(%s) as %s" % (f, f) for f in fields])
             
-            sql = ("select (happenTime/%s)*%s as printTime, host, %s from nm \
+            sql = ("select round(happenTime/%s)*%s as printTime, host, %s from nm \
                     where %s group by printTime, host" % 
                     (happenTimeSplit, happenTimeSplit, sqlFields, where)
                   )
