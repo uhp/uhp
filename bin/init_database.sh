@@ -11,7 +11,7 @@ then
 elif [ "$action" == "init" ] 
 then
     cd $UHP_HOME/uhpcommon ; ./database.py init
-    cd $UHP_HOME/conf/ansible_var/ ; ./import_db_conf.py all
+    cd $UHP_HOME/conf/ansible_var/ ; ./update_db_conf.py import
 else
     echo "init_database.py [action] "
     echo "                 create: create all db table"
