@@ -16,7 +16,7 @@ class ExpParser():
         pm_exp          :=  md_exp,('+'/'-',md_exp)*
         md_exp          :=  bracket_exp,('*'/'/',bracket_exp)*
         bracket_exp     :=  ('(',exp,')')/str_var/number
-        str_var         :=  [a-zA-Z],[a-zA-Z0-9_=-\\.]*
+        str_var         :=  [a-zA-Z],[a-zA-Z0-9_=\\.]*
         '''
         self.fun_parser = Parser( declaration, "fun" )
         self.exp_parser = Parser( declaration, "exp" )

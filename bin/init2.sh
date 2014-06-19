@@ -15,6 +15,7 @@ cd $DIR
 chmod a+x bin/*.sh
 
 export VIRTUAL_ENV="$DIR/vpy" 
+VIRTUAL_ENV2="$UHP_HOME/vpy" 
 
 sudo rm -rf $VIRTUAL_ENV
 
@@ -43,7 +44,7 @@ echo "Install vpy ..."
 echo 
 
 python lib/virtualenv-*.py --no-site-packages $VIRTUAL_ENV
-echo "export PATH=$VIRTUAL_ENV/bin:\$PATH" >> ~/.bash_profile
+echo "export PATH=$VIRTUAL_ENV2/bin:\$PATH" >> ~/.bash_profile
 export PATH=$VIRTUAL_ENV/bin:$PATH
 
 echo 

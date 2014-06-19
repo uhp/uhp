@@ -80,14 +80,15 @@ def _get_mail_to():
     #return ['qiujw@ucweb.com']
 
 def _send_alarm_mail(a_list):
-    _send_mail("alarm_mail",{"alarm_list":a_list})
+    _send_mail("alarm_mail",{"alarm_list":a_list,"cluster":config.mail_cluster})
 
 def _send_mail(template_name,dict):
     template = env.get_template("%s.html" % template_name)
     html = template.render(**dict)
     to_list = _get_mail_to()
+    title = u"%s:UHP告警邮件" % config.mail_cluster
     log.info("send mail to"+str(to_list))
-    mail.send_mail(to_list, "UHP alarm mail", html, "html")
+    mail.send_mail(to_list, title , html, "html")
 
 if __name__ == "__main__" :
     print "x"

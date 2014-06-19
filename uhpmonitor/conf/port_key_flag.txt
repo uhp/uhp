@@ -28,7 +28,7 @@
         },
         "httpfs":{
             "httpfs_http_port" : true,
-            "key":"proc_httpfs"
+            "key":"httpfs"
         }
     },
     "yarn": {
@@ -109,13 +109,19 @@
     },
     "hue": {
         "hueserver": {
-            "web_port": true
+            "web_port": true,
+            "key":"runspawningserver"
         }
     },
     "search": {
         "solrserver": {
             "solr_port": true,
-            "solr_admin_port": false
+            "solr_admin_port": false,
+            "key":"solr.solr.home"
+        },
+        "hbaseindexer": {
+            "solr_admin_port": false,
+            "key":"proc_server.*hbase-indexer"
         }
     }
 }

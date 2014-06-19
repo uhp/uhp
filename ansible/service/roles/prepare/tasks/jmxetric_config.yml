@@ -1,0 +1,16 @@
+
+- name: mkdir /etc/uhp/
+  shell: mkdir -p /etc/uhp
+  sudo: yes
+
+- name: copy the jmxetric to /etc/uhp/
+  sudo: yes
+  template: src=../../conf/templates/{{item}}.j2 dest=/etc/uhp/{{item|basename}}
+  with_items:
+    - zookeeper/zookeeper-jmxetric.xml
+    - hbase/hbase-master-jmxetric.xml
+    - hbase/hbase-regionserver-jmxetric.xml
+    - hive/hive-metastore-jmxetric.xml
+    - hive/hive-server-jmxetric.xml
+    - hive/hive-server2-jmxetric.xml
+

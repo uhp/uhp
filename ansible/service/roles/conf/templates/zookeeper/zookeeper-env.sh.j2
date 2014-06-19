@@ -1,4 +1,6 @@
 
 export ZOOKEEPER_JMXETRIC=" -javaagent:/usr/java/jmxetric-1.0.6.jar=host={{ ganglia__data_source[0] }},port={{ ganglia__gmond_port }},wireformat31x=true,config=/etc/zookeeper/conf/zookeeper-jmxetric.xml"
 
-export JVMFLAGS=" {{ SERVER_OPTS }} $ZOOKEEPER_JMXETRIC {{ zookeeper__ZOOKEEPER_OPTS }} "
+export SERVER_JVMFLAGS=" {{ SERVER_OPTS }} $ZOOKEEPER_JMXETRIC {{ zookeeper__ZOOKEEPER_OPTS }} "
+
+export CLIENT_JVMFLAGS=" {{ zookeeper__ZOOKEEPER_CLIENT_OPTS }}"
