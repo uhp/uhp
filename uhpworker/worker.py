@@ -188,7 +188,7 @@ class AnsibleExecutor(Executor):
         myout.write("\n")
         myout.write('PATH:' + os.getenv('PATH'))
         myout.write("\n")
-        cmd = ["/usr/bin/env", "ansible-playbook", "-i", config.ansible_host_list, pb]
+        cmd = ["/usr/bin/env", "ansible-playbook", "-s", "-i", config.ansible_host_list, pb]
         cmd_str = "cmd="+" ".join(cmd)
         myout.write(cmd_str)
         myout.write("\n")
