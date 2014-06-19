@@ -39,7 +39,8 @@ ganglia__gmetad_rras:
 
 
 #for zookeeper
-zookeeper__ZOOKEEPER_OPTS: "-Xmx1024m"
+zookeeper__ZOOKEEPER_OPTS: " -Xmx1024m "
+zookeeper__ZOOKEEPER_CLIENT_OPTS: " -Xmx1024m "
 zookeeper__zookeeper_client_port: "2181"
 zookeeper__zookeeper_leader_port: "2888"
 zookeeper__zookeeper_election_port: "3888"

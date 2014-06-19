@@ -45,6 +45,9 @@ class NamenodeChecker():
         3. 两者的active状态
         4. 两者的tid
         '''
+        if len(hosts) == 0 :
+            return ("ERROR","没有namenode")
+
         ha_states = []
         tids = []
         for host in hosts:
