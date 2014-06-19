@@ -20,8 +20,8 @@ EOS
 # pid=port
 # tcp        0      0 127.0.0.1:4000              0.0.0.0:*                   LISTEN      30448/python
 #check_ports=$(netstat -nplt 2>/dev/null | grep LISTEN | grep tcp | grep -v ansible | awk '{ port=sub(/.*:/,"",$4); pid=sub(/\/.*/,"",$7); if($7 != "-") printf("%s=%s\n",$7,$4);}')
-check_ports=$( /usr/sbin/ss -nplt 2>/dev/null | sed -e 1d | grep -v ansible | awk '{ sub(/.*:/,"",$4); sub(/.*\",/,"",$6); sub(/,.*/,"",$6); printf("%s=%s\n",$6,$4); }' | sort | uniq )
-
+#check_ports=$( /usr/sbin/ss -nplt 2>/dev/null | sed -e 1d | grep -v ansible | awk '{ sub(/.*:/,"",$4); sub(/.*\",/,"",$6); sub(/,.*/,"",$6); printf("%s=%s\n",$6,$4); }' | sort | uniq )
+check_ports=$( /usr/sbin/ss -nplt 2>/dev/null | grep -v ansible | awk 'BEGIN{nlines=0;ver=1;}{nlines++; if(nlines == 1 && $1 == "State"){ ver=2 }; if(ver == 1){ sub(/.*:/,"",$3); sub(/.*\",/,"",$5); sub(/,.*/,"",$5); printf("%s=%s\n",$5,$3);} else {sub(/.*:/,"",$4); sub(/.*\",/,"",$6); sub(/,.*/,"",$6); printf("%s=%s\n",$6,$4);}}'|sed -e "1d"|sort|uniq)
 retu=()
 
 # 通过Key找到进程，再核对端口
