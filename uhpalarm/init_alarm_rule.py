@@ -42,7 +42,7 @@ if __name__ == "__main__" :
     session.add(Alarm("check rmweb","resourcemanager_web()","send_mail","cluster"))
     session.add(Alarm("check rm heap","max(jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapUsedM/jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapCommittedM,0.8,0.9)","send_mail","resourcemanager"))
 
-    session.add(Alarm("check rm heap","max(jvm.JvmMetrics.ProcessName=NodeManager.MemHeapUsedM/jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM,0.8,0.9)","send_mail","nodemanager"))
+    session.add(Alarm("check nm heap","max(jvm.JvmMetrics.ProcessName=NodeManager.MemHeapUsedM/jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM,0.8,0.9)","send_mail","nodemanager"))
 
     #hbase
     session.add(Alarm("check hm heap","max(hbasemaster_memory_memHeapUsed/hbasemaster_memory_memHeapCommitted,0.8,0.9)","send_mail","hbasemaster"))
