@@ -184,7 +184,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             url: '/monitorback/rm_query',
             params:{
                 "fields"          : fields,
-                "happenTimeSplit" : $scope.rm_split,
+                "happenTimeSplit" : $scope.rm_split*60,
                 "happenTimeMin"   : get_unix_time() - (parseInt($scope.rm_time)*60),
                 "happenTimeMax"   : get_unix_time()
             }
@@ -301,7 +301,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             params:{
                 "fields"          : fields,
                 "hosts"           : $scope.selected_nm_hosts,
-                "happenTimeSplit" : $scope.nm_split,
+                "happenTimeSplit" : $scope.nm_split*60,
                 "happenTimeMin"   : get_unix_time() - (parseInt($scope.nm_time)*60),
                 "happenTimeMax"   : get_unix_time()
             }
