@@ -110,7 +110,7 @@
     "hue": {
         "hueserver": {
             "web_port": true,
-            "key":"BeeswaxServer"
+            "key":"runspawningserver"
         }
     },
     "search": {
