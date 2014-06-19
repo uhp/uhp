@@ -146,7 +146,8 @@ class MonitorBackHandler(BaseHandler):
         if show_info['metrics']:
             show_info['metric'] = show_info['metrics'][0]['name']
         show_info['hosts'] = self._host_list()
-        show_info['host'] = show_info['hosts'][0]
+        if show_info['hosts']:
+            show_info['host'] = show_info['hosts'][0]
 
         ret = {"data":show_info}
         self.ret("ok", "", ret);
@@ -225,7 +226,7 @@ class MonitorBackHandler(BaseHandler):
                     if ins.host == host['host']:
                         host_ins = ins
                         break
-                if host_ins and host_ins.uptime > uptime_limit and host_ins.msg:
+                if host_ins and host_ins.monitor_time > uptime_limit and host_ins.msg:
                     msg = json.loads(host_ins.msg)
                     if 'leader' in msg and msg['leader']:
                         state = state1
@@ -269,247 +270,265 @@ class MonitorBackHandler(BaseHandler):
         service = _service(u'zookeeper', services)
         if service:
             # zookeeper
-            hosts = service['roles']['zookeeper']
-            ori_host_metrics = [
-                {'name' : 'zookeeper_memory_memHeapMax',          'display' : 'JVM最大堆内存',    'func' : _f_b2m},
-                {'name' : 'zookeeper_memory_memHeapCommitted',    'display' : 'JVM申请堆内存',    'func' : _f_b2m},
-                {'name' : 'zookeeper_memory_memHeapUsed',         'display' : 'JVM使用堆内存',    'func' : _f_b2m},
-                {'name' : 'zookeeper_memory_memNonHeapMax',       'display' : 'JVM最大非堆内存',  'func' : _f_b2m},
-                {'name' : 'zookeeper_memory_memNonHeapCommitted', 'display' : 'JVM使用非堆内存',  'func' : _f_b2m},
-                {'name' : 'zookeeper_memory_memNonHeapUsed',      'display' : 'JVM提交非堆内存',  'func' : _f_b2m},
-                {'name' : 'zookeeper_Threading_ThreadCount',      'display' : '线程数'},
-            ]
-            
-            service_metrics = _multi_host_metrics('Zookeeper', hosts, ori_host_metrics)
-            inss = service['instances']['zookeeper']
-            _ext_state(service_metrics, inss, 'leader', 'follower')
-            services_metrics.append(service_metrics)
+            service_name = 'zookeeper'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name' : 'zookeeper_memory_memHeapMax',          'display' : 'JVM最大堆内存',    'func' : _f_b2m},
+                    {'name' : 'zookeeper_memory_memHeapCommitted',    'display' : 'JVM申请堆内存',    'func' : _f_b2m},
+                    {'name' : 'zookeeper_memory_memHeapUsed',         'display' : 'JVM使用堆内存',    'func' : _f_b2m},
+                    {'name' : 'zookeeper_memory_memNonHeapMax',       'display' : 'JVM最大非堆内存',  'func' : _f_b2m},
+                    {'name' : 'zookeeper_memory_memNonHeapCommitted', 'display' : 'JVM使用非堆内存',  'func' : _f_b2m},
+                    {'name' : 'zookeeper_memory_memNonHeapUsed',      'display' : 'JVM提交非堆内存',  'func' : _f_b2m},
+                    {'name' : 'zookeeper_Threading_ThreadCount',      'display' : '线程数'},
+                ]
+                
+                service_metrics = _multi_host_metrics('Zookeeper', hosts, ori_host_metrics)
+                inss = service['instances']['zookeeper']
+                _ext_state(service_metrics, inss, 'leader', 'follower')
+                services_metrics.append(service_metrics)
             
         # hdfs
         service = _service(u'hdfs', services)
         if service:
             # nn
-            hosts = service['roles']['namenode']
-            ori_host_metrics = [
-                {'name':'dfs.namenode.BlockReportAvgTime',                          'display' :'块汇报的平均时间', 'func':_f_f2f, 'unit':'MS'},
-                {'name':'dfs.namenode.SyncsAvgTime',                                'display' :'Syncs操作平均时间', 'func':_f_f2f, 'unit':'MS'},
-                {'name':'dfs.namenode.TransactionsAvgTime',                         'display' :'事务平均时间', 'func':_f_f2f, 'unit':'MS'},
-                {'name':'dfs.NameNode.QueuedEditsSize',                             'display' :'QueuedEditsSize'},
-                {'name':'dfs.namenode.transactionsBatchedInSync',                   'display' :'同步的事务数量'},
-                {'name':'dfs.FSNamesystem.BlockCapacity',                           'display' :'通过计算得到Block'},
-                {'name':'dfs.FSNamesystem.BlocksTotal',                             'display' :'总的块数量'},
-                {'name':'dfs.FSNamesystem.CapacityRemainingGB',                     'display' :'可用空间', 'func':_f_space},
-                {'name':'dfs.FSNamesystem.CapacityTotalGB',                         'display' :'总存储量', 'func':_f_space},
-                {'name':'dfs.FSNamesystem.CapacityUsedGB',                          'display' :'总使用量', 'func':_f_space},
-                {'name':'dfs.FSNamesystem.CorruptBlocks',                           'display' :'损坏的块数'},
-                {'name':'dfs.FSNamesystem.ExcessBlocks',                            'display' :'过量块数'},
-                {'name':'dfs.FSNamesystem.ExpiredHeartbeats',                       'display' :'超时心跳数'},
-                {'name':'dfs.FSNamesystem.FilesTotal',                              'display' :'总inode数'},
-                {'name':'dfs.FSNamesystem.MissingBlocks',                           'display' :'丢失块数'},
-                {'name':'dfs.FSNamesystem.PendingDataNodeMessageCount',             'display' :'待发送命令数'},
-                {'name':'dfs.FSNamesystem.PendingDeletionBlocks',                   'display' :'待删除块数'},
-                {'name':'dfs.FSNamesystem.PendingReplicationBlocks',                'display' :'待复制块数'},
-                {'name':'dfs.FSNamesystem.TotalFiles',                              'display' :'总文件数'},
-                {'name':'dfs.FSNamesystem.UnderReplicatedBlocks',                   'display' :'小于副本数的块数'},
-                {'name':'dfs.FSNamesystem.CorruptReplicaBlocks',                    'display' :'损坏的块数'},
-                {'name':'dfs.FSNamesystem.HAState',                                 'display' :'HA的状态'},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM',    'display' :'JVM申请堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM',         'display' :'JVM使用堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapCommittedM', 'display' :'JVM申请堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapUsedM',      'display' :'JVM使用堆内存', 'func':_f_m2mg},
-            ]
-            
-            service_metrics = _multi_host_metrics('HDFS/NameNode', hosts, ori_host_metrics)
-            inss = service['instances']['namenode']
-            _ext_state(service_metrics, inss, 'active', 'standby')
-            services_metrics.append(service_metrics)
+            service_name = 'namenode'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name':'dfs.namenode.BlockReportAvgTime',                          'display' :'块汇报的平均时间', 'func':_f_f2f, 'unit':'MS'},
+                    {'name':'dfs.namenode.SyncsAvgTime',                                'display' :'Syncs操作平均时间', 'func':_f_f2f, 'unit':'MS'},
+                    {'name':'dfs.namenode.TransactionsAvgTime',                         'display' :'事务平均时间', 'func':_f_f2f, 'unit':'MS'},
+                    {'name':'dfs.NameNode.QueuedEditsSize',                             'display' :'QueuedEditsSize'},
+                    {'name':'dfs.namenode.transactionsBatchedInSync',                   'display' :'同步的事务数量'},
+                    {'name':'dfs.FSNamesystem.BlockCapacity',                           'display' :'通过计算得到Block'},
+                    {'name':'dfs.FSNamesystem.BlocksTotal',                             'display' :'总的块数量'},
+                    {'name':'dfs.FSNamesystem.CapacityRemainingGB',                     'display' :'可用空间', 'func':_f_space},
+                    {'name':'dfs.FSNamesystem.CapacityTotalGB',                         'display' :'总存储量', 'func':_f_space},
+                    {'name':'dfs.FSNamesystem.CapacityUsedGB',                          'display' :'总使用量', 'func':_f_space},
+                    {'name':'dfs.FSNamesystem.CorruptBlocks',                           'display' :'损坏的块数'},
+                    {'name':'dfs.FSNamesystem.ExcessBlocks',                            'display' :'过量块数'},
+                    {'name':'dfs.FSNamesystem.ExpiredHeartbeats',                       'display' :'超时心跳数'},
+                    {'name':'dfs.FSNamesystem.FilesTotal',                              'display' :'总inode数'},
+                    {'name':'dfs.FSNamesystem.MissingBlocks',                           'display' :'丢失块数'},
+                    {'name':'dfs.FSNamesystem.PendingDataNodeMessageCount',             'display' :'待发送命令数'},
+                    {'name':'dfs.FSNamesystem.PendingDeletionBlocks',                   'display' :'待删除块数'},
+                    {'name':'dfs.FSNamesystem.PendingReplicationBlocks',                'display' :'待复制块数'},
+                    {'name':'dfs.FSNamesystem.TotalFiles',                              'display' :'总文件数'},
+                    {'name':'dfs.FSNamesystem.UnderReplicatedBlocks',                   'display' :'小于副本数的块数'},
+                    {'name':'dfs.FSNamesystem.CorruptReplicaBlocks',                    'display' :'损坏的块数'},
+                    {'name':'dfs.FSNamesystem.HAState',                                 'display' :'HA的状态'},
+                    {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM',    'display' :'JVM申请堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM',         'display' :'JVM使用堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapCommittedM', 'display' :'JVM申请堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NameNode.MemNonHeapUsedM',      'display' :'JVM使用堆内存', 'func':_f_m2mg},
+                ]
+                
+                service_metrics = _multi_host_metrics('HDFS/NameNode', hosts, ori_host_metrics)
+                inss = service['instances']['namenode']
+                _ext_state(service_metrics, inss, 'active', 'standby')
+                services_metrics.append(service_metrics)
 
             # dn
-            hosts = service['roles']['datanode']
-            ori_host_metrics= [
+            service_name = 'datanode'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics= [
                     {'name':'dfs.datanode.BlockReportsAvgTime', 'display':'块报告平均时间','func':_f_f2f,'unit':'MS'},
-                {'name':'dfs.datanode.BlockReportsNumOps', 'display':'块报告次数'},
-                {'name':'dfs.datanode.HeartbeatsAvgTime', 'display':'向NameNode汇报平均时间','func':_f_f2f,'unit':'MS'},
-                {'name':'dfs.datanode.HeartbeatsNumOps', 'display':'向NameNode汇报总次数'},
-                {'name':'dfs.datanode.BlocksGetLocalPathInfo', 'display':'BlocksGetLocalPathInfo'},
-                {'name':'dfs.datanode.BlocksRemoved','display':'删除块数目'},
-                {'name':'dfs.datanode.BlocksVerified','display':'块验证总次数'},
-                {'name':'dfs.datanode.BlocksWritten','display':'向硬盘写块总次数'},
-                {'name':'dfs.datanode.BytesWritten','display':'写入总字节数'},
-                {'name':'dfs.datanode.FlushNanosAvgTime','display':'文件系统Flush平均时间','func':_f_f2f,'unit':'NS'},
-                {'name':'dfs.datanode.FlushNanosNumOps','display':'文件系统Flush次数'},
-                {'name':'dfs.datanode.PacketAckRoundTripTimeNanosAvgTime','display':'包确认平均时间','func':_f_f2f,'unit':'NS'},
-                {'name':'dfs.datanode.PacketAckRoundTripTimeNanosNumOps','display':'包确认次数'},
-                {'name':'dfs.datanode.WriteBlockOpAvgTime','display':'写块平均时间','func':_f_f2f,'unit':'NS'},
-                {'name':'dfs.datanode.WriteBlockOpNumOps','display':'写块总次数'},
-                {'name':'dfs.datanode.WritesFromLocalClient','display':'写本地次数'},
-                {'name':'dfs.datanode.WritesFromRemoteClient','display':'写远程次数'},
-                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM','display':'JVM申请堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapUsedM','display':'JVM堆内存使用', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapCommittedM','display':'JVM提交非堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapUsedM','display':'JVM非堆内存使用', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=DataNode.ThreadsTimedWaiting','display':'ThreadsTimedWaiting', 'func':_f_m2mg},
-            ]
+                    {'name':'dfs.datanode.BlockReportsNumOps', 'display':'块报告次数'},
+                    {'name':'dfs.datanode.HeartbeatsAvgTime', 'display':'向NameNode汇报平均时间','func':_f_f2f,'unit':'MS'},
+                    {'name':'dfs.datanode.HeartbeatsNumOps', 'display':'向NameNode汇报总次数'},
+                    {'name':'dfs.datanode.BlocksGetLocalPathInfo', 'display':'BlocksGetLocalPathInfo'},
+                    {'name':'dfs.datanode.BlocksRemoved','display':'删除块数目'},
+                    {'name':'dfs.datanode.BlocksVerified','display':'块验证总次数'},
+                    {'name':'dfs.datanode.BlocksWritten','display':'向硬盘写块总次数'},
+                    {'name':'dfs.datanode.BytesWritten','display':'写入总字节数'},
+                    {'name':'dfs.datanode.FlushNanosAvgTime','display':'文件系统Flush平均时间','func':_f_f2f,'unit':'NS'},
+                    {'name':'dfs.datanode.FlushNanosNumOps','display':'文件系统Flush次数'},
+                    {'name':'dfs.datanode.PacketAckRoundTripTimeNanosAvgTime','display':'包确认平均时间','func':_f_f2f,'unit':'NS'},
+                    {'name':'dfs.datanode.PacketAckRoundTripTimeNanosNumOps','display':'包确认次数'},
+                    {'name':'dfs.datanode.WriteBlockOpAvgTime','display':'写块平均时间','func':_f_f2f,'unit':'NS'},
+                    {'name':'dfs.datanode.WriteBlockOpNumOps','display':'写块总次数'},
+                    {'name':'dfs.datanode.WritesFromLocalClient','display':'写本地次数'},
+                    {'name':'dfs.datanode.WritesFromRemoteClient','display':'写远程次数'},
+                    {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM','display':'JVM申请堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemHeapUsedM','display':'JVM堆内存使用', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapCommittedM','display':'JVM提交非堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=DataNode.MemNonHeapUsedM','display':'JVM非堆内存使用', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=DataNode.ThreadsTimedWaiting','display':'ThreadsTimedWaiting', 'func':_f_m2mg},
+                ]
 
-            service_metrics = _multi_host_metrics('HDFS/DataNode', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+                service_metrics = _multi_host_metrics('HDFS/DataNode', hosts, ori_host_metrics)
+                services_metrics.append(service_metrics)
 
         # yarn
         service = _service(u'yarn', services)
         if service:
             # rm
-            hosts = service['roles']['resourcemanager']
-            ori_host_metrics = [
-                {'name':'yarn.ClusterMetrics.NumActiveNMs',                                'display' :'活跃的NodeManager'},
-                {'name':'yarn.ClusterMetrics.NumLostNMs',                                  'display' :'丢失的NodeManager'},
-                {'name':'yarn.QueueMetrics.Queue=root.AvailableMB',                        'display' :'可用内存', 'func':_f_m2mg},
-                {'name':'yarn.QueueMetrics.Queue=root.AllocatedMB',                        'display' :'分配内存', 'func':_f_m2mg},
-                {'name':'yarn.QueueMetrics.Queue=root.ActiveApplications',                 'display' :'活跃的App'},
-                {'name':'yarn.QueueMetrics.Queue=root.ActiveUsers',                        'display' :'活跃的用户'},
-                {'name':'yarn.QueueMetrics.Queue=root.AllocatedContainers',                'display' :'分配Container'},
-                {'name':'yarn.QueueMetrics.Queue=root.AppsCompleted',                      'display' :'完成的App'},
-                {'name':'yarn.QueueMetrics.Queue=root.AppsFailed',                         'display' :'失败的App'},
-                {'name':'yarn.QueueMetrics.Queue=root.AppsKilled',                         'display' :'Kill的App'},
-                {'name':'yarn.QueueMetrics.Queue=root.AppsPending',                        'display' :'挂起的APP'},
-                {'name':'yarn.QueueMetrics.Queue=root.AppsRunning',                        'display' :'运行的APP'},
-                {'name':'yarn.QueueMetrics.Queue=root.AppsSubmitted',                      'display' :'提交的APP'},
-                {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersAllocated',       'display' :'总共申请的Container'},
-                {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersReleased',        'display' :'总共释放的Container'},
-                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapCommittedM',    'display' :'JVM申请堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapUsedM',         'display' :'JVM使用堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.ThreadsWaiting',       'display' :'ThreadsWaiting'},
-            ]
+            service_name = 'resourcemanager'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name':'yarn.ClusterMetrics.NumActiveNMs',                                'display' :'活跃的NodeManager'},
+                    {'name':'yarn.ClusterMetrics.NumLostNMs',                                  'display' :'丢失的NodeManager'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AvailableMB',                        'display' :'可用内存', 'func':_f_m2mg},
+                    {'name':'yarn.QueueMetrics.Queue=root.AllocatedMB',                        'display' :'分配内存', 'func':_f_m2mg},
+                    {'name':'yarn.QueueMetrics.Queue=root.ActiveApplications',                 'display' :'活跃的App'},
+                    {'name':'yarn.QueueMetrics.Queue=root.ActiveUsers',                        'display' :'活跃的用户'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AllocatedContainers',                'display' :'分配Container'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AppsCompleted',                      'display' :'完成的App'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AppsFailed',                         'display' :'失败的App'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AppsKilled',                         'display' :'Kill的App'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AppsPending',                        'display' :'挂起的APP'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AppsRunning',                        'display' :'运行的APP'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AppsSubmitted',                      'display' :'提交的APP'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersAllocated',       'display' :'总共申请的Container'},
+                    {'name':'yarn.QueueMetrics.Queue=root.AggregateContainersReleased',        'display' :'总共释放的Container'},
+                    {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapCommittedM',    'display' :'JVM申请堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemHeapUsedM',         'display' :'JVM使用堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=ResourceManager.ThreadsWaiting',       'display' :'ThreadsWaiting'},
+                ]
         
-            service_metrics = _multi_host_metrics('YARN/ResourceManager', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+                service_metrics = _multi_host_metrics('YARN/ResourceManager', hosts, ori_host_metrics)
+                services_metrics.append(service_metrics)
 
             # nm
-            hosts = service['roles']['nodemanager']
-            ori_host_metrics = [
-                {'name':'yarn.NodeManagerMetrics.AllocatedGB',                         'display' :'分配内存', 'func':_f_f2f, 'unit':'GB'},
-                {'name':'yarn.NodeManagerMetrics.AvailableGB',                         'display' :'剩下可用内存', 'func':_f_f2f, 'unit':'GB'},
-                {'name':'yarn.NodeManagerMetrics.AllocatedContainers',                 'display' :'分配Container'},
-                {'name':'yarn.NodeManagerMetrics.ContainersCompleted',                 'display' :'Container完成的数量'},
-                {'name':'yarn.NodeManagerMetrics.ContainersIniting',                   'display' :'正在Init的Container'},
-                {'name':'yarn.NodeManagerMetrics.ContainersKilled',                    'display' :'container终止的数量'},
-                {'name':'yarn.NodeManagerMetrics.ContainersLaunched',                  'display' :'登录的container数量'},
-                {'name':'yarn.NodeManagerMetrics.ContainersRunning',                   'display' :'正在运行的Container'},
-                {'name':'yarn.NodeManagerMetrics.ContainersFailed',                    'display' :'container失败的数量'},
-                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM',    'display' :'JVM申请堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapUsedM',         'display' :'JVM使用堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存', 'func':_f_m2mg},
-                {'name':'jvm.JvmMetrics.ProcessName=NodeManager.ThreadsTimedWaiting',  'display' :'ThreadsTimedWaiting'},
-                {'name':'mapred.ShuffleMetrics.ShuffleConnections',                    'display' :'Shuffle连接数'},
-                {'name':'mapred.ShuffleMetrics.ShuffleOutputBytes',                    'display' :'Shuffle输出Bytes'},
-                {'name':'mapred.ShuffleMetrics.ShuffleOutputsOK',                      'display' :'Shuffle输出成功数'},
-            ]
+            service_name = 'nodemanager'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name':'yarn.NodeManagerMetrics.AllocatedGB',                         'display' :'分配内存', 'func':_f_f2f, 'unit':'GB'},
+                    {'name':'yarn.NodeManagerMetrics.AvailableGB',                         'display' :'剩下可用内存', 'func':_f_f2f, 'unit':'GB'},
+                    {'name':'yarn.NodeManagerMetrics.AllocatedContainers',                 'display' :'分配Container'},
+                    {'name':'yarn.NodeManagerMetrics.ContainersCompleted',                 'display' :'Container完成的数量'},
+                    {'name':'yarn.NodeManagerMetrics.ContainersIniting',                   'display' :'正在Init的Container'},
+                    {'name':'yarn.NodeManagerMetrics.ContainersKilled',                    'display' :'container终止的数量'},
+                    {'name':'yarn.NodeManagerMetrics.ContainersLaunched',                  'display' :'登录的container数量'},
+                    {'name':'yarn.NodeManagerMetrics.ContainersRunning',                   'display' :'正在运行的Container'},
+                    {'name':'yarn.NodeManagerMetrics.ContainersFailed',                    'display' :'container失败的数量'},
+                    {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapCommittedM',    'display' :'JVM申请堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemHeapUsedM',         'display' :'JVM使用堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapCommittedM', 'display' :'JVM提交非堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NodeManager.MemNonHeapUsedM',      'display' :'JVM使用非堆内存', 'func':_f_m2mg},
+                    {'name':'jvm.JvmMetrics.ProcessName=NodeManager.ThreadsTimedWaiting',  'display' :'ThreadsTimedWaiting'},
+                    {'name':'mapred.ShuffleMetrics.ShuffleConnections',                    'display' :'Shuffle连接数'},
+                    {'name':'mapred.ShuffleMetrics.ShuffleOutputBytes',                    'display' :'Shuffle输出Bytes'},
+                    {'name':'mapred.ShuffleMetrics.ShuffleOutputsOK',                      'display' :'Shuffle输出成功数'},
+                ]
         
-            service_metrics = _multi_host_metrics('YARN/NodeManager', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+                service_metrics = _multi_host_metrics('YARN/NodeManager', hosts, ori_host_metrics)
+                services_metrics.append(service_metrics)
         
         
         # hive
         service = _service(u'hive', services)
         if service:
             # hivemetastore
-            hosts = service['roles']['hivemetastore']
-            ori_host_metrics = [
-                {'name':'hivemetastore_memory_memHeapCommitted',    'display':'JVM申请堆内存',    'func' : _f_b2m},
-                {'name':'hivemetastore_memory_memHeapMax',          'display':'JVM最大堆内存',    'func' : _f_b2m},
-                {'name':'hivemetastore_memory_memHeapUsed',         'display':'JVM使用堆内存',    'func' : _f_b2m},
-                {'name':'hivemetastore_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存',    'func' : _f_b2m},
-                {'name':'hivemetastore_memory_memNonHeapMax',       'display':'JVM最大非堆内存',    'func' : _f_b2m},
-                {'name':'hivemetastore_memory_memNonHeapUsed',      'display':'JVM使用非堆内存',    'func' : _f_b2m},
-                {'name':'hivemetastore_Threading_ThreadCount',      'display':'线程数'},
-            ]
+            service_name = 'hivemetastore'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name':'hivemetastore_memory_memHeapCommitted',    'display':'JVM申请堆内存',    'func' : _f_b2m},
+                    {'name':'hivemetastore_memory_memHeapMax',          'display':'JVM最大堆内存',    'func' : _f_b2m},
+                    {'name':'hivemetastore_memory_memHeapUsed',         'display':'JVM使用堆内存',    'func' : _f_b2m},
+                    {'name':'hivemetastore_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存',    'func' : _f_b2m},
+                    {'name':'hivemetastore_memory_memNonHeapMax',       'display':'JVM最大非堆内存',    'func' : _f_b2m},
+                    {'name':'hivemetastore_memory_memNonHeapUsed',      'display':'JVM使用非堆内存',    'func' : _f_b2m},
+                    {'name':'hivemetastore_Threading_ThreadCount',      'display':'线程数'},
+                ]
         
-            service_metrics = _multi_host_metrics('Hive/HiveMetaStore', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+                service_metrics = _multi_host_metrics('Hive/HiveMetaStore', hosts, ori_host_metrics)
+                services_metrics.append(service_metrics)
             
             # hiveserver
-            hosts = service['roles']['hiveserver']
-            ori_host_metrics = [
-                {'name' : 'hiveserver_memory_memHeapCommitted',       'display' : 'JVM申请堆内存',      'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memHeapMax',             'display' : 'JVM最大堆内存',      'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memHeapUsed',            'display' : 'JVM使用堆内存',      'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memNonHeapCommitted',    'display' : 'JVM提交非堆内存',    'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memNonHeapMax',          'display' : 'JVM最大非堆内存',    'func' : _f_b2m},
-                {'name' : 'hiveserver_memory_memNonHeapUsed',         'display' : 'JVM使用非堆内存',    'func' : _f_b2m},
-                {'name' : 'hiveserver_Threading_ThreadCount',         'display' : '线程数'},
-            ]
+            service_name = 'hiveserver'
+            if 'hiveserver' in service['roles']:
+                hosts = service['roles'][service_name]
+            	ori_host_metrics = [
+            	    {'name' : 'hiveserver_memory_memHeapCommitted',       'display' : 'JVM申请堆内存',      'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memHeapMax',             'display' : 'JVM最大堆内存',      'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memHeapUsed',            'display' : 'JVM使用堆内存',      'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memNonHeapCommitted',    'display' : 'JVM提交非堆内存',    'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memNonHeapMax',          'display' : 'JVM最大非堆内存',    'func' : _f_b2m},
+            	    {'name' : 'hiveserver_memory_memNonHeapUsed',         'display' : 'JVM使用非堆内存',    'func' : _f_b2m},
+            	    {'name' : 'hiveserver_Threading_ThreadCount',         'display' : '线程数'},
+            	]
         
-            service_metrics = _multi_host_metrics('Hive/HiveServer', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+            	service_metrics = _multi_host_metrics('Hive/HiveServer', hosts, ori_host_metrics)
+            	services_metrics.append(service_metrics)
         
         # hbase
         service = _service(u'hbase', services)
         if service:
             # hbasemaster
-            hosts = service['roles']['hbasemaster']
-            ori_host_metrics = [
-                {'name':'hbasemaster_master_cluster_requests',    'display':'当前机器整体request的个数'},
-                {'name':'hbasemaster_master_splitSizeAvgTime',    'display':'splitSizeAvgTime','unit':'MS'},
-                {'name':'hbasemaster_master_splitSizeMaxTime',    'display':'splitSizeMaxTime','unit':'MS'},
-                {'name':'hbasemaster_master_splitSizeMinTime',    'display':'splitSizeMinTime','unit':'MS'},
-                {'name':'hbasemaster_master_splitSizeNumOps',     'display':'splitlog次数'},
-                {'name':'hbasemaster_master_splitTimeAvgTime',    'display':'splitlog的时间平均值','unit':'MS'},
-                {'name':'hbasemaster_master_splitTimeMaxTime',    'display':'splitlog的时间最大值','unit':'MS'},
-                {'name':'hbasemaster_master_splitTimeMinTime',    'display':'splitlog的时间最小值','unit':'MS'},
-                {'name':'hbasemaster_master_splitTimeNumOps',     'display':'splitlog的次数'},
-                {'name':'hbasemaster_memory_memHeapMax',          'display':'JVM最大堆内存',  'func' : _f_b2m},
-                {'name':'hbasemaster_memory_memHeapCommitted',    'display':'JVM申请堆内存',  'func' : _f_b2m},
-                {'name':'hbasemaster_memory_memHeapUsed',         'display':'JVM使用堆内存',  'func' : _f_b2m},
-                {'name':'hbasemaster_memory_memNonHeapMax',       'display':'JVM最大非堆内存',  'func' : _f_b2m},
-                {'name':'hbasemaster_memory_memNonHeapUsed',      'display':'JVM使用非堆内存',  'func' : _f_b2m},
-                {'name':'hbasemaster_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存',  'func' : _f_b2m},
-                {'name':'hbasemaster_Threading_ThreadCount',      'display':'线程数量'},
-            ]
-            
-            service_metrics = _multi_host_metrics('HBase/HBaseMaster', hosts, ori_host_metrics)
-            inss = service['instances']['hbasemaster']
-            _ext_state(service_metrics, inss, 'active', 'standby')
-            services_metrics.append(service_metrics)
+            service_name = 'hbasemaster'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name':'hbasemaster_master_cluster_requests',    'display':'当前机器整体request的个数'},
+                    {'name':'hbasemaster_master_splitSizeAvgTime',    'display':'splitSizeAvgTime','unit':'MS'},
+                    {'name':'hbasemaster_master_splitSizeMaxTime',    'display':'splitSizeMaxTime','unit':'MS'},
+                    {'name':'hbasemaster_master_splitSizeMinTime',    'display':'splitSizeMinTime','unit':'MS'},
+                    {'name':'hbasemaster_master_splitSizeNumOps',     'display':'splitlog次数'},
+                    {'name':'hbasemaster_master_splitTimeAvgTime',    'display':'splitlog的时间平均值','unit':'MS'},
+                    {'name':'hbasemaster_master_splitTimeMaxTime',    'display':'splitlog的时间最大值','unit':'MS'},
+                    {'name':'hbasemaster_master_splitTimeMinTime',    'display':'splitlog的时间最小值','unit':'MS'},
+                    {'name':'hbasemaster_master_splitTimeNumOps',     'display':'splitlog的次数'},
+                    {'name':'hbasemaster_memory_memHeapMax',          'display':'JVM最大堆内存',  'func' : _f_b2m},
+                    {'name':'hbasemaster_memory_memHeapCommitted',    'display':'JVM申请堆内存',  'func' : _f_b2m},
+                    {'name':'hbasemaster_memory_memHeapUsed',         'display':'JVM使用堆内存',  'func' : _f_b2m},
+                    {'name':'hbasemaster_memory_memNonHeapMax',       'display':'JVM最大非堆内存',  'func' : _f_b2m},
+                    {'name':'hbasemaster_memory_memNonHeapUsed',      'display':'JVM使用非堆内存',  'func' : _f_b2m},
+                    {'name':'hbasemaster_memory_memNonHeapCommitted', 'display':'JVM提交非堆内存',  'func' : _f_b2m},
+                    {'name':'hbasemaster_Threading_ThreadCount',      'display':'线程数量'},
+                ]
+                
+                service_metrics = _multi_host_metrics('HBase/HBaseMaster', hosts, ori_host_metrics)
+                inss = service['instances']['hbasemaster']
+                _ext_state(service_metrics, inss, 'active', 'standby')
+                services_metrics.append(service_metrics)
             
             # regionserver
-            hosts = service['roles']['regionserver']
-            ori_host_metrics = [
-                {'name':'regionserver_rs_blockCacheHitRatio',        'display':'BlockCache命中比例'},
-                {'name':'regionserver_rs_blockCacheSize',            'display':'BlockCache大小',  'func' : _f_b2m},
-                {'name':'regionserver_rs_compactionQueueSize',       'display':'Compaction Queue的大小'},
-                {'name':'regionserver_rs_flushQueueSize',            'display':'flush Queue的大小'},
-                {'name':'regionserver_rs_memstoreSizeMB',            'display':'memstore大小'},
-                {'name':'regionserver_rs_readRequestsCount',         'display':'读请求的数量'},
-                {'name':'regionserver_rs_regions',                   'display':'Region的个数'},
-                {'name':'regionserver_rs_requests',                  'display':'请求的数量'},
-                {'name':'regionserver_rs_storefiles',                'display':'所有的Storefiles的个数'},
-                {'name':'regionserver_rs_stores',                    'display':'Store的个数'},
-                {'name':'regionserver_rs_blockCacheFree',            'display':'BlockCache中空闲的内存大小',  'func' : _f_b2m},
-                {'name':'regionserver_rs_blockCacheCount',           'display':'BlockCache中缓存的block个数'},
-                {'name':'regionserver_rs_blockCacheHitCachingRatio', 'display':'cacheblock的cache比率'},
-                {'name':'regionserver_rs_writeRequestsCount',        'display':'写请求的数量'},
-                {'name':'regionserver_rs_compactionSizeAvgTime',     'display':'平均执行一次Compaction的数据大小',  'func' : _f_b2m},
-                {'name':'regionserver_rs_compactionSizeNumOps',      'display':'执行compaction的次数'},
-                {'name':'regionserver_rs_compactionTimeAvgTime',     'display':'平均执行一次Compaction的时间', 'unit':'S'},
-                {'name':'regionserver_rs_compactionTimeNumOps',      'display':'执行compaction的次数'},
-                {'name':'regionserver_rs_flushSizeAvgTime',          'display':'平均执行一次flush的数据大小'},
-                {'name':'regionserver_rs_flushSizeNumOps',           'display':'执行flush的次数'},
-                {'name':'regionserver_rs_flushTimeAvgTime',          'display':'平均执行一次flush的时间',  'func' : _f_b2m},
-                {'name':'regionserver_rs_flushTimeNumOps',           'display':'执行flush的次数'},
-                {'name':'regionserver_rs_slowHLogAppendCount',       'display':'慢HLog Append数'},
-                {'name':'regionserver_memory_memHeapMax',            'display':'JVM最大堆内存',  'func' : _f_b2m},
-                {'name':'regionserver_memory_memHeapCommitted',      'display':'JVM申请堆内存',  'func' : _f_b2m},
-                {'name':'regionserver_memory_memHeapUsed',           'display':'JVM使用堆内存',  'func' : _f_b2m},
-                {'name':'regionserver_memory_memNonHeapUsed',        'display':'JVM使用非堆内存',  'func' : _f_b2m},
-                {'name':'regionserver_memory_memNonHeapCommitted',   'display':'JVM提交非堆内存',  'func' : _f_b2m},
-                {'name':'regionserver_memory_memNonHeapMax',         'display':'JVM最大非堆内存',  'func' : _f_b2m},
-                {'name':'regionserver_Threading_ThreadCount',        'display':'线程数'},
-            ]
-            
-            service_metrics = _multi_host_metrics('HBase/Regionserver', hosts, ori_host_metrics)
-            services_metrics.append(service_metrics)
+            service_name = 'regionserver'
+            if service_name in service['roles']:
+                hosts = service['roles'][service_name]
+                ori_host_metrics = [
+                    {'name':'regionserver_rs_blockCacheHitRatio',        'display':'BlockCache命中比例'},
+                    {'name':'regionserver_rs_blockCacheSize',            'display':'BlockCache大小',  'func' : _f_b2m},
+                    {'name':'regionserver_rs_compactionQueueSize',       'display':'Compaction Queue的大小'},
+                    {'name':'regionserver_rs_flushQueueSize',            'display':'flush Queue的大小'},
+                    {'name':'regionserver_rs_memstoreSizeMB',            'display':'memstore大小'},
+                    {'name':'regionserver_rs_readRequestsCount',         'display':'读请求的数量'},
+                    {'name':'regionserver_rs_regions',                   'display':'Region的个数'},
+                    {'name':'regionserver_rs_requests',                  'display':'请求的数量'},
+                    {'name':'regionserver_rs_storefiles',                'display':'所有的Storefiles的个数'},
+                    {'name':'regionserver_rs_stores',                    'display':'Store的个数'},
+                    {'name':'regionserver_rs_blockCacheFree',            'display':'BlockCache中空闲的内存大小',  'func' : _f_b2m},
+                    {'name':'regionserver_rs_blockCacheCount',           'display':'BlockCache中缓存的block个数'},
+                    {'name':'regionserver_rs_blockCacheHitCachingRatio', 'display':'cacheblock的cache比率'},
+                    {'name':'regionserver_rs_writeRequestsCount',        'display':'写请求的数量'},
+                    {'name':'regionserver_rs_compactionSizeAvgTime',     'display':'平均执行一次Compaction的数据大小',  'func' : _f_b2m},
+                    {'name':'regionserver_rs_compactionSizeNumOps',      'display':'执行compaction的次数'},
+                    {'name':'regionserver_rs_compactionTimeAvgTime',     'display':'平均执行一次Compaction的时间', 'unit':'S'},
+                    {'name':'regionserver_rs_compactionTimeNumOps',      'display':'执行compaction的次数'},
+                    {'name':'regionserver_rs_flushSizeAvgTime',          'display':'平均执行一次flush的数据大小'},
+                    {'name':'regionserver_rs_flushSizeNumOps',           'display':'执行flush的次数'},
+                    {'name':'regionserver_rs_flushTimeAvgTime',          'display':'平均执行一次flush的时间',  'func' : _f_b2m},
+                    {'name':'regionserver_rs_flushTimeNumOps',           'display':'执行flush的次数'},
+                    {'name':'regionserver_rs_slowHLogAppendCount',       'display':'慢HLog Append数'},
+                    {'name':'regionserver_memory_memHeapMax',            'display':'JVM最大堆内存',  'func' : _f_b2m},
+                    {'name':'regionserver_memory_memHeapCommitted',      'display':'JVM申请堆内存',  'func' : _f_b2m},
+                    {'name':'regionserver_memory_memHeapUsed',           'display':'JVM使用堆内存',  'func' : _f_b2m},
+                    {'name':'regionserver_memory_memNonHeapUsed',        'display':'JVM使用非堆内存',  'func' : _f_b2m},
+                    {'name':'regionserver_memory_memNonHeapCommitted',   'display':'JVM提交非堆内存',  'func' : _f_b2m},
+                    {'name':'regionserver_memory_memNonHeapMax',         'display':'JVM最大非堆内存',  'func' : _f_b2m},
+                    {'name':'regionserver_Threading_ThreadCount',        'display':'线程数'},
+                ]
+                
+                service_metrics = _multi_host_metrics('HBase/Regionserver', hosts, ori_host_metrics)
+                services_metrics.append(service_metrics)
 
         ret = {"data":services_metrics}
         self.ret("ok", "", ret);
@@ -590,12 +609,15 @@ class MonitorBackHandler(BaseHandler):
         self.ret("ok", "", ret);
 
     # 获取所有的机器
+    # 仅获取部署了gmond的机器
     # return [host]
     def _host_list(self):
         session = database.getSession()
-        hosts = session.query(Host)
-        temp = [host.hostname for host in hosts]
-        session.close()
+        try:
+            hosts = session.query(Instance).filter(and_(Instance.role=='gmond'))
+            temp = [host.host for host in hosts]
+        finally:
+            session.close()
         return temp
 
     def _sure_str(self, str):
@@ -745,7 +767,9 @@ class MonitorBackHandler(BaseHandler):
         disk_metric['x'] = x
         disk_total = map(lambda x:self._none_2_0(x), ys[0])
         disk_free  = map(lambda x:self._none_2_0(x), ys[1])
-        disk_used  = map(lambda x,y:x-y, disk_total, disk_free)
+        disk_used = []
+        if disk_total is not None and disk_free is not None:
+            disk_used  = map(lambda x,y:x is not None and y is not None and x-y or None, disk_total, disk_free)
         disk_metric['series'].append({'name':'disk_used',  'type':'line', 'stack':'total', 'data':disk_used}) 
         disk_metric['series'].append({'name':'disk_free',  'type':'line', 'stack':'total', 'data':disk_free}) 
         for temp in disk_metric['series']: temp.update(line_area_style)
@@ -864,11 +888,18 @@ class MonitorBackHandler(BaseHandler):
         # host
         host_healths = {'type':'single','name':'host','display':'机器健康度'}
         hosts = self._host_list()
-        
+      
+        if not hosts:
+            ret = {"data":data}
+            self.ret("ok", "", ret);
+            return
+
         y = []
         for host in hosts:
             y.append(self._host_current_health(rrd_wrapper, cluster_name, host))
-        health = int(reduce(lambda x,y:x+y,y,0)/len(y))
+        health = -1
+        if y:
+            health = int(reduce(lambda x,y:x+y,y,0)/len(y))
         host_healths['value'] = health
         host_healths['x']     = hosts
         host_healths['y']     = y
@@ -892,7 +923,9 @@ class MonitorBackHandler(BaseHandler):
                     y.append(ins_health)
                 role_health['x'] = hosts
                 role_health['y'] = y
-                role_health_value = int(reduce(lambda x,y:x+y,y,0)/len(y)) # 平均值
+                role_health_value = 0
+                if y:
+                    role_health_value = int(reduce(lambda x,y:x+y,y,0)/len(y)) # 平均值
                 service_health_value *= role_health_value/100.0
                 service_health['roles'].append(role_health)
             service_health['value'] = int(service_health_value)
@@ -1062,6 +1095,11 @@ class MonitorBackHandler(BaseHandler):
         
         # 计算需要: 时间范围，机器，表达式
         hosts = self._host_list()
+
+        if not hosts:
+            ret = {"data":data}
+            self.ret("ok", "", ret)
+            return
         
         healths = [] # [[(ts,health)]]
         for host in hosts:
@@ -1112,8 +1150,7 @@ class MonitorBackHandler(BaseHandler):
                 for col in columns:
                     qf = qf | Task.__dict__[col].like(search)
                 query = query.filter(qf)
-        
-            total = query.count();
+            total = query.count()
 
             if dir == "asc":
                 query = query.order_by(asc(orderby))[offset:offset+limit]
@@ -1126,7 +1163,7 @@ class MonitorBackHandler(BaseHandler):
                     v = getattr(record, col)
                     # 特别的，时间转化
                     if col == 'ctime':
-                        t = time.localtime(v)
+                        t = time.localtime(int(v))
                         v = time.strftime("%Y-%m-%d %H:%M:%S", t)
                     temp.append(v)
                 data.append(temp)
@@ -1170,6 +1207,8 @@ class MonitorBackHandler(BaseHandler):
 
         host_overview = [] #机器概述
         data = [] # 分项数据
+        disk_data = []
+        load_metric_dist = {'metric':'负载分布','series':[{'name':'负载分布','type':'pie','data':[]}]}
         
         cluster_name = self._query_var('all', 'cluster_name')
         cluster_name = self._sure_str(cluster_name)
@@ -1177,6 +1216,11 @@ class MonitorBackHandler(BaseHandler):
 
         # hosts: [host]
         hosts = self._host_list()
+        
+        if not hosts:
+            ret = {"data":data, 'diskData':disk_data, "hostOverview":host_overview, 'loadDist':load_metric_dist}
+            self.ret("ok", "", ret);
+            return
 
         # 机器概览
         total_hosts         = len(hosts)
@@ -1366,7 +1410,6 @@ class MonitorBackHandler(BaseHandler):
         
         # 存储扩展 [ { name:hadoop1磁盘, x:[sda1,sdb1], xtype:'h', series:[{ name:disk_used, type:bar, stack:disk, data:[1,2] }
         #                                                       { name:disk_free, type:bar, stack:disk, data:[2,1] }] } ]
-        disk_data = []
         regex = re.compile(r'dev_(\w+)_disk_total')
         for host in hosts:
             host = self._sure_str(host)
