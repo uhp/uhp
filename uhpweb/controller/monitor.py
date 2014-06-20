@@ -1729,6 +1729,7 @@ class MonitorBackHandler(BaseHandler):
         limit = self.get_argument("limit",50)
         orderField = self.get_argument("orderField","appid")
         orderDirection = self.get_argument("orderDirection","desc")
+
         session = database.getSession()
         selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
                    "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",

@@ -381,7 +381,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             params:{
                 "where" : $scope.getWhere(),
                 "offset" : ( $scope.nowPage -1) * $scope.limit,
-                "limit" : 50,
+                "limit" : $scope.limit,
                 "orderField" : $scope.orderField,
                 "orderDirection" : $scope.orderDirection
             }
