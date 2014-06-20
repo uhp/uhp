@@ -195,6 +195,10 @@ class Collector:
                     
     def getNodeFromAddress(self,address):
         split = address.find(":")
+        # 处理长短域名，短域名
+        split2 = address.find(0,split)
+        if split2 > 0: 
+            split = split2
         return address[0:split]
     
     def getJobCounter(self,jobid):
