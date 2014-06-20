@@ -1646,9 +1646,11 @@ class MonitorBackHandler(BaseHandler):
                 where += " and" if where else ""
                 where += " happenTime > " + str(happenTimeMin)
             
-            hostWhere = ",".join(["'%s'" % h for h in hosts])
+            #hostWhere = ",".join(["'%s'" % h for h in hosts])
+            hostWhere = "or".join([" host like '%s%%' " % h for h in hosts])
             where += " and" if where else ""
-            where += ' host in (%s)' % hostWhere
+            #where += ' host in (%s)' % hostWhere
+            where += ' (%s)' % hostWhere
             
             sqlFields=",".join(["sum(%s) as %s" % (f, f) for f in fields])
             
