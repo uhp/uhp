@@ -1591,7 +1591,7 @@ class MonitorBackHandler(BaseHandler):
             for field in fields:
                 sqlFields = sqlFields+" , sum("+field+") as " + field
         
-            sql = ("select (happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
+            sql = ("select round(happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
 
             session = database.getSession()
             cursor  = session.execute(sql)
@@ -1647,12 +1647,14 @@ class MonitorBackHandler(BaseHandler):
                 where += " happenTime > " + str(happenTimeMin)
             
             hostWhere = ",".join(["'%s'" % h for h in hosts])
+            #hostWhere = "or".join([" host like '%s%%' " % h for h in hosts])
             where += " and" if where else ""
             where += ' host in (%s)' % hostWhere
+            #where += ' (%s)' % hostWhere
             
             sqlFields=",".join(["sum(%s) as %s" % (f, f) for f in fields])
             
-            sql = ("select (happenTime/%s)*%s as printTime, host, %s from nm \
+            sql = ("select round(happenTime/%s)*%s as printTime, host, %s from nm \
                     where %s group by printTime, host" % 
                     (happenTimeSplit, happenTimeSplit, sqlFields, where)
                   )
@@ -1727,6 +1729,7 @@ class MonitorBackHandler(BaseHandler):
         limit = self.get_argument("limit",50)
         orderField = self.get_argument("orderField","appid")
         orderDirection = self.get_argument("orderDirection","desc")
+
         session = database.getSession()
         selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
                    "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",
