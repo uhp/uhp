@@ -695,6 +695,12 @@ class MonitorBackHandler(BaseHandler):
     
     # 显示单机的主要指标
     def show_host_main_metrics(self):
+        # 单位变换用到的常量
+        GT = ['G','T']
+        MGT = ['M','G','T']
+        KMGT = ['K','M','G','T']
+        BKMGT = ['B','K','M','G','T']
+
         precision    = self.get_argument("precision")
         host         = self.get_argument("host")
 
@@ -753,24 +759,29 @@ class MonitorBackHandler(BaseHandler):
         mem_metric['series'].append({'name':'mem_used',  'type':'line', 'stack':'total', 'data':mem_used}) 
         mem_metric['series'].append({'name':'mem_free',  'type':'line', 'stack':'total', 'data':mem_free}) 
         mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used})
-        for temp in mem_metric['series']: temp.update(line_area_style)
+        for temp in mem_metric['series']: 
+            temp.update(line_area_style)
+        self._metric_unit_convert(mem_metric,1024,MGT)
 
         # Net
         metrics = ['bytes_in', 'bytes_out']
         _fetch_m(net_metric, metrics, line_area_style)
+        self._metric_unit_convert(net_metric,1024,BKMGT)
         
         # Disk
         metrics = ['disk_total','disk_free']
         (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
         disk_metric['x'] = x
-        disk_total = map(lambda x:self._none_2_0(x), ys[0])
-        disk_free  = map(lambda x:self._none_2_0(x), ys[1])
-        disk_used = []
-        if disk_total is not None and disk_free is not None:
-            disk_used  = map(lambda x,y:x is not None and y is not None and x-y or None, disk_total, disk_free)
+        #disk_total = map(lambda x:self._none_2_0(x), ys[0])
+        #disk_free  = map(lambda x:self._none_2_0(x), ys[1])
+        disk_total = ys[0]
+        disk_free  = ys[1]
+        disk_used  = map(_my_sub, disk_total, disk_free)
         disk_metric['series'].append({'name':'disk_used',  'type':'line', 'stack':'total', 'data':disk_used}) 
         disk_metric['series'].append({'name':'disk_free',  'type':'line', 'stack':'total', 'data':disk_free}) 
-        for temp in disk_metric['series']: temp.update(line_area_style)
+        for temp in disk_metric['series']: 
+            temp.update(line_area_style)
+        self._metric_unit_convert(disk_metric,1024,GT)
 
         data = []
         data.append(load_metric)
@@ -794,7 +805,7 @@ class MonitorBackHandler(BaseHandler):
             try:
                 rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
                 (x,y) = rrd.convert_to_xy(rrd_metric)
-                if x is not None: ts = x
+                if not ts and x is not None: ts = x
                 values.append(y)
             except Exception, e:
                 app_log.exception('')
@@ -1467,8 +1478,8 @@ class MonitorBackHandler(BaseHandler):
                 disk_frees.append(disk_free)
 
                 info_disk = []
-                info_disk.append({'name':'读速度','value':disk_iostat_r,'unit':'KB'})
-                info_disk.append({'name':'写速度','value':disk_iostat_w,'unit':'KB'})
+                info_disk.append(self._value_unit_convert({'name':'读速度','value':disk_iostat_r,'unit':'KB'},1024,KMGT))
+                info_disk.append(self._value_unit_convert({'name':'写速度','value':disk_iostat_w,'unit':'KB'},1024,KMGT))
                 info_disk.append({'name':'通电时间','value':disk_smartctl_power_on_hours,'unit':'小时'})
                 info_disk.append({'name':'Seek_Error_Rate','value':disk_smartctl_seek_error_rate,'unit':''})
                 info_disk.append({'name':'Raw_Read_Error_Rate','value':disk_smartctl_raw_read_error_rate,'unit':''})
@@ -1477,6 +1488,7 @@ class MonitorBackHandler(BaseHandler):
                 
             disks['series'].append({'name':'disk_used','type':'bar','stack':'disk','data':disk_useds})
             disks['series'].append({'name':'disk_free','type':'bar','stack':'disk','data':disk_frees})
+            self._metric_unit_convert(disks,1024,GT)
             disk_data.append(disks)
         
         # overview
@@ -1530,7 +1542,7 @@ class MonitorBackHandler(BaseHandler):
                 dm_min = dm_min / div
                 ui += 1
             if ui > 0: #需要转换
-                data = map(lambda x: None if x is None else x/(div ** ui), data)
+                data = map(lambda x: None if x is None else "%.2f" % (x/(div ** ui)), data)
         return (data, units[ui])
     
     def _metric_unit_convert(self, m, div, units):
