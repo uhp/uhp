@@ -186,7 +186,7 @@ def del_instance(session,host,role):
 
 def init():
     #默认的admin
-    insert(User("admin","admin","admin@ucweb.com",0));
+    insert(User("admin","0123456789Aa","admin@ucweb.com",0));
     #默认分组
     insert(Group("all","no chinise"))
     #关键分组变量

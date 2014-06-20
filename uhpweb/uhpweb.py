@@ -17,7 +17,6 @@ import database
 from controller import *
 from controller.monitor import *
 from controller.admin import AdminHandler,AdminBackHandler
-from controller.user import UserHandler,UserBackHandler
 from controller import callback_lib
 
 access_log = logging.getLogger("tornado.access")
@@ -53,10 +52,8 @@ class Application(tornado.web.Application):
             (r"/", IndexHandler),
             (r"/login", LoginHandler),
             (r"/admin", AdminHandler),
-            (r"/user", UserHandler),
             (r"/monitorback/(.*)", MonitorBackHandler),
             (r"/adminback/(.*)", AdminBackHandler),
-            (r"/userback/(.*)", UserBackHandler),
             (r"/logout", AuthLogoutHandler),
             (r'/statics/(.*)', tornado.web.StaticFileHandler, {'path':os.path.join(os.path.dirname(__file__), "statics")}),
             (r'/tmp/(.*)', tornado.web.StaticFileHandler, {'path':'/tmp'})
