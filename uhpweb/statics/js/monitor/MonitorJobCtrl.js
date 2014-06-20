@@ -415,7 +415,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             temp['start']=unix_to_datetime(app[4]*1000)
             temp['end']=unix_to_datetime(app[5]*1000)
             temp['state']=$scope.stateDict[app[6]]
-            temp['finalState']=$scope.finalStateDict[app[7]]
+            temp['finalStatus']=$scope.finalStatusDict[app[7]]
             temp['retry']=app[8]
             temp['map_total']=app[9]
             temp['map_fini']=app[10]
@@ -450,8 +450,8 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         if($scope.filterState != null ) {
             where = where + ' and state = "'+$scope.filterState+'" '
         }
-        if($scope.filterFinalState != null ) {
-            where = where + ' and finalstate = "'+$scope.filterFinalState+'" '
+        if($scope.filterFinalStatus != null ) {
+            where = where + ' and finalStatus = "'+$scope.filterFinalStatus+'" '
         }
         
         //开始时间
@@ -549,9 +549,9 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
        
         //init dict
         //$scope.states = ['', 'FINISHED'];
-        //$scope.finalStates = ['', 'SUCCEEDED', 'KILLED', 'FAILED'];
+        //$scope.finalStatuss = ['', 'SUCCEEDED', 'KILLED', 'FAILED'];
         $scope.stateDict = {"FINISHED":"完成"}
-        $scope.finalStateDict = {"SUCCEEDED":"成功","KILLED":"中止","FAILED":"失败"}
+        $scope.finalStatusDict = {"SUCCEEDED":"成功","KILLED":"中止","FAILED":"失败"}
         $scope.fieldDict = {
             "appid":"应用id",
             "user":"用户",

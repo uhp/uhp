@@ -48,7 +48,7 @@
         <div class="col-md-6">
           <div class="input-group">
             <span class="input-group-addon w7e">FinalStatus</span>
-            <select class="select-block" ng-model="filterFinalState" ng-options="k as v for (k,v) in finalStateDict"></select>
+            <select class="select-block" ng-model="filterFinalStatus" ng-options="k as v for (k,v) in finalStatusDict"></select>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@
               <td style="width:80px;" >[[ app['start'] ]]</td>
               <td style="width:80px;" >[[ app['end'] ]]</td>
               <td class="smalltd" >[[ app['state'] ]]</td>
-              <td class="smalltd" >[[ app['finalState'] ]]</td>
+              <td class="smalltd" >[[ app['finalStatus'] ]]</td>
               <td class="smalltd" >[[ app['retry'] ]]</td>
               <td class="smalltd" >[[ app['map_total'] ]]</td>
               <td class="smalltd" >[[ app['map_fini'] ]]</td>
