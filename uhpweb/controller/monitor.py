@@ -1520,18 +1520,18 @@ class MonitorBackHandler(BaseHandler):
     # 
     def _value_unit_convert(self, d, div, units):
         if 'value' in d:
-            (v,d['unit']) = self._unit_convert(d['value'], div, units)
-            v2 = int(v*100)
-            if v2 % 100 == 0: # 整数
-                v = "%d" % (v2 / 100)
-            else: # 浮点
-                v = "%.2f" % v 
-            d['value'] = v
+            v = d['value']
+            if v is not None:
+                (v,d['unit']) = self._unit_convert(v, div, units)
+                v2 = int(v*100)
+                if v2 % 100 == 0: # 整数
+                    v = "%d" % (v2 / 100)
+                else: # 浮点
+                    v = "%.2f" % v 
+                d['value'] = v
         return d
 
     # data: [number]
-    # net_metric  = {'metric':'网络','x':[],'series':[]}
-    # net_metric['series'].append({'name':'bytes_in', 'type':'bar', 'stack':'net', 'data':net_metric_bytes_in})
     def _data_unit_convert(self, data, div, units):
         ui = 0
         dm = [d for d in data if d is not None]
@@ -1545,6 +1545,8 @@ class MonitorBackHandler(BaseHandler):
                 data = map(lambda x: None if x is None else "%.2f" % (x/(div ** ui)), data)
         return (data, units[ui])
     
+    # net_metric  = {'metric':'网络','x':[],'series':[]}
+    # net_metric['series'].append({'name':'bytes_in', 'type':'bar', 'stack':'net', 'data':net_metric_bytes_in})
     def _metric_unit_convert(self, m, div, units):
         ui = 0
         if 'series' in m:
@@ -1554,16 +1556,20 @@ class MonitorBackHandler(BaseHandler):
                 data = serie['data']
                 data = [d for d in data if d is not None]
                 all_data += data
-            all_data_min = min(all_data)
-            ulen = len(units)
-            while ui < ulen and all_data_min > div:
-                all_data_min = all_data_min / div
-                ui += 1
-            if ui > 0: #需要转换
-            for serie in series:
-                data = serie['data']
-                data = map(lambda x: None if x is None else x/(div ** ui), data)
-                serie['data'] = data
+            if all_data:
+                # 使用中值
+                # all_data_min = min(all_data)
+                all_data.sort()
+                all_data_min = all_data[(len(all_data)-1)/2]
+                ulen = len(units)
+                while ui < ulen and all_data_min > div:
+                    all_data_min = all_data_min / div
+                    ui += 1
+                if ui > 0: #需要转换
+                    for serie in series:
+                        data = serie['data']
+                        data = map(lambda x: None if x is None else x/(div ** ui), data)
+                        serie['data'] = data
         m['unit'] = units[ui]    
         return m 
 

@@ -97,7 +97,6 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     	},
       function(res){
         $scope.alarms = res['data'];
-        console.debug($scope.alarms);
       }
     );
 	}
@@ -118,7 +117,6 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
     //var wantPage = wantPage.val();
     //if(!wantPage){ return false; }
     //$scope.wantPage=parseInt(wantPage);
-    //console.debug(wantPage);
     wantPage=parseInt(wantPage);
 		$scope.nowPage = Math.min(Math.max(wantPage, 1), $scope.alarms.totalPage);
 	}

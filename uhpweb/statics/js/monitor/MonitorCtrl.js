@@ -28,8 +28,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
   }
 
   $rootScope.showHostMetrics = function(newValue, oldValue, scope){
-    console.log('precision:' + scope.show.precision);
-    console.log('host:' + scope.show.host);
     if(!scope.show.precision || !scope.show.host) return;
     $rootScope.myHttp('GET', '/monitorback/show_host_metrics', 
       {precision:scope.show.precision, host:scope.show.host, groups:scope.groups}, 
@@ -59,7 +57,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
   // 激活数组中指定 
   $scope.activeItem = function(item, arr){
     $.each(arr, function(k, v){
-      console.debug(v);
       if(v.active == 'active'){
         v.active = '';
       }
@@ -116,8 +113,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
   // metric:[{metric:,x:[], xtype:'horizontal', series:[{name:,type:,data:[]}]}]
   // metric:[{metric:,series:[{name:,type:,data:[]}]}] # pie 分布图
   $scope.make_chartOpt=function(metric){
-    console.debug(metric);
- 
     type = "axis";
 
     //转换null值为echart要求格式
@@ -209,8 +204,12 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
         chartOpt.yAxis=yAxis();
     }
 
-    if(bool(metric.metric) && bool(metric.metric.unit)){
-      chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+metric.metric.unit }
+    if(bool(metric.unit)){
+        if(metric.xtype == 'horizontal'){
+            chartOpt.xAxis[0].axisLabel = { formatter:'{value}'+metric.unit }
+        } else {
+            chartOpt.yAxis[0].axisLabel = { formatter:'{value}'+metric.unit }
+        }
     }
 
     return chartOpt;
@@ -220,21 +219,16 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
   // @target : jquery object[s]
   function draw(target, host_metric){
     target=target.get();
-    console.debug(target);
     if(!bool(target)) return;
-    var myChart = echarts.init(target,{grid:{x:40,y:30,x2:10,y2:55}});
+    var myChart = echarts.init(target,{grid:{x:50,y:30,x2:20,y2:55}});
     var chartOpt = $scope.make_chartOpt(host_metric)
-    console.debug(chartOpt);
     myChart.setOption(chartOpt);
   }
   
   $scope.draw=function(id, host_metric){
     if(!bool(host_metric)) {
-      console.debug('$scope.draw null metric');
-      console.debug(host_metric);
       return false;
     }
-    console.debug("draw ...")
     // 等待界面target元素绘制完成
     $timeout(function(){ 
       var t = $(id);
@@ -247,10 +241,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
           h = w * 0.4;
           t.height(h);
         }
-        console.debug('id:'+id);
-        console.debug(t);
-        console.debug(t.width());
-        console.debug(t.height());
         draw(t, host_metric); 
       });
     }, 300);
@@ -265,7 +255,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
   // @rose_group_metric:{name:,data:[{value:,name:}]}
   function drawRose(target, rose_group_metric){
     target=target.get();
-    console.debug(target);
     if(!bool(target)) return;
     chartOpt = { 
       tooltip : { trigger: 'item', formatter: "{a} <br/>{b} : {c} ({d}%)" },
@@ -296,7 +285,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
     if(!bool(rose_group_metric)) {
       return false;
     }
-    console.debug("draw ...")
     // 等待界面target元素绘制完成
     $timeout(function(){ 
       var t = $(id);
@@ -308,7 +296,6 @@ function MonitorBaseController($scope, $rootScope, $timeout, $location, anchorSm
           h = w * 0.9;
           t.height(h);
         }
-        console.debug('id:'+id);
         drawRose(t, rose_group_metric); 
       });
     }, 300);

@@ -25,10 +25,8 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
 	      	$rootScope.alert("提交失败 ("+response["msg"]+")");
           return;
 	    }
-      console.log("query ok!");
       $scope.column = response['column']
 			$scope.data = response['data'];
-      console.log($scope.data);
 	  }).error(function(data, status) {
 	  	$rootScope.alert("发送manual_query请求失败");
 	  });
@@ -77,7 +75,6 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
   }
   
   $scope.ready_edit_record=function(record){
-    console.log(record);
     $scope.recordAction="update";
     $scope.new_record={};
     $.each($scope.column, function(i,n){
@@ -96,7 +93,6 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     } else if (method == "update") {
       sql=squel.update(opts).table(table).setFields(values).where("id="+values['id']).limit(1).toString();
     }
-    console.log(sql);
     return sql;
   }
 
@@ -121,7 +117,6 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
   }
 
   $scope.save_new_record=function(){
-    console.log($scope.new_record);
     $scope.dealRecord($scope.new_record)
   }
 
@@ -130,7 +125,6 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     //for(i in $scope.column){
     //  update_record[$scope.column[i]] = record[i];
     //}
-    console.log(update_record);
     var sql = make_sql("delete", $scope.sql_table, update_record);
 		$http({
 	    method: 'GET',
