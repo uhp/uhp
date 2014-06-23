@@ -4,7 +4,7 @@ import string
 
 from simpleparse.common import numbers, strings, comments
 from simpleparse.parser import Parser
-#from lib.logger import log
+from lib.logger import log
 
 class ExpParser():
     def __init__(self):
@@ -47,16 +47,20 @@ class ExpParser():
 
     def _get_value(self, tag,start,end,subtags,str,map):
         if tag == "number" :
+            log.info("1")
             return (string.atof(str[start:end]),"")
         elif tag == "str_var" :
             temp = str[start:end]
             if map.has_key(temp) :
                 #log.debug("get args %s %f" % (temp,map[temp]) )
+                log.info("2")
                 return (map[temp],"")
             else:
+                log.info("3")
                 return (None,"not find %s in map" % temp)
         elif tag == "exp" :
             for exp in subtags:
+                log.info("4")
                 return self._get_value(exp[0],exp[1],exp[2],exp[3],str,map)
         elif tag == "pm_exp" :
             re = None
@@ -73,10 +77,13 @@ class ExpParser():
                         elif op == '-' :
                             re = re - val
                         else:
+                            log.info("5")
                             return (None,"oper %s is not + or -" % op)
                         
                 else:
+                    log.info("6")
                     return (val,msg)
+            log.info("7")
             return (re,"") 
         elif tag == "md_exp" :
             re = None
@@ -95,15 +102,20 @@ class ExpParser():
                                 return (None,"div value %s is 0 " % exp[0])
                             re = re / val
                         else:
+                            log.info("8")
                             return (None,"oper %s is not * or /" % op)
                 else:
+                    log.info("9")
                     return (val,msg)
+            log.info("10")
             return (re,"")
         else:
             if len(subtags) > 0 :
                 for exp in subtags:
+                    log.info("11")
                     return self._get_value(exp[0],exp[1],exp[2],exp[3],str,map)
             else:
+                log.info("12")
                 return (None,"unfind tag %s and have no subtags" % tag)
         
 if __name__ == "__main__":   

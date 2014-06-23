@@ -69,6 +69,7 @@ class AlarmExpManager(Manager):
         for arg in args:
             value,msg = self.exp_parser.get_exp_value(arg,data_set)
             if value == None :
+                log.info(u"value is none %s." % msg)
                 return (None,msg)    
             real_args.append(value)
         return (real_args,"")

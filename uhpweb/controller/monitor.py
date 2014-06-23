@@ -1459,7 +1459,7 @@ class MonitorBackHandler(BaseHandler):
             # overview
             total_disk_numb += len(names)
 
-            info = {'overview':'本机包含%d个磁盘' % len(names), 'disks':{}}
+            info = {'overview':'','disks':{}}
             disks = {'metric':'%s磁盘状况'%host,'x':[], 'xtype':'horizontal', 'series':[], 'info':info}
             disk_useds = []
             disk_frees = []
@@ -1474,18 +1474,6 @@ class MonitorBackHandler(BaseHandler):
 
                 disk_used = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_used' % dev)
                 disk_total = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_total' % dev)
-                
-                disk_iostat_r = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_iostat_%s_rkB_s' % dev)
-                disk_iostat_w = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_iostat_%s_wkB_s' % dev)
-                # disk_smartctl_sda_Power_On_Hours
-                disk_smartctl_power_on_hours = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_Power_On_Hours' % dev2)
-                # disk_smartctl_sda_Seek_Error_Rate
-                disk_smartctl_seek_error_rate = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_Seek_Error_Rate' % dev2)
-                # disk_smartctl_sda_Raw_Read_Error_Rate
-                disk_smartctl_raw_read_error_rate = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_Raw_Read_Error_Rate' % dev2)
-                # disk_smartctl_sda_UDMA_CRC_Error_Count
-                disk_smartctl_udma_crc_error_count = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_UDMA_CRC_Error_Count' % dev2)
-                 
                 if disk_total is not None: disk_total = int(disk_total)
                 if disk_free  is not None: disk_free  = int(disk_free)
                 disk_free = None
@@ -1495,15 +1483,24 @@ class MonitorBackHandler(BaseHandler):
                 disk_useds.append(disk_used)
                 disk_frees.append(disk_free)
 
-                info_disk = []
-                info_disk.append(self._value_unit_convert({'name':'读速度','value':disk_iostat_r,'unit':'KB'},1024,KMGT))
-                info_disk.append(self._value_unit_convert({'name':'写速度','value':disk_iostat_w,'unit':'KB'},1024,KMGT))
-                info_disk.append({'name':'通电时间','value':disk_smartctl_power_on_hours,'unit':'小时'})
-                info_disk.append({'name':'Seek_Error_Rate','value':disk_smartctl_seek_error_rate,'unit':''})
-                info_disk.append({'name':'Raw_Read_Error_Rate','value':disk_smartctl_raw_read_error_rate,'unit':''})
-                info_disk.append({'name':'UDMA CRC错误','value':disk_smartctl_udma_crc_error_count,'unit':'次'})
-                info['disks'][dev] = info_disk
+                if dev2 not in info['disks']:
+                    disk_iostat_r = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_iostat_%s_rkB_s' % dev2)
+                    disk_iostat_w = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_iostat_%s_wkB_s' % dev2)
+                    disk_smartctl_power_on_hours = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_Power_On_Hours' % dev2)
+                    disk_smartctl_seek_error_rate = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_Seek_Error_Rate' % dev2)
+                    disk_smartctl_raw_read_error_rate = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_Raw_Read_Error_Rate' % dev2)
+                    disk_smartctl_udma_crc_error_count = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_smartctl_%s_UDMA_CRC_Error_Count' % dev2)
+
+                    info_disk = []
+                    info_disk.append(self._value_unit_convert({'name':'读速度','value':disk_iostat_r,'unit':'KB'},1024,KMGT))
+                    info_disk.append(self._value_unit_convert({'name':'写速度','value':disk_iostat_w,'unit':'KB'},1024,KMGT))
+                    info_disk.append({'name':'通电时间','value':disk_smartctl_power_on_hours,'unit':'小时'})
+                    info_disk.append({'name':'Seek_Error_Rate','value':disk_smartctl_seek_error_rate,'unit':''})
+                    info_disk.append({'name':'Raw_Read_Error_Rate','value':disk_smartctl_raw_read_error_rate,'unit':''})
+                    info_disk.append({'name':'UDMA CRC错误','value':disk_smartctl_udma_crc_error_count,'unit':'次'})
+                    info['disks'][dev2] = info_disk
                 
+            info['overview'] = "本机包含%d个磁盘,%d个卷" % (len(info['disks']),len(names)), 
             disks['series'].append({'name':'disk_used','type':'bar','stack':'disk','data':disk_useds})
             disks['series'].append({'name':'disk_free','type':'bar','stack':'disk','data':disk_frees})
             self._metric_unit_convert(disks,1024,GT)
