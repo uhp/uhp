@@ -76,27 +76,31 @@ def get_value(name):
 
     _value = 'unknown'
 
-    for dev in DEVS:
+    t = name.split("_")
+    if len(t) < 3 :
+        return _value
+
+    dev = "/dev/%s" % t[2]
+
+    # use iostat to get the io stats
+    (out, err, code,) = execute('iostat -x -k -d %s' % dev)
+    if code != 0:
+        print("iostat did not installed exit \n %s " % err)
+        sys.exit(code)
+    else:
         next_data = False
-        # use iostat to get the io stats
-        (out, err, code,) = execute('iostat -x -k -d %s' % dev)
-        if code != 0:
-            print("iostat did not installed exit \n %s " % err)
-            sys.exit(code)
-        else:
+        for line in out.split('\n'):
+            if next_data:
+                next_data = False
+                # split the data
+                datas = line.split()
 
-            for line in out.split('\n'):
-                if next_data:
-                    next_data = False
-                    # split the data
-                    datas = line.split()
+                current_dev = datas[0]
+                datas = datas[1:]
 
-                    current_dev = datas[0]
-                    datas = datas[1:]
-
-                    _value = float(datas[VALUES[name]])
-                if line.startswith('Device:'):
-                    next_data = True
+                _value = float(datas[VALUES[name]])
+            if line.startswith('Device:'):
+                next_data = True
 
     return _value
 
