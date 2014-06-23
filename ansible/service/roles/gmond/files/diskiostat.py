@@ -58,24 +58,15 @@ def execute(cmd):
         pass
 
 
-def get_mounted_disks(lparams):
+def get_mounted_disks():
     global VALUES
 
-    # set parameters
-    for key in lparams:
-        PARAMS[key] = lparams[key]
-
-    with open(PARAMS['mounts'], 'r') as f:
-        mounts = f.readlines()
-
+    out,err,code = execute(' fdisk -l|grep Disk|grep -v identifier ')
     devs = []
-    for mount in mounts:
-        if mount.startswith('/dev/'):
-            mount = mount.split()
-            dev = mount[0]
-            if os.path.islink(dev):
-                dev = '/dev/%s' % os.readlink(dev).split('/')[-1]
-            devs.append(dev)
+    for line in out.split("\n"):
+        t = line.split()
+        if len(t) >= 2 :
+            devs.append(t[1].strip(": "))
     return devs
 
 
@@ -112,7 +103,7 @@ def get_value(name):
 
 def metric_init(lparams):
     """Initialize metric descriptors"""
-    devs = get_mounted_disks(lparams)
+    devs = get_mounted_disks()
     global VALUES, LPARAMS, DEVS
     LPARAMS = lparams
     DEVS = devs
@@ -168,7 +159,7 @@ def metric_cleanup():
 if __name__ == '__main__':
     descriptors = metric_init(PARAMS)
 
-    for i in range(9999):
+    for i in range(1):
         for d in descriptors:
             print (('%s = %s') % (d['name'], d['format'])) % (d['call_back'](d['name'])) + '  %s' % d['units']
         print('-------------------------------------')
