@@ -949,33 +949,51 @@ class MonitorBackHandler(BaseHandler):
         # {'name':'yarn.QueueMetrics.Queue=root.AvailableMB',                        'display' :'可用内存MB'},
         # {'name':'yarn.QueueMetrics.Queue=root.AllocatedMB',                        'display' :'分配内存MB'},
         jobs_healths =  {'type':'multi', 'name':'job','display':'作业健康度', 'group':[]}
-        rm_service = None
-        for service in services:
-            if u'yarn' == service['name']:
-                rm_service = service
-                break
-        if rm_service: 
-            hosts = service['roles']['resourcemanager']
-            if hosts:
-                host = hosts[0]
-                apps_failed    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsFailed')
-                apps_completed = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsCompleted')
-                apps_running   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsRunning')
-                allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
-                available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
+        # 使用REST接口获取相关指标
+        url = "http://%s:%s/ws/v1/cluster/metrics" % (self._get_rmhost(),self._get_rmport())
+        cluster_metrics = util.get_http_json(url)
+        if cluster_metrics is not None:
+            jobs_healths['group'].append({'name':'','display':'作业失败数',"value":cluster_metrics['clusterMetrics']['appsFailed']})
+            jobs_healths['group'].append({'name':'','display':'作业完成数',"value":cluster_metrics['clusterMetrics']['appsCompleted']})
+            jobs_healths['group'].append({'name':'','display':'作业运行数',"value":cluster_metrics['clusterMetrics']['appsRunning']})
+            allocated_mb=cluster_metrics['clusterMetrics']['allocatedMB']/1024.0
+            jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
+            avaliable_mb=cluster_metrics['clusterMetrics']['availableMB']/1024.0
+            jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
+            jobs_healths['group'].append({'name':'','display':'全部节点',"value":totalNodes})
+            jobs_healths['group'].append({'name':'','display':'失联节点',"value":lostNodes})
+            jobs_healths['group'].append({'name':'','display':'退役节点',"value":decommissionedNodes})
+        else: #
+            jobs_healths['group'].append({'name':'','display':'获取实时指标失败，RM服务可能宕机',"value":0})
 
-                if apps_failed is None: apps_failed = 0
-                jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"%.2f" % apps_failed})
-                if apps_completed is None: apps_completed = 0
-                jobs_healths['group'].append({'name':'','display':'作业完成数',"value":"%.2f" % apps_completed})
-                if apps_running is None: apps_running = 0
-                jobs_healths['group'].append({'name':'','display':'作业运行数',"value": "%.2f" % apps_running})
-                if allocated_mb is not None:
-                    allocated_mb = allocated_mb / 1024.0
-                    jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
-                if available_mb is not None:
-                    available_mb = available_mb / 1024.0
-                    jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
+        # 下面从rrd中获取的数据不准，用rest接口获取
+        #rm_service = None
+        #for service in services:
+        #    if u'yarn' == service['name']:
+        #        rm_service = service
+        #        break
+        #if rm_service: 
+        #    hosts = service['roles']['resourcemanager']
+        #    if hosts:
+        #        host = hosts[0]
+        #        apps_failed    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsFailed')
+        #        apps_completed = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsCompleted')
+        #        apps_running   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsRunning')
+        #        allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
+        #        available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
+
+        #        if apps_failed is None: apps_failed = 0
+        #        jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"%.2f" % apps_failed})
+        #        if apps_completed is None: apps_completed = 0
+        #        jobs_healths['group'].append({'name':'','display':'作业完成数',"value":"%.2f" % apps_completed})
+        #        if apps_running is None: apps_running = 0
+        #        jobs_healths['group'].append({'name':'','display':'作业运行数',"value": "%.2f" % apps_running})
+        #        if allocated_mb is not None:
+        #            allocated_mb = allocated_mb / 1024.0
+        #            jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
+        #        if available_mb is not None:
+        #            available_mb = available_mb / 1024.0
+        #            jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
         
         data.append(jobs_healths)
 
