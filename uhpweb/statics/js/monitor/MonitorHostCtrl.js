@@ -34,8 +34,6 @@ uhpApp.controller('MoniHostCtrl', ['$scope', '$rootScope', '$http', '$sce', '$ti
 
   
   $scope.showHostMainMetrics = function(newValue, oldValue, scope){
-    console.log('precision:' + scope.show.precision);
-    console.log('host:' + scope.show.host);
     if(!scope.show.precision || !scope.show.host) return;
     $rootScope.myHttp('GET', '/monitorback/show_host_main_metrics', 
       {precision:scope.show.precision, host:scope.show.host, groups:scope.groups}, 

@@ -34,8 +34,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
                 temp['todo_reduce']=0
                 $scope.queueMeta[queueName]=temp
             }
-            console.log($scope.queues)
-            console.log($scope.queueMeta)
             //run for app proxy for every app
             for(var queue in $scope.queues ){
                 for(var appid in $scope.queues[queue]){
@@ -189,7 +187,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
                 "happenTimeMax"   : get_unix_time()
             }
         }).success(function(response, status, headers, config){
-            console.log("todo print rm data")
             $scope.rm = response
             // 数据格式转换 [[]] => [{}]
             // [ {metric:,x:[],y:[]} ]
@@ -200,7 +197,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             $.each($scope.rm.metrics, function(i, n){
                 n.x = $.map(n.x, xfunc);
             });
-            console.debug($scope.rm.metrics);
         }).error(function(data, status) {
             $rootScope.alert("发送app_running请求失败");
         });
@@ -306,7 +302,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
                 "happenTimeMax"   : get_unix_time()
             }
         }).success(function(response, status, headers, config){
-            console.log("todo print nm data")
             $scope.nm = response
             // 数据格式转换 [[]] => [{}]
             // 同一指标，多实体对比
@@ -318,7 +313,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             $.each($scope.nm.metrics, function(i, n){
                 n.x = $.map(n.x, xfunc);
             });
-            console.debug($scope.nm.metrics);
         }).error(function(data, status) {
             $rootScope.alert("发送app_nmquery请求失败");
         });

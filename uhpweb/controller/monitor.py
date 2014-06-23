@@ -695,6 +695,12 @@ class MonitorBackHandler(BaseHandler):
     
     # 显示单机的主要指标
     def show_host_main_metrics(self):
+        # 单位变换用到的常量
+        GT = ['G','T']
+        MGT = ['M','G','T']
+        KMGT = ['K','M','G','T']
+        BKMGT = ['B','K','M','G','T']
+
         precision    = self.get_argument("precision")
         host         = self.get_argument("host")
 
@@ -743,36 +749,39 @@ class MonitorBackHandler(BaseHandler):
         (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
         mem_metric['x'] = x
         def _my_sub(a, b):
-            a = self._none_2_0(a)
-            b = self._none_2_0(b)
-            a = int(a/1024)
-            b = int(b/1024)
+            if a is None or b is None: 
+                return None
             return a - b  
         mem_used  = map(_my_sub, ys[0], ys[1]) 
-        mem_free  = map(lambda x: int(self._none_2_0(x)/1024), ys[1])
+        mem_free  = ys[1]
         swap_used = map(_my_sub, ys[2], ys[3])
         
         mem_metric['series'].append({'name':'mem_used',  'type':'line', 'stack':'total', 'data':mem_used}) 
         mem_metric['series'].append({'name':'mem_free',  'type':'line', 'stack':'total', 'data':mem_free}) 
         mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used})
-        for temp in mem_metric['series']: temp.update(line_area_style)
+        for temp in mem_metric['series']: 
+            temp.update(line_area_style)
+        self._metric_unit_convert(mem_metric,1024,MGT)
 
         # Net
         metrics = ['bytes_in', 'bytes_out']
         _fetch_m(net_metric, metrics, line_area_style)
+        self._metric_unit_convert(net_metric,1024,BKMGT)
         
         # Disk
         metrics = ['disk_total','disk_free']
         (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
         disk_metric['x'] = x
-        disk_total = map(lambda x:self._none_2_0(x), ys[0])
-        disk_free  = map(lambda x:self._none_2_0(x), ys[1])
-        disk_used = []
-        if disk_total is not None and disk_free is not None:
-            disk_used  = map(lambda x,y:x is not None and y is not None and x-y or None, disk_total, disk_free)
+        #disk_total = map(lambda x:self._none_2_0(x), ys[0])
+        #disk_free  = map(lambda x:self._none_2_0(x), ys[1])
+        disk_total = ys[0]
+        disk_free  = ys[1]
+        disk_used  = map(_my_sub, disk_total, disk_free)
         disk_metric['series'].append({'name':'disk_used',  'type':'line', 'stack':'total', 'data':disk_used}) 
         disk_metric['series'].append({'name':'disk_free',  'type':'line', 'stack':'total', 'data':disk_free}) 
-        for temp in disk_metric['series']: temp.update(line_area_style)
+        for temp in disk_metric['series']: 
+            temp.update(line_area_style)
+        self._metric_unit_convert(disk_metric,1024,GT)
 
         data = []
         data.append(load_metric)
@@ -796,7 +805,7 @@ class MonitorBackHandler(BaseHandler):
             try:
                 rrd_metric = rrd_wrapper.query(metric, start, end, hostname=host, clusterName=cluster_name)
                 (x,y) = rrd.convert_to_xy(rrd_metric)
-                if x is not None: ts = x
+                if not ts and x is not None: ts = x
                 values.append(y)
             except Exception, e:
                 app_log.exception('')
@@ -940,33 +949,51 @@ class MonitorBackHandler(BaseHandler):
         # {'name':'yarn.QueueMetrics.Queue=root.AvailableMB',                        'display' :'可用内存MB'},
         # {'name':'yarn.QueueMetrics.Queue=root.AllocatedMB',                        'display' :'分配内存MB'},
         jobs_healths =  {'type':'multi', 'name':'job','display':'作业健康度', 'group':[]}
-        rm_service = None
-        for service in services:
-            if u'yarn' == service['name']:
-                rm_service = service
-                break
-        if rm_service: 
-            hosts = service['roles']['resourcemanager']
-            if hosts:
-                host = hosts[0]
-                apps_failed    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsFailed')
-                apps_completed = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsCompleted')
-                apps_running   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsRunning')
-                allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
-                available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
+        # 使用REST接口获取相关指标
+        url = "http://%s:%s/ws/v1/cluster/metrics" % (self._get_rmhost(),self._get_rmport())
+        cluster_metrics = util.get_http_json(url)
+        if cluster_metrics is not None:
+            jobs_healths['group'].append({'name':'','display':'作业失败数',"value":cluster_metrics['clusterMetrics']['appsFailed']})
+            jobs_healths['group'].append({'name':'','display':'作业完成数',"value":cluster_metrics['clusterMetrics']['appsCompleted']})
+            jobs_healths['group'].append({'name':'','display':'作业运行数',"value":cluster_metrics['clusterMetrics']['appsRunning']})
+            allocated_mb=cluster_metrics['clusterMetrics']['allocatedMB']/1024.0
+            jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
+            available_mb=cluster_metrics['clusterMetrics']['availableMB']/1024.0
+            jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
+            #jobs_healths['group'].append({'name':'','display':'全部节点',"value":cluster_metrics['clusterMetrics']['totalNodes']})
+            #jobs_healths['group'].append({'name':'','display':'失联节点',"value":cluster_metrics['clusterMetrics']['lostNodes']})
+            #jobs_healths['group'].append({'name':'','display':'退役节点',"value":cluster_metrics['clusterMetrics']['decommissionedNodes']})
+        else: #
+            jobs_healths['group'].append({'name':'','display':'获取实时指标失败，RM服务可能宕机',"value":0})
 
-                if apps_failed is None: apps_failed = 0
-                jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"%.2f" % apps_failed})
-                if apps_completed is None: apps_completed = 0
-                jobs_healths['group'].append({'name':'','display':'作业完成数',"value":"%.2f" % apps_completed})
-                if apps_running is None: apps_running = 0
-                jobs_healths['group'].append({'name':'','display':'作业运行数',"value": "%.2f" % apps_running})
-                if allocated_mb is not None:
-                    allocated_mb = allocated_mb / 1024.0
-                    jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
-                if available_mb is not None:
-                    available_mb = available_mb / 1024.0
-                    jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
+        # 下面从rrd中获取的数据不准，用rest接口获取
+        #rm_service = None
+        #for service in services:
+        #    if u'yarn' == service['name']:
+        #        rm_service = service
+        #        break
+        #if rm_service: 
+        #    hosts = service['roles']['resourcemanager']
+        #    if hosts:
+        #        host = hosts[0]
+        #        apps_failed    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsFailed')
+        #        apps_completed = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsCompleted')
+        #        apps_running   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AppsRunning')
+        #        allocated_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AllocatedMB')
+        #        available_mb   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'yarn.QueueMetrics.Queue=root.AvailableMB')
+
+        #        if apps_failed is None: apps_failed = 0
+        #        jobs_healths['group'].append({'name':'','display':'作业失败数',"value":"%.2f" % apps_failed})
+        #        if apps_completed is None: apps_completed = 0
+        #        jobs_healths['group'].append({'name':'','display':'作业完成数',"value":"%.2f" % apps_completed})
+        #        if apps_running is None: apps_running = 0
+        #        jobs_healths['group'].append({'name':'','display':'作业运行数',"value": "%.2f" % apps_running})
+        #        if allocated_mb is not None:
+        #            allocated_mb = allocated_mb / 1024.0
+        #            jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
+        #        if available_mb is not None:
+        #            available_mb = available_mb / 1024.0
+        #            jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
         
         data.append(jobs_healths)
 
@@ -1201,9 +1228,15 @@ class MonitorBackHandler(BaseHandler):
         if v is None: return 0
         return v
 
+
     # 监控 机器 概览 当前 
     # data:[{name,x:[],series:[{name:,type:,data:[]}]}]
     def fetch_host_current_overview(self):
+        # 单位变换用到的常量
+        GT = ['G','T']
+        MGT = ['M','G','T']
+        KMGT = ['K','M','G','T']
+        BKMGT = ['B','K','M','G','T']
 
         host_overview = [] #机器概述
         data = [] # 分项数据
@@ -1308,8 +1341,8 @@ class MonitorBackHandler(BaseHandler):
             cpu_metric_cpu_wio.append(cpu_wio)
 
             # 网络
-            if bytes_in  is not None: bytes_in  = int(bytes_in)/1024
-            if bytes_out is not None: bytes_out = int(bytes_out)/1024
+            #if bytes_in  is not None: bytes_in  = int(bytes_in)/1024
+            #if bytes_out is not None: bytes_out = int(bytes_out)/1024
             net_metric_bytes_in.append(bytes_in)
             net_metric_bytes_out.append(bytes_out)
             net_metric_1g_mark.append(128*1024)
@@ -1320,8 +1353,8 @@ class MonitorBackHandler(BaseHandler):
             total_net_out += self._none_2_0(bytes_out)
 
             # 内存
-            if mem_total is not None: mem_total = int(mem_total)/1024
-            if mem_free  is not None: mem_free  = int(mem_free)/1024
+            #if mem_total is not None: mem_total = int(mem_total)/1024
+            #if mem_free  is not None: mem_free  = int(mem_free)/1024
             mem_used = None
             if mem_total is not None and mem_free is not None:
                 mem_used = mem_total - mem_free
@@ -1332,8 +1365,8 @@ class MonitorBackHandler(BaseHandler):
             total_mem_capacity  += self._none_2_0(mem_total)
             total_mem_used      += self._none_2_0(mem_used)
             
-            if swap_total is not None: swap_total = int(swap_total)/1024
-            if swap_free  is not None: swap_free  = int(swap_free)/1024
+            #if swap_total is not None: swap_total = int(swap_total)/1024
+            #if swap_free  is not None: swap_free  = int(swap_free)/1024
             swap_used = None
             if swap_total is not None and swap_free is not None:
                 swap_used = swap_total - swap_free
@@ -1369,15 +1402,18 @@ class MonitorBackHandler(BaseHandler):
         net_metric['series'].append({'name':'bytes_out', 'type':'bar', 'stack':'net', 'data':net_metric_bytes_out})
         #net_metric['series'].append({'name':'1g_mark', 'type':'line', 'data':net_metric_1g_mark})
         #net_metric['series'].append({'name':'2g_mark', 'type':'line', 'data':net_metric_2g_mark})
+        self._metric_unit_convert(net_metric,1024,BKMGT)
 
         # 内存
         mem_metric['series'].append({'name':'mem_used', 'type':'bar', 'stack':'mem', 'data':mem_metric_mem_used})
         mem_metric['series'].append({'name':'mem_free', 'type':'bar', 'stack':'mem', 'data':mem_metric_mem_free})
         mem_metric['series'].append({'name':'swap_used', 'type':'bar', 'stack':'mem', 'data':mem_metric_swap_used})
+        self._metric_unit_convert(mem_metric,1024,KMGT)
 
         # 存储
         disk_metric['series'].append({'name':'disk_used', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_used})
         disk_metric['series'].append({'name':'disk_free', 'type':'bar', 'stack':'disk', 'data':disk_metric_disk_free})
+        self._metric_unit_convert(disk_metric,1024,GT)
         
         # 负载分布
         # load_metric_load_percent.append(load_percent)
@@ -1460,8 +1496,8 @@ class MonitorBackHandler(BaseHandler):
                 disk_frees.append(disk_free)
 
                 info_disk = []
-                info_disk.append({'name':'读速度','value':disk_iostat_r,'unit':'KB'})
-                info_disk.append({'name':'写速度','value':disk_iostat_w,'unit':'KB'})
+                info_disk.append(self._value_unit_convert({'name':'读速度','value':disk_iostat_r,'unit':'KB'},1024,KMGT))
+                info_disk.append(self._value_unit_convert({'name':'写速度','value':disk_iostat_w,'unit':'KB'},1024,KMGT))
                 info_disk.append({'name':'通电时间','value':disk_smartctl_power_on_hours,'unit':'小时'})
                 info_disk.append({'name':'Seek_Error_Rate','value':disk_smartctl_seek_error_rate,'unit':''})
                 info_disk.append({'name':'Raw_Read_Error_Rate','value':disk_smartctl_raw_read_error_rate,'unit':''})
@@ -1470,21 +1506,90 @@ class MonitorBackHandler(BaseHandler):
                 
             disks['series'].append({'name':'disk_used','type':'bar','stack':'disk','data':disk_useds})
             disks['series'].append({'name':'disk_free','type':'bar','stack':'disk','data':disk_frees})
+            self._metric_unit_convert(disks,1024,GT)
             disk_data.append(disks)
         
         # overview
         host_overview.append({'name':'总机器数量','value':total_hosts,'unit':'台'})
         host_overview.append({'name':'总磁盘数量','value':total_disk_numb,'unit':'个'})
-        host_overview.append({'name':'总磁盘容量','value':total_disk_capacity,'unit':'G'})
-        host_overview.append({'name':'总磁盘使用','value':total_disk_used,'unit':'G'})
-        host_overview.append({'name':'总内存容量','value':total_mem_capacity,'unit':'M'})
-        host_overview.append({'name':'总内存使用','value':total_mem_used,'unit':'M'})
+        host_overview.append(self._value_unit_convert({'name':'总磁盘容量','value':total_disk_capacity,'unit':'G'},1024,GT))
+        host_overview.append(self._value_unit_convert({'name':'总磁盘使用','value':total_disk_used,'unit':'G'},1024,GT))
+        host_overview.append(self._value_unit_convert({'name':'总内存容量','value':total_mem_capacity,'unit':'M'},1024,MGT))
+        host_overview.append(self._value_unit_convert({'name':'总内存使用','value':total_mem_used,'unit':'M'},1024,MGT))
         host_overview.append({'name':'总CPU数量','value':total_cpu_numb,'unit':'个'})
-        host_overview.append({'name':'总网卡流入','value':total_net_in,'unit':'M'})
-        host_overview.append({'name':'总网卡流出','value':total_net_out,'unit':'M'})
+        host_overview.append(self._value_unit_convert({'name':'总网卡流入','value':total_net_in,'unit':'M'},1024,MGT))
+        host_overview.append(self._value_unit_convert({'name':'总网卡流出','value':total_net_out,'unit':'M'},1024,MGT))
 
         ret = {"data":data, 'diskData':disk_data, "hostOverview":host_overview, 'loadDist':load_metric_dist}
         self.ret("ok", "", ret);
+
+    # 单位转换: 整数位在一个进制范围内，小数位2个
+    # div 进制 例如: 1024
+    # units 单位上升 例如： M G T
+    # return (value, unit)
+    def _unit_convert(self, value,div,units):
+        ui = 0
+        ulen = len(units)
+        while ui < ulen and value > div:
+            value = value / div
+            ui += 1
+        return (value, units[ui])
+
+    # 
+    def _value_unit_convert(self, d, div, units):
+        if 'value' in d:
+            v = d['value']
+            if v is not None:
+                (v,d['unit']) = self._unit_convert(v, div, units)
+                v2 = int(v*100)
+                if v2 % 100 == 0: # 整数
+                    v = "%d" % (v2 / 100)
+                else: # 浮点
+                    v = "%.2f" % v 
+                d['value'] = v
+        return d
+
+    # data: [number]
+    def _data_unit_convert(self, data, div, units):
+        ui = 0
+        dm = [d for d in data if d is not None]
+        if dm:
+            ulen = len(units)
+            dm_min = min(dm)
+            while ui < ulen and dm_min > div:
+                dm_min = dm_min / div
+                ui += 1
+            if ui > 0: #需要转换
+                data = map(lambda x: None if x is None else "%.2f" % (x/(div ** ui)), data)
+        return (data, units[ui])
+    
+    # net_metric  = {'metric':'网络','x':[],'series':[]}
+    # net_metric['series'].append({'name':'bytes_in', 'type':'bar', 'stack':'net', 'data':net_metric_bytes_in})
+    def _metric_unit_convert(self, m, div, units):
+        ui = 0
+        if 'series' in m:
+            series = m['series']
+            all_data = []
+            for serie in series:
+                data = serie['data']
+                data = [d for d in data if d is not None]
+                all_data += data
+            if all_data:
+                # 使用中值
+                # all_data_min = min(all_data)
+                all_data.sort()
+                all_data_min = all_data[(len(all_data)-1)/2]
+                ulen = len(units)
+                while ui < ulen and all_data_min > div:
+                    all_data_min = all_data_min / div
+                    ui += 1
+                if ui > 0: #需要转换
+                    for serie in series:
+                        data = serie['data']
+                        data = map(lambda x: None if x is None else x/(div ** ui), data)
+                        serie['data'] = data
+        m['unit'] = units[ui]    
+        return m 
 
     def _query_special_hosts(self, service_name, role_name):
         # [{name:, roles:{role:[instance]}}]
