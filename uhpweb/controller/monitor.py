@@ -958,7 +958,7 @@ class MonitorBackHandler(BaseHandler):
             jobs_healths['group'].append({'name':'','display':'作业运行数',"value":cluster_metrics['clusterMetrics']['appsRunning']})
             allocated_mb=cluster_metrics['clusterMetrics']['allocatedMB']/1024.0
             jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
-            avaliable_mb=cluster_metrics['clusterMetrics']['availableMB']/1024.0
+            available_mb=cluster_metrics['clusterMetrics']['availableMB']/1024.0
             jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
             jobs_healths['group'].append({'name':'','display':'全部节点',"value":totalNodes})
             jobs_healths['group'].append({'name':'','display':'失联节点',"value":lostNodes})
