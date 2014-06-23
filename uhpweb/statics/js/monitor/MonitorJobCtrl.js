@@ -598,6 +598,26 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
           $scope.runningQuery();
         },10000);
     }
+
+    // 历史查询
+    $scope.metricsQuery = function(){
+      //var fields = getMetricsFieldParams();
+      //var recordTimeMin = getMetricsRecordTimeMinParams();
+      //var recordTimeMax = getMetricsRecordTimeMaxParams();
+      //var recordTimeSplit = getMetricsRecordTimeSplitParams();
+      //
+      //var appQuery;
+      //appQuery = new XMLHttpRequest();
+      //appQuery.onreadystatechange=function(){
+      //  if (appQuery.readyState==4 && appQuery.status==200){
+      //    showMetricsData(JSON.parse(appQuery.responseText));
+      //  }
+      //}
+      //var url = "db/metricsQuery?fields="+fields+"&recordTimeSplit="+recordTimeSplit
+      //        +"&recordTimeMax="+recordTimeMax+"&recordTimeMin="+recordTimeMin
+      //appQuery.open("GET",url,true);
+      //appQuery.send();
+    }
     
     $scope.needKillApp = function(appId){
       $scope.needKillAppIds = [appId];
