@@ -960,9 +960,9 @@ class MonitorBackHandler(BaseHandler):
             jobs_healths['group'].append({'name':'','display':'分配内存',"value":"%.2fG" % allocated_mb})
             available_mb=cluster_metrics['clusterMetrics']['availableMB']/1024.0
             jobs_healths['group'].append({'name':'','display':'可用内存',"value":"%.2fG" % available_mb})
-            jobs_healths['group'].append({'name':'','display':'全部节点',"value":totalNodes})
-            jobs_healths['group'].append({'name':'','display':'失联节点',"value":lostNodes})
-            jobs_healths['group'].append({'name':'','display':'退役节点',"value":decommissionedNodes})
+            jobs_healths['group'].append({'name':'','display':'全部节点',"value":cluster_metrics['clusterMetrics']['totalNodes']})
+            jobs_healths['group'].append({'name':'','display':'失联节点',"value":cluster_metrics['clusterMetrics']['lostNodes']})
+            jobs_healths['group'].append({'name':'','display':'退役节点',"value":cluster_metrics['clusterMetrics']['decommissionedNodes']})
         else: #
             jobs_healths['group'].append({'name':'','display':'获取实时指标失败，RM服务可能宕机',"value":0})
 
