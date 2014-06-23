@@ -75,35 +75,40 @@ def get_value(name):
     global DEVS
 
     _value = 'unknown'
+  
+    t = name.split("_")
+    if len(t) < 3:
+        return _value
 
-    for dev in DEVS:
-        # use iostat to get the io stats
-        (out, err, code,) = execute('smartctl -A %s' % dev)
-        if code != 0:
-            print("smartctl did not installed exit \n %s " % err)
-            sys.exit(code)
-        else:
+    dev = "/dev/%s" % t[2]
 
-            cleanedlines = []
-            next_data = False
-            for line in out.split('\n'):
-                #This removes blank items from remaining list
-                if next_data and line != '':
-                    cleanedlines.append(line)
+    # use iostat to get the io stats
+    (out, err, code,) = execute('smartctl -A %s' % dev)
+    if code != 0:
+        print("smartctl did not installed exit \n %s " % err)
+        sys.exit(code)
+    else:
 
-                if line.startswith('ID#'):
-                    next_data = True
+        cleanedlines = []
+        next_data = False
+        for line in out.split('\n'):
+            #This removes blank items from remaining list
+            if next_data and line != '':
+                cleanedlines.append(line)
 
-            current_dev = dev[5:]
+            if line.startswith('ID#'):
+                next_data = True
 
-            length = len(NAME_PREFIX + current_dev + '_')
-            _current_name = name[length:]
+        current_dev = dev[5:]
 
-            for l in cleanedlines:
-                datas = l.split()
+        length = len(NAME_PREFIX + current_dev + '_')
+        _current_name = name[length:]
 
-                if _current_name in datas:
-                    _value = datas[9]
+        for l in cleanedlines:
+            datas = l.split()
+
+            if _current_name in datas:
+                _value = datas[9]
 
     return float(_value)
 
@@ -112,7 +117,6 @@ def metric_init(lparams):
     """Initialize metric descriptors"""
     devs = get_mounted_disks(lparams)
 
-    print devs
     for dev in devs:
         open_mart(dev)
 

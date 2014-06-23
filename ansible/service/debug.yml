@@ -4,6 +4,8 @@
   tasks: 
   - name: fix the disk iostat bug
     copy: src=roles/gmond/files/diskiostat.py dest=/usr/lib64/ganglia/python_modules/diskiostat.py
+  - name: fix the disk smart bug
+    copy: src=roles/gmond/files/disksmartctl.py dest=/usr/lib64/ganglia/python_modules/disksmartctl.py
 
 #  - name: copy the jar
 #    copy: src=/home/qiujw/kafka-0.7.2-incubating-src.after.tar.gz dest=/home/qiujw/temp/temp.tar.gz
