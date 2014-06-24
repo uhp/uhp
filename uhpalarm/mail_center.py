@@ -39,8 +39,6 @@ def get_key_word_map():
     global key_word_map
     temp = copy.deepcopy(key_word_map)
     mutex.release()
-    log.info("get key word")
-    log.info(temp)
     return temp
 
 def add_alarm_info(content):

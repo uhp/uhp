@@ -82,10 +82,7 @@ class Alarm:
                 data_set = self.data_manager.get_data_by_host(host)
                 for rule in rule_list:
                     temp = self.judge_specify_rule(host, rule, data_set)
-                    log.info("get list from %s %s " % (host, rule.name) )
-                    log.info(temp)
                     alarm_list.extend(temp)
-                    log.info(alarm_list)
             self.cb_manager.deal_alarm_list(alarm_list)
         except:
             log.exception("get exeception judge_host_rule")
