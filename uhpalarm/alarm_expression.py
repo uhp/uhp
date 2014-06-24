@@ -39,7 +39,7 @@ class AlarmExpManager(Manager):
 
         real_args,msg = self._get_args_from_ds(data_set,rule.exp_args)
         if real_args == None :
-            key_word = "%s(%s)" % (host, self.rule.name+" args not get")
+            key_word = "%s(%s)" % (host, rule.name+" args not get")
             return [{"key_word":key_word,"msg":msg}]
         begin = time.time()
         exp_result = apply(rule.exp_func,real_args)
