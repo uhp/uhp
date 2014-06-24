@@ -12,7 +12,7 @@ import database
 from lib.manager import Manager
 from lib.logger import log
 from lib import contants
-from model.alarm import AlarmList
+from model.alarm import AlarmList,AlarmAssist
 
 class AlarmCallbackManager(Manager):
     def __init__(self):
@@ -55,11 +55,23 @@ class AlarmCallbackManager(Manager):
         mail_center.push_key_word_map(self.key_word_map)
         
         session = database.getSession()
+        ignore_key_word = session.query(AlarmAssist).filter(AlarmAssist.name=="ignore_key_word").first()
+        ignore_list = []
+        if ignore_key_word != None:
+            ignore_list = ignore_key_word.value.split(",") 
+        log.info(ignore_list)
+
         for alarm_state in new_key_word:
+            key_word = alarm_state['key_word']
+            if key_word in ignore_list:
+                continue
             self._callback(alarm_state)
             session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "ERROR", int(time.time()) ))
 
         for alarm_state in old_key_word:
+            key_word = alarm_state['key_word']
+            if key_word in ignore_list:
+                continue
             self._callback(alarm_state)
             session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "INFO", int(time.time()) ))
         

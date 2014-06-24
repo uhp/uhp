@@ -97,6 +97,7 @@ def _get_mail_to():
     session = database.getSession()
     mail_list = session.query(AlarmAssist).filter(AlarmAssist.name=="mail_to").first()
     log.info("to mail %s" % mail_list.value)
+    session.close()
     return mail_list.value.split(",")
     #return ['qiujw@ucweb.com']
 
