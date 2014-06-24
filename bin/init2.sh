@@ -5,7 +5,7 @@ DIR=$(cd $(dirname "$0"); cd ..; pwd)
 
 if [ "$UHP_HOME" == "" ] ; then 
     echo "export UHP_HOME=$DIR" >> ~/.bash_profile
-    echo "export ANSIBLE_CONFIG=\$HUP_HOME/conf/ansible.cfg" >> ~/.bash_profile
+    echo "export ANSIBLE_CONFIG=\$UHP_HOME/conf/ansible.cfg" >> ~/.bash_profile
     echo "export PATH=\$UHP_HOME/bin:\$PATH" >> ~/.bash_profile
     export UHP_HOME=$DIR
 fi
