@@ -1526,7 +1526,7 @@ class MonitorBackHandler(BaseHandler):
     # return (value, unit)
     def _unit_convert(self, value,div,units):
         ui = 0
-        ulen = len(units)
+        ulen = len(units) - 1
         while ui < ulen and value > div:
             value = value / div
             ui += 1
@@ -1551,7 +1551,7 @@ class MonitorBackHandler(BaseHandler):
         ui = 0
         dm = [d for d in data if d is not None]
         if dm:
-            ulen = len(units)
+            ulen = len(units) - 1
             dm_min = min(dm)
             while ui < ulen and dm_min > div:
                 dm_min = dm_min / div
@@ -1576,7 +1576,7 @@ class MonitorBackHandler(BaseHandler):
                 # all_data_min = min(all_data)
                 all_data.sort()
                 all_data_min = all_data[(len(all_data)-1)/2]
-                ulen = len(units)
+                ulen = len(units) - 1
                 while ui < ulen and all_data_min > div:
                     all_data_min = all_data_min / div
                     ui += 1
