@@ -20,22 +20,10 @@ def check_instance_state():
 
 class InstanceStateChecker:
     def __init__(self):
-        self.state = "OK"
-        self.msg = u""
-        self.msg_count = 1
+        self.alarm_list = []
 
-    def update_msg(self,msg):
-        self.msg += "%d: %s" % (self.msg_count, msg)
-        self.msg_count = self.msg_count + 1
-
-    def update_result(self, state, msg):
-        if state == "ERROR" :
-            self.state = state
-            self.update_msg(msg)
-        elif state == "WARN" :
-            self.update_msg(msg)
-            if self.state != "ERROR" :
-                self.state = state
+    def update_result(self, key_word, msg):
+        self.alarm_list.append({"key_word":key_word,"msg":msg})
 
     def check_instance_state(self):
         '''
@@ -45,8 +33,12 @@ class InstanceStateChecker:
         #get all instance
         session = database.getSession()
         for instance in session.query(Instance):
+            #检查实例
             result,msg = self.check_instance(instance)
-            self.update_result(result,msg)
+            if not result:
+                key_word = "%s(%s error)" % (instance.host,instance.role)
+                self.update_result(key_word, msg)
+            #采集服务
             if not service_role_map.has_key(instance.service) :
                 service_role_map[instance.service] = []
             service_role_map[instance.service].append(instance)
@@ -55,30 +47,33 @@ class InstanceStateChecker:
             if service == "zookeeper" :
                 zk_leader_port = database.get_service_conf(session,"zookeeper","zookeeper_leader_port")   
                 result,msg = self.check_zk_leader(zk_leader_port,roles)
-                self.update_result(result,msg)
+                if not result:
+                    key_word = "cluster(zk no leader)"
+                    self.update_result(key_word, msg)
             elif service == "hbase" :
                 #TODO
                 hbase_master_info_port = database.get_service_conf(session,"hbase","hbase_master_info_port")
                 result,msg = self.check_hbase_master(hbase_master_info_port,roles)
-                self.update_result(result,msg)
-                
+                if not result:
+                    key_word = "cluster(hbase no leader)"
+                    self.update_result(key_word, msg)
 
         session.close()
-        return (self.state,self.msg)
+        return self.alarm_list
 
     def check_instance(self, instance):
         if instance.status == Instance.STATUS_START :
             if instance.health == Instance.HEALTH_UNHEALTHY :  
-                return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
+                return (False, u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
             if instance.health == Instance.HEALTH_DOWN :  
-                return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
+                return (False, u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
             if instance.monitor_time == None or instance.monitor_time == 0  :
-                return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但未找到检测信息。 " % (instance.host, instance.role) )
+                return (False, u"检测到实例 %s(%s) 在启动状态,但未找到检测信息。 " % (instance.host, instance.role) )
             else:
                 dis = int(time.time()) - instance.monitor_time
                 if dis > config.max_unknow_time :
-                    return ("ERROR", u"检测到实例 %s(%s) 在启动状态,但检测超时%ds。" % (instance.host, instance.role, dis) )
-        return ("OK","")
+                    return (False, u"检测到实例 %s(%s) 在启动状态,但检测超时%ds。" % (instance.host, instance.role, dis) )
+        return (True,"")
 
     def check_zk_leader(self,port,roles):
         start = False
@@ -96,11 +91,11 @@ class InstanceStateChecker:
 
         if start :
             if len(roles) > 1 and len(masters) == 0 :
-                return ("ERROR", u"检测到zookeeper在分布式状态启动,但是找不到领导结点。" )
+                return (Flase, u"检测到zookeeper在分布式状态启动,但是找不到领导结点。" )
             elif len(masters) > 1 :
-                return ("ERROR", u"检测到有多个zookeeper的领导结点 %s。" % (",".join(masters)) )
+                return (False, u"检测到有多个zookeeper的领导结点 %s。" % (",".join(masters)) )
 
-        return ("OK","")
+        return (True,"")
 
     def check_hbase_master(self,port,roles):
         
@@ -123,10 +118,10 @@ class InstanceStateChecker:
 
         if start :
             if len(masters) == 0 :
-                return ("ERROR", u"检测到hbase没有主hbasemaster。%s " % debug_msg )
+                return (False, u"检测到hbase没有主hbasemaster。%s " % debug_msg )
             elif len(masters) > 1:
-                return ("ERROR", u"检测到有多个主hbasemaster %s。" % (",".join(masters)))
-        return ("OK","")
+                return (False, u"检测到有多个主hbasemaster %s。" % (",".join(masters)))
+        return (True,"")
         
 if __name__ == "__main__":
     print check_instance_state()

@@ -61,16 +61,19 @@ class Alarm:
 
     def judge_specify_rule(self, host, rule, data_set ):
         try:
-            exp_result = self.exp_manager.judge(host, rule, data_set)
-            self.cb_manager.callback(host, rule, exp_result)
+            #exp_result = self.exp_manager.judge(host, rule, data_set)
+            return self.exp_manager.judge(host, rule, data_set)
+            #self.cb_manager.callback(host, rule, exp_result)
         except:
             log.exception("get exception with h:%s r:%s" % (host,rule) )
+        return []
 
     def judge_host_rule(self):
         '''
         为每个host的规则进行判断
         '''
         try:
+            alarm_list = []
             host_list = self.get_host_list()
             #添加集群规则
             host_list.append("cluster")
@@ -78,7 +81,12 @@ class Alarm:
                 rule_list = self.rule_manager.get_rule_by_host(host)
                 data_set = self.data_manager.get_data_by_host(host)
                 for rule in rule_list:
-                    self.judge_specify_rule(host, rule, data_set)
+                    temp = self.judge_specify_rule(host, rule, data_set)
+                    log.info("get list from %s %s " % (host, rule.name) )
+                    log.info(temp)
+                    alarm_list.extend(temp)
+                    log.info(alarm_list)
+            self.cb_manager.deal_alarm_list(alarm_list)
         except:
             log.exception("get exeception judge_host_rule")
 

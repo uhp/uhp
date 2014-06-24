@@ -17,9 +17,6 @@ class AlarmExpManager(Manager):
     def __init__(self):
         self.exp_map = AlarmExpMap()
         self.exp_parser = ExpParser()
-        #self.exp_pattern = re.compile('^([a-zA-Z0-9_\\-]+)\\((.*)\\)$')
-        #self.double_pattern = re.compile('^[0-9]+(\\.[0-9]*)?$') 
-        #self.var_pattern = re.compile('^[0-9a-zA-Z\\._-]+$')
     
     def judge(self, host, rule, data_set):
         
@@ -42,7 +39,8 @@ class AlarmExpManager(Manager):
 
         real_args,msg = self._get_args_from_ds(data_set,rule.exp_args)
         if real_args == None :
-            return (contants.ALARM_ERROR, msg)
+            key_word = "%s(%s)" % (host, self.rule.name+" args not get")
+            return [{"key_word":key_word,"msg":msg}]
         begin = time.time()
         exp_result = apply(rule.exp_func,real_args)
         end = time.time()
@@ -69,7 +67,6 @@ class AlarmExpManager(Manager):
         for arg in args:
             value,msg = self.exp_parser.get_exp_value(arg,data_set)
             if value == None :
-                log.info(u"value is none %s." % msg)
                 return (None,msg)    
             real_args.append(value)
         return (real_args,"")
@@ -85,39 +82,33 @@ class AlarmExpMap:
 
     对于cluster的函数,请在cluster_func加入对应的函数
 
+    返回的exp_result的格式为
+    (level,[{"key_word":"","msg"},{"key_word":"","msg"}...])
+
     '''
     def __init__(self):
         pass
         #self.cluster_func = ["sum_and_equal"]
 
-    def filter_cluster(self):
-        func_name = self.rule.exp_func_name
-        if self.host == 'cluster' :
-            if func_name in self.cluster_func :
-                return None 
-            else:
-                return (contants.ALARM_CONFIG_ERROR, u"检查集群规则使用了非集群的判断函数 规则名称:%s 判断函数:%s " % (self.rule.name, func_name ) )
-        else:
-            if func_name in self.cluster_func :
-                return (contants.ALARM_CONFIG_ERROR, u"检查非集群规则使用了集群的判断函数 规则名称:%s 判断函数:%s " % (self.rule.name, func_name ) )
-            else:
-                return None
+    def build_alarm_list(state,msg):
+        key_word = "%s(%s)" % (self.host, rule.name+" alarm")
+        return [{"key_word":key_word,"msg":msg}]
 
     def max(self, value, warn, error):
         if value > error :
-            return (contants.ALARM_ERROR, u"%s 检查到错误状态  %.2f 大于  %.2f" % (self.rule.name, value, error) )
+            return self.build_alarm_list(u"%s 检查到错误状态  %.2f 大于  %.2f" % (self.rule.name, value, error) )
         elif value > warn:
-            return (contants.ALARM_WARN, u"%s 检查到警告状态  %.2f 大于  %.2f" % (self.rule.name, value, warn) )
+            return self.build_alarm_list(u"%s 检查到警告状态  %.2f 大于  %.2f" % (self.rule.name, value, warn) )
         else:
-            return (contants.ALARM_OK, "")
+            return []
 
     def min(self, value, warn, error):
         if value < error :
-            return (contants.ALARM_ERROR, u"%s 检查到错误状态  %.2f 小于  %.2f" % (self.rule.name, value, error) )
+            return self.build_alarm_list(u"%s 检查到错误状态  %.2f 小于  %.2f" % (self.rule.name, value, error) )
         elif value < warn:
-            return (contants.ALARM_WARN, u"%s 检查到警告状态  %.2f 小于  %.2f" % (self.rule.name, value, warn) )
+            return self.build_alarm_list(u"%s 检查到警告状态  %.2f 小于  %.2f" % (self.rule.name, value, warn) )
         else:
-            return (contants.ALARM_OK, "")
+            return []
 
     def disk_use(self, warn, error):
         '''
@@ -126,26 +117,25 @@ class AlarmExpMap:
         '''
         key_pattern = re.compile('^dev_[a-zA-Z0-9]*?_disk_used$')  
         level = 0 
-        msg = u""
+        alarm_list = []
         found = False
         for (k,v) in self.data_set.items():
             m = key_pattern.match(k)
             if m :
                 found = True
+                key_word = "%s(%s)" % (self.host, self.rule.name+" "+k)
                 if v >= error :
-                    level = level | 2
-                    msg = msg + (u"指标%s %.2f 大于 %.2f. " % (k,v,error))
+                    msg = u"指标%s %.2f 大于 %.2f. " % (k,v,error)
+                    alarm_list.append({"key_word":key_word, "msg":msg })
                 elif v >= warn :
-                    level = level | 1
-                    msg = msg + (u"指标%s %.2f 大于 %.2f. " % (k,v,warn))
+                    msg = u"指标%s %.2f 大于 %.2f. " % (k,v,warn)
+                    alarm_list.append({"key_word":key_word, "msg":msg })
         if found == False :
-            return (contants.ALARM_ERROR, u"找不到磁盘统计数据.")
-        elif ( level & 2 ) > 0 :
-            return (contants.ALARM_ERROR, msg)
-        elif ( level & 1 ) > 0 :
-            return (contants.ALARM_WARN, msg)
-        else :
-            return (contants.ALARM_OK, "")
+            key_word = "%s(%s)" % (self.host, rule.name+" not get data") 
+            msg = u"找不到磁盘统计数据."
+            alarm_list.append({"key_word":key_word, "msg":msg })
+
+        return alarm_list
 
     def resourcemanager_web(self):
         session = database.getSession()
@@ -154,10 +144,15 @@ class AlarmExpMap:
         for inst in session.query(Instance).filter(Instance.role == "resourcemanager"):
             rms.append(inst.host)
         session.close()
+        alarm_list = []
         if len(rms) == 0 :
-            return  (contants.ALARM_ERROR, u"%s 检查不到有resourcemanager" % self.rule.name )
+            key_word = "cluster(no rm)"
+            msg = u"%s 检查不到有resourcemanager" % self.rule.name 
+            return [{"key_word":key_word,"msg":msg}]  
         if len(rms) != 1 :
-            return  (contants.ALARM_ERROR, u"%s 检查到有多个resourcemanager %s" % (self.rule.name, ",".join(rms) ) )
+            key_word = "cluster(too much rm)"
+            msg = u"%s 检查到有多个resourcemanager %s" % (self.rule.name, ",".join(rms) )
+            return [{"key_word":key_word,"msg":msg}]  
         return resourcemanager_web.resourcemanager_web(rms[0],rm_port)
 
     def namenode_web(self):
@@ -172,7 +167,4 @@ class AlarmExpMap:
     #below is cluster function
     def check_instance_state(self):
         return check_instance_state.check_instance_state()
-
-    def sum_and_equal(self, point_name, want):
-        return (contants.ALARM_OK, "")  
 
