@@ -873,14 +873,17 @@ class MonitorBackHandler(BaseHandler):
     # 服务健康度：进程，端口，响应，性能
     def _service_instance_current_health(self, rrd_wrapper, cluster_name, service, role, host):
         session = database.getSession()
-        for instance in session.query(Instance).filter(and_(Instance.service==service, Instance.role==role,
-            Instance.host==host)):
-            if instance.status != 'start':
-                return 100
-            if instance.health == Instance.HEALTH_HEALTHY:
-                return 100
-            if instance.health == Instance.HEALTH_UNKNOW:
-                return -1
+        try:
+            for instance in session.query(Instance).filter(and_(Instance.service==service, Instance.role==role,
+                Instance.host==host)):
+                if instance.status != 'start':
+                    return 100
+                if instance.health == Instance.HEALTH_HEALTHY:
+                    return 100
+                if instance.health == Instance.HEALTH_UNKNOW:
+                    return -1
+        finally:
+            session.close()
         return 0
 
     # 当前的监控指标
@@ -1696,35 +1699,38 @@ class MonitorBackHandler(BaseHandler):
             sql = ("select round(happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
 
             session = database.getSession()
-            cursor  = session.execute(sql)
-            for record in cursor:
-                temp = []
-                for value in record:
-                    app_log.info(type(value))
-                    if isinstance(value,Decimal):
-                        app_log.info("into deci")
-                        temp.append(float(value))    
-                    else:
-                        temp.append(value)
-                queryResult.append(temp)
-            app_log.info(queryResult)
+            try:
+                cursor  = session.execute(sql)
+                for record in cursor:
+                    temp = []
+                    for value in record:
+                        app_log.info(type(value))
+                        if isinstance(value,Decimal):
+                            app_log.info("into deci")
+                            temp.append(float(value))    
+                        else:
+                            temp.append(value)
+                    queryResult.append(temp)
+                app_log.info(queryResult)
         
-            #特殊处理mapTime和reduceTime
-            #由于前面有一个printTime的查询，所以偏移一位
-            fieldOffset = 1 
-            if "mapTime" in fields and "mapNum" in fields :
-                timeIndex = fields.index("mapTime") + fieldOffset
-                numIndex = fields.index("mapNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex] 
+                #特殊处理mapTime和reduceTime
+                #由于前面有一个printTime的查询，所以偏移一位
+                fieldOffset = 1 
+                if "mapTime" in fields and "mapNum" in fields :
+                    timeIndex = fields.index("mapTime") + fieldOffset
+                    numIndex = fields.index("mapNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex] 
         
-            if "reduceTime" in fields and "reduceNum"  in fields :
-                timeIndex = fields.index("reduceTime") + fieldOffset
-                numIndex = fields.index("reduceNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex]
+                if "reduceTime" in fields and "reduceNum"  in fields :
+                    timeIndex = fields.index("reduceTime") + fieldOffset
+                    numIndex = fields.index("reduceNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex]
+            finally:
+                session.close()
 
         result = {"result":queryResult, "sql":sql}
         self.ret("ok","",result)               
@@ -1762,33 +1768,36 @@ class MonitorBackHandler(BaseHandler):
                   )
 
             session = database.getSession()
-            cursor  = session.execute(sql)
-            
-            for record in cursor:
-                temp = []
-                for value in record:
-                    if isinstance(value,Decimal):
-                        temp.append(float(value))    
-                    else:
-                        temp.append(value)
-                queryResult.append(temp)
+            try:
+                cursor  = session.execute(sql)
                 
-            #特殊处理mapTime和reduceTime
-            #由于前面有printTime和host两个位置，所以偏移两位
-            fieldOffset = 2
-            if "mapTime" in fields and "mapNum"  in fields :
-                timeIndex = fields.index("mapTime") + fieldOffset
-                numIndex = fields.index("mapNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex] 
-            
-            if "reduceTime" in fields and "reduceNum"  in fields :
-                timeIndex = fields.index("reduceTime") + fieldOffset
-                numIndex = fields.index("reduceNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex]
+                for record in cursor:
+                    temp = []
+                    for value in record:
+                        if isinstance(value,Decimal):
+                            temp.append(float(value))    
+                        else:
+                            temp.append(value)
+                    queryResult.append(temp)
+                    
+                #特殊处理mapTime和reduceTime
+                #由于前面有printTime和host两个位置，所以偏移两位
+                fieldOffset = 2
+                if "mapTime" in fields and "mapNum"  in fields :
+                    timeIndex = fields.index("mapTime") + fieldOffset
+                    numIndex = fields.index("mapNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex] 
+                
+                if "reduceTime" in fields and "reduceNum"  in fields :
+                    timeIndex = fields.index("reduceTime") + fieldOffset
+                    numIndex = fields.index("reduceNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex]
+            finally:
+                session.close()
             
         result = {"result":queryResult,"sql":sql}
         self.ret("ok","",result)               
@@ -1797,30 +1806,32 @@ class MonitorBackHandler(BaseHandler):
     def app_sum(self):
         where = self.get_argument("where","1").replace("o|o","%")
         session = database.getSession()
-        sumKey=["mapsTotal","mapsCompleted","successfulMapAttempts","killedMapAttempts","failedMapAttempts",
-                "localMap","rackMap",
-                "reducesTotal","reducesCompleted","successfulReduceAttempts","killedReduceAttempts",
-                "failedReduceAttempts",
-                "fileRead","fileWrite","hdfsRead","hdfsWrite"]
-        select = "count(appid) as appidCount"
-        for key in sumKey:
-            select = select +" , sum("+key+") as "+key+"Sum "
-        sql = (("select "+select+" from app where %s ") % (where))
-        app_log.info(sql)
-        cursor = session.execute(sql)
-        resultRecord = {}
-        temp = []
-        for record in cursor:
-            app_log.info(record)
-            for value in record:
-                temp.append(value)
-                app_log.info(value)
-        for (key,value) in zip(cursor.keys(),temp):
-            if value != None:
-                resultRecord[key]=int(value)
-            else:
-                resultRecord[key]=0
-        session.close()
+        try:
+            sumKey=["mapsTotal","mapsCompleted","successfulMapAttempts","killedMapAttempts","failedMapAttempts",
+                    "localMap","rackMap",
+                    "reducesTotal","reducesCompleted","successfulReduceAttempts","killedReduceAttempts",
+                    "failedReduceAttempts",
+                    "fileRead","fileWrite","hdfsRead","hdfsWrite"]
+            select = "count(appid) as appidCount"
+            for key in sumKey:
+                select = select +" , sum("+key+") as "+key+"Sum "
+            sql = (("select "+select+" from app where %s ") % (where))
+            app_log.info(sql)
+            cursor = session.execute(sql)
+            resultRecord = {}
+            temp = []
+            for record in cursor:
+                app_log.info(record)
+                for value in record:
+                    temp.append(value)
+                    app_log.info(value)
+            for (key,value) in zip(cursor.keys(),temp):
+                if value != None:
+                    resultRecord[key]=int(value)
+                else:
+                    resultRecord[key]=0
+        finally:
+            session.close()
         result={"resultRecord":resultRecord}
         
         self.ret("ok","",result)
@@ -1833,25 +1844,27 @@ class MonitorBackHandler(BaseHandler):
         orderDirection = self.get_argument("orderDirection","desc")
 
         session = database.getSession()
-        selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
-                   "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",
-                   "fileRead","fileWrite","hdfsRead","hdfsWrite"]
-        if orderField=="appid" :
-            selectKeyArray.append("CAST(SUBSTR(appid,27 ) AS SIGNED) as appnum")
-            orderby = "appnum "+orderDirection
-        else:
-            orderby = orderField+" "+orderDirection 
-        selectKey = ",".join(selectKeyArray)
-        sql = ("select "+selectKey+" from app where %s order by %s LIMIT %s OFFSET %s " % (where,orderby,limit,offset))
-        cursor = session.execute(sql)
-        queryResult = []
-        for record in cursor:
-            temp = []
-            for v in record:
-                temp.append(v)
-            queryResult.append(temp)
-        #queryResult = cursor.fetchall()
-        session.close()
+        try:
+            selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
+                       "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",
+                       "fileRead","fileWrite","hdfsRead","hdfsWrite"]
+            if orderField=="appid" :
+                selectKeyArray.append("CAST(SUBSTR(appid,27 ) AS SIGNED) as appnum")
+                orderby = "appnum "+orderDirection
+            else:
+                orderby = orderField+" "+orderDirection 
+            selectKey = ",".join(selectKeyArray)
+            sql = ("select "+selectKey+" from app where %s order by %s LIMIT %s OFFSET %s " % (where,orderby,limit,offset))
+            cursor = session.execute(sql)
+            queryResult = []
+            for record in cursor:
+                temp = []
+                for v in record:
+                    temp.append(v)
+                queryResult.append(temp)
+            #queryResult = cursor.fetchall()
+        finally:
+            session.close()
         result={"applist":queryResult,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
         self.ret("ok","",result)
 
