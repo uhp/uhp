@@ -9,4 +9,5 @@
    - hadoop-hdfs-zkfc
    - hadoop-lzo-cdh4
    - bigtop-utils
+   - expect
 
