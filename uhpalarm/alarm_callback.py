@@ -8,6 +8,7 @@ import re
 #commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
 #sys.path.append(commondir)
 
+import config
 import mail_center
 import database
 from lib.manager import Manager
@@ -25,19 +26,21 @@ class AlarmCallbackManager(Manager):
         new_key_word = []
         old_key_word = []
         current_key_word = {}
+        
+        temp_key_msg_map = {}
 
         #计算新增的key_word 并记录current_key_word
         for alarm_state in alarm_list:
             key_word = alarm_state['key_word']
-            if not self.key_word_map.has_key(key_word) :
-                new_key_word.append(alarm_state)
             current_key_word[key_word] = 1
+            temp_key_msg_map[key_word] = alarm_state['msg'] 
 
         #计算解除的key_word
         for (key_word,count) in self.key_word_map.items():
             if not current_key_word.has_key(key_word) :
-                msg = u"告警解除,连续告警次数为%d." % count
-                old_key_word.append({"key_word":key_word,"msg":msg})
+                if count >= config.alarm_least_count:
+                    msg = u"告警解除,连续告警次数为%d." % count
+                    old_key_word.append({"key_word":key_word,"msg":msg})
 
         #合并得到最新的key_word
         new_map = {}
@@ -47,6 +50,9 @@ class AlarmCallbackManager(Manager):
             else:
                 now_count = 0
             new_map[key_word] = now_count + 1
+            if new_map[key_word] == config.alarm_least_count :
+                msg = temp_key_msg_map[key_word]
+                new_key_word.append({"key_word":key_word,"msg":msg})
 
         self.key_word_map = new_map
         return (new_key_word,old_key_word)
@@ -136,6 +142,18 @@ class AlarmCallbackMap:
 if __name__ == "__main__":
     #print get_http("http://mob616:50088/ws/v1/cluster/apps?state=RUNNING")
     manager = AlarmCallbackManager()
+    alarm_list = [{"key_word":"a","msg":"m1"},{"key_word":"b","msg":"m2"}]
+    new_key_word,old_key_word = manager.diff_key_word(alarm_list)
+    print new_key_word
+    print old_key_word
+    alarm_list = [{"key_word":"a","msg":"m1"},{"key_word":"b","msg":"m2"}]
+    new_key_word,old_key_word = manager.diff_key_word(alarm_list)
+    print new_key_word
+    print old_key_word
+    alarm_list = [{"key_word":"a","msg":"m1"},{"key_word":"b","msg":"m2"}]
+    new_key_word,old_key_word = manager.diff_key_word(alarm_list)
+    print new_key_word
+    print old_key_word
     alarm_list = [{"key_word":"a","msg":"m1"},{"key_word":"b","msg":"m2"}]
     new_key_word,old_key_word = manager.diff_key_word(alarm_list)
     print new_key_word
