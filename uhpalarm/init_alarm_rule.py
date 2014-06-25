@@ -7,7 +7,7 @@ commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
 sys.path.append(commondir)
 
 import database
-from model.alarm import Alarm
+from model.alarm import *
 
 if __name__ == "__main__" :
     session = database.getSession()
@@ -52,6 +52,14 @@ if __name__ == "__main__" :
     session.add(Alarm("check metastore heap","max(hivemetastore_memory_memHeapUsed/hivemetastore_memory_memHeapCommitted,0.8,0.9)","send_mail","hivemetastore"))
     session.add(Alarm("check hiveserver heap","max(hiveserver_memory_memHeapUsed/hiveserver_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver"))
     session.add(Alarm("check hiveserver2 heap","max(hiveserver2_memory_memHeapUsed/hiveserver2_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver2"))
+
+    #alarm var
+    session.add(AlarmAssist("mail_to","123456@123.com"))
+    session.add(AlarmAssist("ignore_key_word",""))
+
+    #alarm autofix
+    session.add(AlarmAutofix(".*(datanode down)",15,"hdfs","datanode","restart"))
+    session.add(AlarmAutofix(".*(nodemanager down)",15,"yarn","nodemanager","restart"))
 
     session.commit()
     session.close()

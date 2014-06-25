@@ -54,7 +54,7 @@ def query_tasks(ids=None):
     session = database.getSession(False)
     tasks   = session.query(Task).filter(
             and_(Task.status.in_([Task.STATUS_INIT]),
-                Task.taskType.in_(['ansible', 'shell'])))
+                Task.taskType.in_(['auto_fix', 'ansible', 'shell'])))
     if ids:
         tasks = tasks.filter(Task.id.in_(ids))
     session.close()
@@ -214,7 +214,7 @@ class AnsibleExecutor(Executor):
 def run(task):
     try:
         log.debug("run task: %d" % task.id)
-        if(task.taskType == "ansible" ):
+        if(task.taskType == "ansible" or task.taskType == "auto_fix"):
             executor = AnsibleExecutor()
         elif(task.taskType == "shell"):
             executor = ShellExecutor()

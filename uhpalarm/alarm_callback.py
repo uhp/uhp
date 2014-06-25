@@ -3,6 +3,7 @@
 
 import os,sys,time
 import re
+import json
 
 #for debug
 #commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
@@ -14,7 +15,7 @@ import database
 from lib.manager import Manager
 from lib.logger import log
 from lib import contants
-from model.alarm import AlarmList,AlarmAssist
+from model.alarm import AlarmList,AlarmAssist,AlarmAutofix
 
 class AlarmCallbackManager(Manager):
     def __init__(self):
@@ -39,7 +40,7 @@ class AlarmCallbackManager(Manager):
         for (key_word,count) in self.key_word_map.items():
             if not current_key_word.has_key(key_word) :
                 if count >= config.alarm_least_count:
-                    msg = u"告警解除,连续告警次数为%d." % count
+                    msg = u"告警解除,连续告警次数为%d 时间%d秒." % (count,count*config.alarm_interval)
                     old_key_word.append({"key_word":key_word,"msg":msg})
 
         #合并得到最新的key_word
@@ -62,6 +63,24 @@ class AlarmCallbackManager(Manager):
         mail_center.push_key_word_map(self.key_word_map)
         
         session = database.getSession()
+        #根据连续告警次数尝试进行修复动作
+        try:
+            fix_list = []
+            for auto_fix in session.query(AlarmAutofix):
+                fix_list.append( auto_fix.format() )
+
+            for (key_word,count) in self.key_word_map.items():
+                for auto_fix in fix_list:
+                    match = auto_fix['pattern'].match(key_word)
+                    if match and ( count == auto_fix['count'] or count == auto_fix['count']*2 ) :
+                        end = key_word.find('(')
+                        host = key_word[0:end]
+                        log.info(" build the auto fix tasks: %s %s %s " %(host,auto_fix['role'],auto_fix['task']))
+                        database.build_task(session,"auto_fix",auto_fix['service'],host,auto_fix['role'],auto_fix['task'])
+        except:
+            log.exception("autofix catch exception")
+
+        #发出邮件 记录动作
         ignore_key_word = session.query(AlarmAssist).filter(AlarmAssist.name=="ignore_key_word").first()
         ignore_list = []
         if ignore_key_word != None:

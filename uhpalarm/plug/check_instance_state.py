@@ -34,9 +34,8 @@ class InstanceStateChecker:
         session = database.getSession()
         for instance in session.query(Instance):
             #检查实例
-            result,msg = self.check_instance(instance)
-            if not result:
-                key_word = "%s(%s error)" % (instance.host,instance.role)
+            key_word,msg = self.check_instance(instance)
+            if key_word != None:
                 self.update_result(key_word, msg)
             #采集服务
             if not service_role_map.has_key(instance.service) :
@@ -64,16 +63,20 @@ class InstanceStateChecker:
     def check_instance(self, instance):
         if instance.status == Instance.STATUS_START :
             if instance.health == Instance.HEALTH_UNHEALTHY :  
-                return (False, u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
+                key_word = "%s(%s unhealthy)" % (instance.host,instance.role)
+                return (key_word, u"检测到实例 %s(%s) 在启动状态,但不健康,报告: %s。" % (instance.host, instance.role, instance.msg) )
             if instance.health == Instance.HEALTH_DOWN :  
-                return (False, u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
+                key_word = "%s(%s down)" % (instance.host,instance.role)
+                return (key_word, u"检测到实例 %s(%s) 在启动状态,但找不到对应的pid,报告: %s。" % (instance.host, instance.role, instance.msg) )
             if instance.monitor_time == None or instance.monitor_time == 0  :
-                return (False, u"检测到实例 %s(%s) 在启动状态,但未找到检测信息。 " % (instance.host, instance.role) )
+                key_word = "%s(%s notfound)" % (instance.host,instance.role)
+                return (key_word, u"检测到实例 %s(%s) 在启动状态,但未找到检测信息。 " % (instance.host, instance.role) )
             else:
                 dis = int(time.time()) - instance.monitor_time
                 if dis > config.max_unknow_time :
-                    return (False, u"检测到实例 %s(%s) 在启动状态,但检测超时%ds。" % (instance.host, instance.role, dis) )
-        return (True,"")
+                    key_word = "%s(%s unknow)" % (instance.host,instance.role)
+                    return (key_word, u"检测到实例 %s(%s) 在启动状态,但检测超时%ds。" % (instance.host, instance.role, dis) )
+        return (None,"")
 
     def check_zk_leader(self,port,roles):
         start = False
@@ -91,7 +94,7 @@ class InstanceStateChecker:
 
         if start :
             if len(roles) > 1 and len(masters) == 0 :
-                return (Flase, u"检测到zookeeper在分布式状态启动,但是找不到领导结点。" )
+                return (False, u"检测到zookeeper在分布式状态启动,但是找不到领导结点。" )
             elif len(masters) > 1 :
                 return (False, u"检测到有多个zookeeper的领导结点 %s。" % (",".join(masters)) )
 

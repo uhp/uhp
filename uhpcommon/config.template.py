@@ -64,7 +64,7 @@ mail_host = None
 mail_from = None
 mail_user = None
 mail_passwd = None
-mail_send_interval = 600
+mail_send_interval = 90
 mail_interval = 60
 
 #for collect

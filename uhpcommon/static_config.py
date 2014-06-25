@@ -63,6 +63,8 @@ if config.install_monitor:
                     #{"name":"mtMetricHost",     "display":"监控部署",     "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_host()"},
                     #{"name":"mtMetricPubVar",   "display":"监控公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_global_variate()"},
                     {"name":"mtAlarm",          "display":"告警配置",     "href":"/statics/partials/monitor/conf.html", "func":"query_alarm()"},
+                    {"name":"mtAlarmAutofix",   "display":"告警自动修复", "href":"/statics/partials/monitor/conf.html",
+                        "func":"query_alarm_autofix()"},
                     {"name":"mtAlarmAssist",    "display":"告警公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_alarm_assist()"}
                 ]
             }

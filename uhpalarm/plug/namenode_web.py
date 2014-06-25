@@ -95,7 +95,7 @@ class NamenodeChecker():
             if row["volfails"] > 0 :
                 self.update_result("%s(datanode error Vol)" % row["name"], u"机器 %s 检测到 %d 个损坏的卷。" % (row["name"],row["volfails"]) )
             if row["last_contact"] > 30 :
-                self.update_result("%s(datanode lost heartbeat" % row["name"], u"机器 %s 检测丢失心跳 %d秒。" % (row["name"],row["last_contact"]) )
+                self.update_result("%s(datanode lost heartbeat)" % row["name"], u"机器 %s 检测丢失心跳 %d秒。" % (row["name"],row["last_contact"]) )
 
         return (ha_state,tid)
 

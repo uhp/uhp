@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import re
 from sqlalchemy import Column, Integer, String, Text, schema
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey, DateTime, Boolean, func, UniqueConstraint
@@ -7,7 +8,7 @@ from models import UHPBase
 
 BASE = declarative_base()
 
-__all__ =  ['Alarm', 'AlarmAssist', 'AlarmList']
+__all__ =  ['Alarm','AlarmAutofix', 'AlarmAssist', 'AlarmList']
 
 class Alarm(BASE, UHPBase):
     
@@ -49,6 +50,33 @@ class Alarm(BASE, UHPBase):
                 return (host_lists[0].split(","),[])
 
         return ([],[])
+
+class AlarmAutofix(BASE, UHPBase):
+
+    __tablename__ = 'alarm_autofix'
+
+    id = Column(Integer, primary_key=True)
+    pattern = Column(String(32), nullable=False, unique=True)
+    count = Column(Integer, nullable=False)
+    service = Column(String(32), nullable=False)
+    role = Column(String(32), nullable=False)
+    task = Column(String(32), nullable=False)
+    
+    def __init__(self, pattern, count, service, role, task):
+        self.pattern = pattern
+        self.count = count
+        self.service = service
+        self.role = role
+        self.task = task
+
+    def format(self):
+        result = {}
+        result['pattern'] = re.compile(self.pattern)
+        result['count'] = self.count
+        result['service'] = self.service
+        result['role'] = self.role
+        result['task'] = self.task
+        return result
     
 class AlarmAssist(BASE, UHPBase):
     

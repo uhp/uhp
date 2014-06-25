@@ -62,6 +62,12 @@ uhpApp.controller('MoniConfCtrl', ['$scope', '$rootScope', '$http', '$sce','$tim
     $scope.query();
   }
   
+  function query_alarm_autofix() {
+    $scope.sql_table = "alarm_autofix";
+    $scope.sql = "select * from "+$scope.sql_table;
+    $scope.query();
+  }
+
   function query_alarm_assist() {
     $scope.sql_table = "alarm_assist";
     $scope.sql = "select * from "+$scope.sql_table;
