@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import os,sys,time
+import re
 
 #for debug
 #commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
@@ -58,24 +59,36 @@ class AlarmCallbackManager(Manager):
         ignore_key_word = session.query(AlarmAssist).filter(AlarmAssist.name=="ignore_key_word").first()
         ignore_list = []
         if ignore_key_word != None:
-            ignore_list = ignore_key_word.value.split(",") 
-        log.info(ignore_list)
+            #ignore_list = ignore_key_word.value.split(",") 
+            for str in ignore_key_word.value.split(","):
+                if len(str) >1 :
+                    ignore_list.append( re.compile(str) )
+        #log.info(ignore_list)
 
         for alarm_state in new_key_word:
             key_word = alarm_state['key_word']
-            if key_word in ignore_list:
+            if self.is_match(ignore_list,key_word):
+                log.info("ignore %s" % key_word)
                 continue
             self._callback(alarm_state)
             session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "ERROR", int(time.time()) ))
 
         for alarm_state in old_key_word:
             key_word = alarm_state['key_word']
-            if key_word in ignore_list:
+            if self.is_match(ignore_list,key_word):
+                log.info("ignore %s" % key_word)
                 continue
             self._callback(alarm_state)
             session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "INFO", int(time.time()) ))
         
         session.close()
+
+    def is_match(self, pattern_list, key_word):
+        for pattern in pattern_list:
+            if pattern.match(key_word):
+                return True
+        return False
+
 
     def _callback(self, alarm_state):
             

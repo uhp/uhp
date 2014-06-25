@@ -90,8 +90,8 @@ class AlarmExpMap:
         pass
         #self.cluster_func = ["sum_and_equal"]
 
-    def build_alarm_list(state,msg):
-        key_word = "%s(%s)" % (self.host, rule.name+" alarm")
+    def build_alarm_list(self, msg):
+        key_word = "%s(%s)" % (self.host, self.rule.name+" alarm")
         return [{"key_word":key_word,"msg":msg}]
 
     def max(self, value, warn, error):
