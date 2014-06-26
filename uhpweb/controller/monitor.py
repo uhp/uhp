@@ -761,7 +761,7 @@ class MonitorBackHandler(BaseHandler):
         mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used})
         for temp in mem_metric['series']: 
             temp.update(line_area_style)
-        self._metric_unit_convert(mem_metric,1024,MGT)
+        self._metric_unit_convert(mem_metric,1024,KMGT)
 
         # Net
         metrics = ['bytes_in', 'bytes_out']
