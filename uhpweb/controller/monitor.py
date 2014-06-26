@@ -745,14 +745,18 @@ class MonitorBackHandler(BaseHandler):
         _fetch_m(cpu_metric, metrics, line_stack_style)
 
         # Mem
-        metrics = ['mem_total', 'mem_free', 'swap_total', 'swap_free']
+        metrics = ['mem_total', 'mem_free', 'swap_total', 'swap_free', 'mem_buffers', 'mem_cached']
         (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
         mem_metric['x'] = x
         def _my_sub(a, b):
             if a is None or b is None: 
                 return None
             return a - b  
-        mem_used  = map(_my_sub, ys[0], ys[1]) 
+        def _my_sub3(a, b, c, d):
+            if a is None or b is None or c is None or d is None: 
+                return None
+            return a - b - c - d 
+        mem_used  = map(_my_sub3, ys[0], ys[1], ys[4],ys[5]) 
         mem_free  = ys[1]
         swap_used = map(_my_sub, ys[2], ys[3])
         
@@ -1358,6 +1362,8 @@ class MonitorBackHandler(BaseHandler):
             bytes_out    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'bytes_out')
             mem_total    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_total')
             mem_free     = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_free')
+            mem_buffers  = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_buffers')
+            mem_cached   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_cached')
             swap_total   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'swap_total')
             swap_free    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'swap_free')
             disk_total   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_total')
@@ -1398,8 +1404,8 @@ class MonitorBackHandler(BaseHandler):
             #if mem_total is not None: mem_total = int(mem_total)/1024
             #if mem_free  is not None: mem_free  = int(mem_free)/1024
             mem_used = None
-            if mem_total is not None and mem_free is not None:
-                mem_used = mem_total - mem_free
+            if mem_total is not None and mem_free is not None and mem_buffers is not None and mem_cached is not None:
+                mem_used = mem_total - mem_free - mem_buffers - mem_cached
             mem_metric_mem_used.append(mem_used)
             mem_metric_mem_free.append(mem_free)
             
