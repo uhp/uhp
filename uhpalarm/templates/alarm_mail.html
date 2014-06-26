@@ -1,6 +1,6 @@
 <pre> 集群: {{ cluster }} 当前的正在告警项: 
-{% for key,count in key_word_map.iteritems() -%}
-{{key}}:{{count}}
+{% for key,info in key_word_map.iteritems() -%}
+{{key}}:{{info['count']}}
 {% endfor %}
 </pre>
 <style type="text/css">

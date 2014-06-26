@@ -15,7 +15,7 @@ import database
 from lib.manager import Manager
 from lib.logger import log
 from lib import contants
-from model.alarm import AlarmList,AlarmAssist,AlarmAutofix
+from model.alarm import *
 
 class AlarmCallbackManager(Manager):
     def __init__(self):
@@ -33,11 +33,12 @@ class AlarmCallbackManager(Manager):
         #计算新增的key_word 并记录current_key_word
         for alarm_state in alarm_list:
             key_word = alarm_state['key_word']
-            current_key_word[key_word] = 1
-            temp_key_msg_map[key_word] = alarm_state['msg'] 
+            current_key_word[key_word] = alarm_state
+            #temp_key_msg_map[key_word] = alarm_state['msg'] 
 
         #计算解除的key_word
-        for (key_word,count) in self.key_word_map.items():
+        for (key_word, info) in self.key_word_map.items():
+            count = info['count']
             if not current_key_word.has_key(key_word) :
                 if count >= config.alarm_least_count:
                     msg = u"告警解除,连续告警次数为%d 时间%d秒." % (count,count*config.alarm_interval)
@@ -45,15 +46,18 @@ class AlarmCallbackManager(Manager):
 
         #合并得到最新的key_word
         new_map = {}
-        for (key_word,count) in current_key_word.items():
+        for (key_word,alarm_state) in current_key_word.items():
             if self.key_word_map.has_key(key_word) :
-                now_count = self.key_word_map[key_word]
+                now_count = self.key_word_map[key_word]['count']
             else:
                 now_count = 0
-            new_map[key_word] = now_count + 1
-            if new_map[key_word] == config.alarm_least_count :
-                msg = temp_key_msg_map[key_word]
-                new_key_word.append({"key_word":key_word,"msg":msg})
+            new_count = now_count + 1
+            new_map[key_word] = {}
+            new_map[key_word]['count'] = new_count 
+            new_map[key_word]['msg'] = alarm_state['msg']
+
+            if new_count == config.alarm_least_count :
+                new_key_word.append({"key_word":key_word,"msg":alarm_state['msg']})
 
         self.key_word_map = new_map
         return (new_key_word,old_key_word)
@@ -63,6 +67,17 @@ class AlarmCallbackManager(Manager):
         mail_center.push_key_word_map(self.key_word_map)
         
         session = database.getSession()
+        #更新数据库的alarm_now表
+        for alarm_now in session.query(AlarmNow):
+            session.delete(alarm_now)
+
+        for (key_word,info) in self.key_word_map.items():
+            end = key_word.find('(')
+            host = key_word[0:end]
+            session.add(AlarmNow(key_word,host,info['msg'],"ERROR",info['count'],int(time.time())))
+
+        session.commit()
+
         #根据连续告警次数尝试进行修复动作
         try:
             fix_list = []
@@ -96,16 +111,16 @@ class AlarmCallbackManager(Manager):
                 session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "ERROR", int(time.time()) ))
                 if self.is_match(ignore_list,key_word):
                     log.info("ignore %s" % key_word)
-                    continue
-                self._callback(alarm_state)
+                else:
+                    self._callback(alarm_state)
 
             for alarm_state in old_key_word:
                 key_word = alarm_state['key_word']
                 session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "INFO", int(time.time()) ))
                 if self.is_match(ignore_list,key_word):
                     log.info("ignore %s" % key_word)
-                    continue
-                self._callback(alarm_state)
+                else:
+                    self._callback(alarm_state)
 
             session.commit()
         except:

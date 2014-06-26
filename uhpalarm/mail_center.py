@@ -116,6 +116,6 @@ def _send_mail(template_name,dict):
 if __name__ == "__main__" :
     print "x"
     add_alarm_info({"a":"b","c":"d"})
-    push_key_word_map({"a":1,"b":1})
+    push_key_word_map({"a":{"msg":"m1","count":1},"b":{"msg":"m2","count":3}})
     _need_send_alarm_mail()
 

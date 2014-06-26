@@ -8,7 +8,7 @@ from models import UHPBase
 
 BASE = declarative_base()
 
-__all__ =  ['Alarm','AlarmAutofix', 'AlarmAssist', 'AlarmList']
+__all__ =  ['Alarm','AlarmAutofix', 'AlarmAssist', 'AlarmList', 'AlarmNow']
 
 class Alarm(BASE, UHPBase):
     
@@ -111,3 +111,27 @@ class AlarmList(BASE, UHPBase):
         self.msg   = msg
         self.level = level
         self.ctime = ctime
+
+
+class AlarmNow(BASE, UHPBase):
+    """存储当前的告警项"""
+
+    __tablename__ = 'alarm_now'
+
+    id    = Column(Integer, primary_key  = True)
+    level = Column(String(10), nullable  = False)
+    title = Column(String(255), nullable = False)
+    host  = Column(String(32), nullable = False)
+    msg   = Column(Text, nullable        = False)
+    count = Column(Integer)
+    ctime = Column(Integer)
+
+    def __init__(self, title, host, msg, level, count, ctime):
+        self.title = title
+        self.host  = host
+        self.msg   = msg
+        self.level = level
+        self.count = count
+        self.ctime = ctime
+
+
