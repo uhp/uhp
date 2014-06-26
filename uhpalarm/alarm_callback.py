@@ -80,32 +80,36 @@ class AlarmCallbackManager(Manager):
         except:
             log.exception("autofix catch exception")
 
-        #发出邮件 记录动作
-        ignore_key_word = session.query(AlarmAssist).filter(AlarmAssist.name=="ignore_key_word").first()
-        ignore_list = []
-        if ignore_key_word != None:
-            #ignore_list = ignore_key_word.value.split(",") 
-            for str in ignore_key_word.value.split(","):
-                if len(str) >1 :
-                    ignore_list.append( re.compile(str) )
-        #log.info(ignore_list)
+        try:
+            #发出邮件 记录动作
+            ignore_key_word = session.query(AlarmAssist).filter(AlarmAssist.name=="ignore_key_word").first()
+            ignore_list = []
+            if ignore_key_word != None:
+                #ignore_list = ignore_key_word.value.split(",") 
+                for str in ignore_key_word.value.split(","):
+                    if len(str) >1 :
+                        ignore_list.append( re.compile(str) )
+            #log.info(ignore_list)
 
-        for alarm_state in new_key_word:
-            key_word = alarm_state['key_word']
-            if self.is_match(ignore_list,key_word):
-                log.info("ignore %s" % key_word)
-                continue
-            self._callback(alarm_state)
-            session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "ERROR", int(time.time()) ))
+            for alarm_state in new_key_word:
+                key_word = alarm_state['key_word']
+                session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "ERROR", int(time.time()) ))
+                if self.is_match(ignore_list,key_word):
+                    log.info("ignore %s" % key_word)
+                    continue
+                self._callback(alarm_state)
 
-        for alarm_state in old_key_word:
-            key_word = alarm_state['key_word']
-            if self.is_match(ignore_list,key_word):
-                log.info("ignore %s" % key_word)
-                continue
-            self._callback(alarm_state)
-            session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "INFO", int(time.time()) ))
-        
+            for alarm_state in old_key_word:
+                key_word = alarm_state['key_word']
+                session.add( AlarmList(alarm_state['key_word'], "", alarm_state['msg'], "INFO", int(time.time()) ))
+                if self.is_match(ignore_list,key_word):
+                    log.info("ignore %s" % key_word)
+                    continue
+                self._callback(alarm_state)
+
+            session.commit()
+        except:
+            log.exception("deal callback catch exception")
         session.close()
 
     def is_match(self, pattern_list, key_word):

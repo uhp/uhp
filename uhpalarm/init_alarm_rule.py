@@ -9,7 +9,7 @@ sys.path.append(commondir)
 import database
 from model.alarm import *
 
-if __name__ == "__main__" :
+def init_alarm():
     session = database.getSession()
     for alarm in session.query(Alarm):
         session.delete(alarm)
@@ -35,7 +35,7 @@ if __name__ == "__main__" :
     session.add(Alarm("check lost heartbeat","max(dfs.FSNamesystem.ExpiredHeartbeats-PRE_dfs.FSNamesystem.ExpiredHeartbeats,0,0)","send_mail","namenode"))
     session.add(Alarm("check nmweb","namenode_web()","send_mail","cluster"))
 
-    session.add(Alarm("check nm heap","max(jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM/jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM,0.8,0.9)","send_mail","namenode"))
+    session.add(Alarm("check nn heap","max(jvm.JvmMetrics.ProcessName=NameNode.MemHeapUsedM/jvm.JvmMetrics.ProcessName=NameNode.MemHeapCommittedM,0.8,0.9)","send_mail","namenode"))
     session.add(Alarm("check dn heap","max(jvm.JvmMetrics.ProcessName=DataNode.MemHeapUsedM/jvm.JvmMetrics.ProcessName=DataNode.MemHeapCommittedM,0.8,0.9)","send_mail","datanode"))
 
     #yarn check
@@ -53,13 +53,29 @@ if __name__ == "__main__" :
     session.add(Alarm("check hiveserver heap","max(hiveserver_memory_memHeapUsed/hiveserver_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver"))
     session.add(Alarm("check hiveserver2 heap","max(hiveserver2_memory_memHeapUsed/hiveserver2_memory_memHeapCommitted,0.8,0.9)","send_mail","hiveserver2"))
 
-    #alarm var
-    session.add(AlarmAssist("mail_to","123456@123.com"))
-    session.add(AlarmAssist("ignore_key_word",""))
+    session.commit()
+    session.close()
 
-    #alarm autofix
-    session.add(AlarmAutofix(".*(datanode down)",15,"hdfs","datanode","restart"))
-    session.add(AlarmAutofix(".*(nodemanager down)",15,"yarn","nodemanager","restart"))
+def init_alarm_assist():
+    session = database.getSession()
+
+    #alarm var
+    session.merge(AlarmAssist("mail_to","123456@123.com"))
+    session.merge(AlarmAssist("ignore_key_word",""))
 
     session.commit()
     session.close()
+
+def init_alarm_autofix():
+
+    session = database.getSession()
+    session.merge(AlarmAutofix(".*(datanode down)",15,"hdfs","datanode","restart"))
+    session.merge(AlarmAutofix(".*(nodemanager down)",15,"yarn","nodemanager","restart"))
+
+    session.commit()
+    session.close()
+
+if __name__ == "__main__" :
+    init_alarm()
+    #init_alarm_assist()
+    #init_alarm_autofix()
