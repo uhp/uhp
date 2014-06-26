@@ -1,0 +1,21 @@
+<!-- <div class="row" ng-controler="MoniOverviewCtrl"> -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-info">
+
+      <table class="table table-bordered table-striped table-hover">
+        <thead>
+          <tr>
+            <th ng-repeat="col in alarmsNow.columns">[[col]]</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="record in alarmsNow.rows">
+            <td style="max-width:500px;overflow:auto;word-wrap:break-word;white-space:pre-wrap;" ng-repeat="v in record track by $index">[[v]]</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

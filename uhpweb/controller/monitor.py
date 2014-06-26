@@ -1156,7 +1156,7 @@ class MonitorBackHandler(BaseHandler):
 
         ret = {"data":data}
         self.ret("ok", "", ret);
-
+    
     # 获取最新报警列表数据
     def query_alarms(self):
         search  = self.get_argument("search", "")
@@ -1200,6 +1200,45 @@ class MonitorBackHandler(BaseHandler):
 
             # alarms
             alarms = {'columns':columns, 'rows':data, 'total': total, 'totalPage':int(total/limit)+1}
+            self.ret("ok", "", {"data": alarms})
+        finally:
+            session.close()
+
+    # 获取当前报警
+    def query_alarms_now(self):
+        orderby = "id"
+        dir     = "desc"
+        offset  = "0"
+        limit   = "50"
+        offset  = int(offset)
+        limit   = int(limit)
+
+        session = database.getSession()
+        try:
+            columns = []
+            columns = [col.name for col in AlarmNow.__table__.columns]
+            data    = []
+
+            query = session.query(AlarmNow)
+
+            if dir == "asc":
+                query = query.order_by(asc(orderby))[offset:offset+limit]
+            else:
+                query = query.order_by(desc(orderby))[offset:offset+limit]
+                
+            for record in query:
+                temp = []
+                for col in columns:
+                    v = getattr(record, col)
+                    # 特别的，时间转化
+                    if v is not None and col == 'ctime':
+                        t = time.localtime(int(v))
+                        v = time.strftime("%Y-%m-%d %H:%M:%S", t)
+                    temp.append(v)
+                data.append(temp)
+
+            # alarms
+            alarms = {'columns':columns, 'rows':data}
             self.ret("ok", "", {"data": alarms})
         finally:
             session.close()
@@ -1514,11 +1553,11 @@ class MonitorBackHandler(BaseHandler):
         host_overview.append({'name':'总磁盘数量','value':total_disk_numb,'unit':'个'})
         host_overview.append(self._value_unit_convert({'name':'总磁盘容量','value':total_disk_capacity,'unit':'G'},1024,GT))
         host_overview.append(self._value_unit_convert({'name':'总磁盘使用','value':total_disk_used,'unit':'G'},1024,GT))
-        host_overview.append(self._value_unit_convert({'name':'总内存容量','value':total_mem_capacity,'unit':'M'},1024,MGT))
-        host_overview.append(self._value_unit_convert({'name':'总内存使用','value':total_mem_used,'unit':'M'},1024,MGT))
+        host_overview.append(self._value_unit_convert({'name':'总内存容量','value':total_mem_capacity,'unit':'M'},1024,KMGT))
+        host_overview.append(self._value_unit_convert({'name':'总内存使用','value':total_mem_used,'unit':'M'},1024,KMGT))
         host_overview.append({'name':'总CPU数量','value':total_cpu_numb,'unit':'个'})
-        host_overview.append(self._value_unit_convert({'name':'总网卡流入','value':total_net_in,'unit':'M'},1024,MGT))
-        host_overview.append(self._value_unit_convert({'name':'总网卡流出','value':total_net_out,'unit':'M'},1024,MGT))
+        host_overview.append(self._value_unit_convert({'name':'总网卡流入','value':total_net_in,'unit':'M'},1024,BKMGT))
+        host_overview.append(self._value_unit_convert({'name':'总网卡流出','value':total_net_out,'unit':'M'},1024,BKMGT))
 
         ret = {"data":data, 'diskData':disk_data, "hostOverview":host_overview, 'loadDist':load_metric_dist}
         self.ret("ok", "", ret);

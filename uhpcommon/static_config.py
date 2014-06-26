@@ -27,9 +27,10 @@ if config.install_monitor:
         'submenus':[
             {"name":"mOverview", "display":'概览', "href":"#/monitor/overview",
                 "tabs": [
-                    {"name":"mtCurent", "display":"当前状态", "href":"/statics/partials/monitor/overview.html"},
-                    #{"name":"mtHistory", "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
-                    {"name":"mtAlarmList", "display":"告警列表", "href":"/statics/partials/monitor/overview_alarms.html"}
+                    {"name":"mtCurent",    "display":"当前状态", "href":"/statics/partials/monitor/overview.html"},
+                    #{"name":"mtHistory",  "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
+                    {"name":"mtAlarmNow",  "display":"当前告警", "href":"/statics/partials/monitor/overview_alarms_now.html"},
+                    {"name":"mtAlarmList", "display":"告警列表", "href":"/statics/partials/monitor/overview_alarms.html"},
                 ]
             },
             {"name":"mHost", "display":"机器", "href":"#/monitor/host",
