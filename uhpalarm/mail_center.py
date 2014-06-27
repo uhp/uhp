@@ -10,15 +10,36 @@ import threading
 import config
 import mail
 import database
+import copy
 from jinja2 import Environment, FileSystemLoader
 from lib.logger import log
 from model.alarm import AlarmAssist
 
 mutex = threading.Lock()
 alarm_list = []
+key_word_map ={}
 max_length = 100
 last_send = -1
 env = Environment(loader = FileSystemLoader("%s/uhpalarm/templates" % config.uhphome))
+
+def push_key_word_map(map):
+    '''
+    推送一个当前的告警列表
+    '''
+    mutex.acquire()
+    global key_word_map
+    key_word_map = copy.deepcopy(map)
+    mutex.release()
+
+def get_key_word_map():
+    '''
+    获得一个当前的告警列表
+    '''
+    mutex.acquire()
+    global key_word_map
+    temp = copy.deepcopy(key_word_map)
+    mutex.release()
+    return temp
 
 def add_alarm_info(content):
     '''
@@ -76,11 +97,13 @@ def _get_mail_to():
     session = database.getSession()
     mail_list = session.query(AlarmAssist).filter(AlarmAssist.name=="mail_to").first()
     log.info("to mail %s" % mail_list.value)
+    session.close()
     return mail_list.value.split(",")
     #return ['qiujw@ucweb.com']
 
 def _send_alarm_mail(a_list):
-    _send_mail("alarm_mail",{"alarm_list":a_list,"cluster":config.mail_cluster})
+    key_word_map = get_key_word_map() 
+    _send_mail("alarm_mail",{"key_word_map":key_word_map,"alarm_list":a_list,"cluster":config.mail_cluster})
 
 def _send_mail(template_name,dict):
     template = env.get_template("%s.html" % template_name)
@@ -93,5 +116,6 @@ def _send_mail(template_name,dict):
 if __name__ == "__main__" :
     print "x"
     add_alarm_info({"a":"b","c":"d"})
+    push_key_word_map({"a":{"msg":"m1","count":1},"b":{"msg":"m2","count":3}})
     _need_send_alarm_mail()
 

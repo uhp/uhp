@@ -593,6 +593,12 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.rmQuery();
         $scope.appQuery();
 
+        $scope.selected_metrics_type = ['app'];
+        $scope.selected_metrics_time = '180';
+        $scope.selected_metrics_split = '10';
+
+        //$scope.metricsQuery();
+
         //定时刷新正在运行的作业
         timer = $interval(function(){
           $scope.runningQuery();
@@ -601,71 +607,73 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
 
     // 历史查询
     function getMetricsFieldParams(){
-        var pick = $("#metrics-params-type-select option:selected");
         var temp = []
-        for(var i=0;i<pick.length;i++){
-            if(  pick[i].value == "app" ){
+        $.each($scope.selected_metrics_type,function(i,n){
+            var value=n;
+            if( value == "app" ) {
                 temp.push("appsCompleted")
                 temp.push("appsPending")
                 temp.push("appsRunning")
                 temp.push("appsFailed")
                 temp.push("appsKilled")
-            }
-            else if(  pick[i].value == "resource" ){
+            } else if( value == "resource" ) {
                 //temp.push("totalMB")
                 temp.push("availableMB")
                 temp.push("allocatedMB")
                 temp.push("containersAllocated")
-            }
-            else if(  pick[i].value == "node" ){
+            } else if( value == "node" ) {
                 temp.push("totalNodes")
                 temp.push("activeNodes")
-            }    
-            else{
-                temp.push(pick[i].value)
+            } else {
+                temp.push(value)
             }
-        }
+        });
         return temp;
     }
     function getMetricsRecordTimeMinParams(){
-        var temp = datetime_to_unix($("#metrics-params-recordTime-min")[0].value);
+        //var temp = datetime_to_unix($("#metrics-params-recordTime-min")[0].value);
+        var temp = $scope.selected_metrics_time
         if(temp == null){
-                temp = get_unix_time()-24*3600;
+            temp = get_unix_time()-24*3600;
+        } else {
+            temp = get_unix_time()-(temp * 60);
         }
-        //temp = temp - 24*3600*20;
         return temp;
     }
     function getMetricsRecordTimeMaxParams(){
-        var temp = datetime_to_unix($("#metrics-params-recordTime-max")[0].value);
+        //var temp = datetime_to_unix($("#metrics-params-recordTime-max")[0].value);
+        var temp = null;
         if(temp == null){
-                temp = get_unix_time();
+            temp = get_unix_time();
         }
         return temp;
     } 
     function getMetricsRecordTimeSplitParams(){
-        var pick = $("#metrics-params-recordTime-split-select option:selected");
-        return pick[0].value*60;
+        //var pick = $("#metrics-params-recordTime-split-select option:selected");
+        //return pick[0].value*60;
+        var temp = $scope.selected_metrics_split;
+        if(temp == null){
+            temp = 10;
+        }
+        return temp * 60;
     }
-    function showMetricsData(data){
+    function showMetricsData(fields,beginTime,endTime,timeSplit,data){
         //分隔数据到各个指标
-        var fields = getMetricsFieldParams();
-        var recordTimeMin = getMetricsRecordTimeMinParams();
-        var recordTimeMax = getMetricsRecordTimeMaxParams();
-        var recordTimeSplit = getMetricsRecordTimeSplitParams();
         //转换data的result的记录形式从[time,xx,xx...]转换为[time][xx,xx...]
         var dataPool = {}
-        for(var key in data['result']){
-            var temp = data['result'][key];
+        for(var key in data){
+            var temp = data[key];
             var time = temp[0]
+            if( !(time in dataPool) ){
+              dataPool[time] = {}
+            }
             for(var i=1;i<temp.length;i++){
-                if( !(time in dataPool) ){
-                     dataPool[time] = {}
-                }
                 dataPool[time][i-1]=temp[i];
             }
         }
         var htmlid = "metrics-draw-div";
-        //drawMetricsHighChart(htmlid,fields,dataPool,recordTimeMin,recordTimeMax,recordTimeSplit)
+        // TODO
+        //drawMetricsHighChart(htmlid,fields,dataPool,beginTime,endTime,timeSplit)
     }
     function drawMetricsHighChart(htmlid,fields,dataPool,beginTime,endTime,split){
         var begin = Math.floor(beginTime/split)*split;
@@ -692,23 +700,21 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         console.log(series)
         buildLineCharts(htmlid,field,xAxis,getValueFormatter,series)
     }
+
     $scope.metricsQuery = function(){
       var fields = getMetricsFieldParams();
       var recordTimeMin = getMetricsRecordTimeMinParams();
       var recordTimeMax = getMetricsRecordTimeMaxParams();
       var recordTimeSplit = getMetricsRecordTimeSplitParams();
       
-      var appQuery;
-      appQuery = new XMLHttpRequest();
-      appQuery.onreadystatechange=function(){
-        if (appQuery.readyState==4 && appQuery.status==200){
-          showMetricsData(JSON.parse(appQuery.responseText));
-        }
-      }
-      var url = "db/metricsQuery?fields="+fields+"&recordTimeSplit="+recordTimeSplit
-              +"&recordTimeMax="+recordTimeMax+"&recordTimeMin="+recordTimeMin
-      appQuery.open("GET",url,true);
-      appQuery.send();
+      $rootScope.myHttp('GET', '/monitorback/metrics_query', 
+          {fields:fields, recordTimeMin:recordTimeMin, recordTimeMax:recordTimeMax, recordTimeSplit:recordTimeSplit}, 
+          function(res){
+              mqs = res['result']
+              // [[]]
+              showMetricsData(fields,recordTimeMin,recordTimeMax,recordTimeSplit,mqs);
+          }
+      );
     }
     
     $scope.needKillApp = function(appId){

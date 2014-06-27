@@ -41,34 +41,45 @@ def execute(cmd):
 
 
 def open_mart(dev):
-    out, err, code = execute('smartctl -s on %s' % dev)
+    out, err, code = execute('/usr/sbin/smartctl -s on %s' % dev)
     if code != 0:
         print('smartctl can not enable %s' % err)
 
 
-def get_mounted_disks(lparams):
-    # set parameters
-    for key in lparams:
-        PARAMS[key] = lparams[key]
+#def get_mounted_disks(lparams):
+#    # set parameters
+#    for key in lparams:
+#        PARAMS[key] = lparams[key]
+#
+#    #with open(PARAMS['mounts'], 'r') as f:
+#    f = open(PARAMS['mounts'], 'r')
+#    mounts = f.readlines()
+#
+#    _devs = []
+#    devs = set()
+#    for mount in mounts:
+#        if mount.startswith('/dev/'):
+#            mount = mount.split()
+#            dev = mount[0]
+#            if os.path.islink(dev):
+#                dev = '/dev/%s' % os.readlink(dev).split('/')[-1]
+#            _devs.append(dev)
+#
+#    for d in _devs:
+#        devs.add(d[0:8])
+#
+#    return list(devs)
 
-    with open(PARAMS['mounts'], 'r') as f:
-        mounts = f.readlines()
+def get_mounted_disks():
+    global VALUES
 
-    _devs = []
-    devs = set()
-    for mount in mounts:
-        if mount.startswith('/dev/'):
-            mount = mount.split()
-            dev = mount[0]
-            if os.path.islink(dev):
-                dev = '/dev/%s' % os.readlink(dev).split('/')[-1]
-            _devs.append(dev)
-
-    for d in _devs:
-        devs.add(d[0:8])
-
-    return list(devs)
-
+    out,err,code = execute(' /sbin/fdisk -l|grep Disk|grep -v identifier ')
+    devs = []
+    for line in out.split("\n"):
+        t = line.split()
+        if len(t) >= 2 :
+            devs.append(t[1].strip(": "))
+    return devs
 
 def get_value(name):
     """Return a value for the requested metric"""
@@ -83,7 +94,7 @@ def get_value(name):
     dev = "/dev/%s" % t[2]
 
     # use iostat to get the io stats
-    (out, err, code,) = execute('smartctl -A %s' % dev)
+    (out, err, code,) = execute('/usr/sbin/smartctl -A %s' % dev)
     if code != 0:
         print("smartctl did not installed exit \n %s " % err)
         sys.exit(code)
@@ -115,7 +126,8 @@ def get_value(name):
 
 def metric_init(lparams):
     """Initialize metric descriptors"""
-    devs = get_mounted_disks(lparams)
+    #devs = get_mounted_disks(lparams)
+    devs = get_mounted_disks()
 
     for dev in devs:
         open_mart(dev)
@@ -128,7 +140,7 @@ def metric_init(lparams):
     descriptors = []
     for dev in devs:
         # use iostat to get the io stats
-        (out, err, code,) = execute('smartctl -A %s' % dev)
+        (out, err, code,) = execute('/usr/sbin/smartctl -A %s' % dev)
         if code != 0:
             print("smartctl did not installed exit \n %s " % err)
             sys.exit(code)

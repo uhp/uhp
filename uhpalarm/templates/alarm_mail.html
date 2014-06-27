@@ -1,5 +1,8 @@
-<h1> UHP自动告警邮件 </h1>
-<pre> 集群: {{ cluster }} </pre>
+<pre> 集群: {{ cluster }} 当前的正在告警项: 
+{% for key,info in key_word_map.iteritems() -%}
+{{key}}:{{info['count']}}
+{% endfor %}
+</pre>
 <style type="text/css">
 th 
 {
@@ -16,18 +19,14 @@ td
 <table>
     <thead>
         <th>时间</th>
-        <th>监控名称</th>
-        <th>监控对象</th>
-        <th>告警状态</th>
+        <th>告警key</th>
         <th>详细信息</th>
     </thead>
     <tbody>
         {% for record in alarm_list %}
         <tr>
             <td>{{ record.ts }}</td>
-            <td>{{ record.name }}</td>
-            <td>{{ record.host }}</td>
-            <td>{{ record.state }}</td>
+            <td>{{ record.key_word }}</td>
             <td>{{ record.msg }}</td>
         </tr>
         {% endfor %}

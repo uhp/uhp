@@ -68,7 +68,9 @@ def get_all_models():
     
     models.append(Alarm)
     models.append(AlarmAssist)
+    models.append(AlarmAutofix)
     models.append(AlarmList)
+    models.append(AlarmNow)
     
     models.append(MonitorAssist)
     models.append(MonitorMetric)

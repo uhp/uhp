@@ -72,14 +72,13 @@ uhpApp.controller('MoniOverviewCtrl', ['$scope', '$rootScope', '$http', '$sce','
       );
     });
 
-    // 加载最新的告警列表，最多显示前100条, 不需要定时任务
-    //$rootScope.myHttp('GET', '/statics/static_data/monitor/fetch_last_alarm_list', 
-    //$rootScope.myHttp('GET', '/monitorback/fetch_last_alarm_list', 
-    //  {}, 
-    //  function(res){
-    //    $scope.alarms = res['data'];
-    //  }
-    //);
+    // 加载最新的告警列表
+    $rootScope.myHttp('GET', '/monitorback/query_alarms_now', 
+      {}, 
+      function(res){
+        $scope.alarmsNow = res['data'];
+      }
+    );
 
 	  $scope.$watch(function(){return $scope.nowPage}, function(newValue,oldValue){
 	    $scope.query();

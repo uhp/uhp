@@ -61,7 +61,7 @@ def execute(cmd):
 def get_mounted_disks():
     global VALUES
 
-    out,err,code = execute(' fdisk -l|grep Disk|grep -v identifier ')
+    out,err,code = execute(' /sbin/fdisk -l|grep Disk|grep -v identifier ')
     devs = []
     for line in out.split("\n"):
         t = line.split()

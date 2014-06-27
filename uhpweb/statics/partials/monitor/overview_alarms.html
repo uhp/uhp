@@ -34,7 +34,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="record in alarms.rows">
-            <td style="max-width:500px;overflow:auto;word-wrap:break-word;white-space:pre-wrap;" ng-repeat="v in record">[[v]]</td>
+            <td style="max-width:500px;overflow:auto;word-wrap:break-word;white-space:pre-wrap;" ng-repeat="v in record track by $index">[[v]]</td>
           </tr>
         </tbody>
       </table>

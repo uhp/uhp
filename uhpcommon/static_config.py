@@ -27,9 +27,10 @@ if config.install_monitor:
         'submenus':[
             {"name":"mOverview", "display":'概览', "href":"#/monitor/overview",
                 "tabs": [
-                    {"name":"mtCurent", "display":"当前状态", "href":"/statics/partials/monitor/overview.html"},
-                    #{"name":"mtHistory", "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
-                    {"name":"mtAlarmList", "display":"告警列表", "href":"/statics/partials/monitor/overview_alarms.html"}
+                    {"name":"mtCurent",    "display":"当前状态", "href":"/statics/partials/monitor/overview.html"},
+                    #{"name":"mtHistory",  "display":"历史状态", "href":"/statics/partials/monitor/overview_history.html"},
+                    {"name":"mtAlarmNow",  "display":"当前告警", "href":"/statics/partials/monitor/overview_alarms_now.html"},
+                    {"name":"mtAlarmList", "display":"告警列表", "href":"/statics/partials/monitor/overview_alarms.html"},
                 ]
             },
             {"name":"mHost", "display":"机器", "href":"#/monitor/host",
@@ -50,7 +51,7 @@ if config.install_monitor:
             {"name":"mJob", "display":"作业", "href":"#/monitor/job",
                 "tabs": [
                     {"name":"mtJobRun", "display":"当前作业", "href":"/statics/partials/monitor/job.html"},
-                    #{"name":"mtJobMetrics", "display":"历史状态", "href":"/statics/partials/monitor/metrics.html"},
+                    {"name":"mtJobMetrics", "display":"历史状态", "href":"/statics/partials/monitor/metrics.html"},
                     {"name":"mtJobRm", "display":"RM指标", "href":"/statics/partials/monitor/rm.html"},
                     {"name":"mtJobNm", "display":"NM指标", "href":"/statics/partials/monitor/nm.html"},
                     {"name":"mtJobApp", "display":"应用查询", "href":"/statics/partials/monitor/app.html"}
@@ -63,6 +64,8 @@ if config.install_monitor:
                     #{"name":"mtMetricHost",     "display":"监控部署",     "href":"/statics/partials/monitor/conf.html", "func":"query_monitor_host()"},
                     #{"name":"mtMetricPubVar",   "display":"监控公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_global_variate()"},
                     {"name":"mtAlarm",          "display":"告警配置",     "href":"/statics/partials/monitor/conf.html", "func":"query_alarm()"},
+                    {"name":"mtAlarmAutofix",   "display":"告警自动修复", "href":"/statics/partials/monitor/conf.html",
+                        "func":"query_alarm_autofix()"},
                     {"name":"mtAlarmAssist",    "display":"告警公共变量", "href":"/statics/partials/monitor/conf.html", "func":"query_alarm_assist()"}
                 ]
             }

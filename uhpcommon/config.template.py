@@ -54,6 +54,7 @@ monitor_process_timeout = 10
 # for alarm
 ganglia_rrd_dir = "/var/lib/ganglia/rrds"
 rrd_image_dir = os.path.join(uhphome, "uhpalarm","imgs")
+alarm_least_count = 5
 
 alarm_interval = 60
 
@@ -63,7 +64,7 @@ mail_host = None
 mail_from = None
 mail_user = None
 mail_passwd = None
-mail_send_interval = 600
+mail_send_interval = 90
 mail_interval = 60
 
 #for collect

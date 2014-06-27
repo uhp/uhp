@@ -7,9 +7,9 @@ import StringIO
 import string
 from lxml import etree
 
-#for main run
-commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
-sys.path.append(commondir)
+#for debug run
+#commondir=os.path.join( os.getenv('UHP_HOME'),"uhpcommon");
+#sys.path.append(commondir)
 
 import util
 
@@ -20,22 +20,10 @@ def namenode_web(hosts,port):
 class NamenodeChecker():
 
     def __init__(self):
-        self.state = "OK"
-        self.msg = u""
-        self.msg_count = 1
+        self.alarm_list = []
 
-    def update_msg(self,msg):
-        self.msg += "%d: %s" % (self.msg_count, msg)
-        self.msg_count = self.msg_count + 1
-
-    def update_result(self, state, msg):
-        if state == "ERROR" :
-            self.state = state
-            self.update_msg(msg)
-        elif state == "WARN" :
-            self.update_msg(msg)
-            if self.state != "ERROR" :
-                self.state = state
+    def update_result(self, key_word, msg):
+        self.alarm_list.append({"key_word":key_word,"msg":msg})
 
     def namenode_web(self,hosts,port):
         '''
@@ -46,7 +34,8 @@ class NamenodeChecker():
         4. 两者的tid
         '''
         if len(hosts) == 0 :
-            return ("ERROR","没有namenode")
+            sefl.update_result("cluster(no nm)","没有namenode")
+            return self.alarm_list
 
         ha_states = []
         tids = []
@@ -58,7 +47,7 @@ class NamenodeChecker():
         self.check_ha_states(hosts, ha_states)
         #self.check_tids(hosts, tids)
         
-        return (self.state,self.msg)
+        return self.alarm_list
 
     def check_ha_states(self, hosts, ha_states):
         h1 = hosts[0]
@@ -66,23 +55,23 @@ class NamenodeChecker():
         s1 = ha_states[0]
         s2 = ha_states[1]
         if s1 == "active" and s2 == "active" :
-            self.update_result("ERROR",u"检测到两个namenode都是active状态。")
+            self.update_result("cluster(check_ha_states)", u"检测到两个namenode都是active状态。")
         if s1 != "active" and s2 != "active" :
-            self.update_result("ERROR",u"检测到两个namenode都不是active状态。")
+            self.update_result("cluster(check_ha_states)", u"检测到两个namenode都不是active状态。")
 
     def check_tids(self, hosts, tids):
         diff = abs( tids[0]-tids[1] )
         if diff > 1000 :
-            self.update_result("WARN",u"检测到两个namenode的TID相差%d。" % diff)
+            self.update_result("cluster(check_tids)", u"检测到两个namenode的TID相差%d。" % diff)
         elif diff > 10000 :
-            self.update_result("ERROR",u"检测到两个namenode的TID相差%d。" % diff)
+            self.update_result("cluster(check_tids)", u"检测到两个namenode的TID相差%d。" % diff)
 
     def get_nm_and_check(self,host,port):
 
         url = "http://%s:%s/dfshealth.jsp" % (host,port)
         html = util.get_http(url,5)
         if html == None :
-            self.update_result("ERROR",u"不能连接到%s:%s。" % (host,port) )
+            self.update_result( "%s(connect nmweb error)" % host, u"不能连接到%s:%s。" % (host,port) )
             return ("",0)
         #get ha_state tid
         ha_state = self.get_ha_state(html)
@@ -91,22 +80,22 @@ class NamenodeChecker():
         dirs = self.get_storge_dir(html)
         for (dir,dir_state) in dirs.items():
             if dir_state != "Active":
-                self.update_result("ERROR",u"目录 %s 状态为 %s。" % (dir,dir_state) )
+                self.update_result("%s(storge error)" % (host, dir), u"目录 %s 状态为 %s。" % (dir,dir_state) )
 
         #get live datanode status
         # {"name","pcremaining","volfails"}
         url = "http://%s:%s/dfsnodelist.jsp?whatNodes=LIVE" % (host,port)
         html = util.get_http(url,5)
         if html == None :
-            self.update_result("ERROR",u"不能连接到%s:%s。" % (host,port) )
+            self.update_result("%s(connect nmweb error)" % host , u"不能连接到%s:%s。" % (host,port) )
             return (ha_state,tid)
 
         tables = self.get_live_dn_table(html)
         for row in tables :
             if row["volfails"] > 0 :
-                self.update_result("ERROR", u"机器 %s 检测到 %d 个损坏的卷。" % (row["name"],row["volfails"]) )
+                self.update_result("%s(datanode error Vol)" % row["name"], u"机器 %s 检测到 %d 个损坏的卷。" % (row["name"],row["volfails"]) )
             if row["last_contact"] > 30 :
-                self.update_result("ERROR", u"机器 %s 检测丢失心跳 %d秒。" % (row["name"],row["last_contact"]) )
+                self.update_result("%s(datanode lost heartbeat)" % row["name"], u"机器 %s 检测丢失心跳 %d秒。" % (row["name"],row["last_contact"]) )
 
         return (ha_state,tid)
 

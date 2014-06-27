@@ -745,14 +745,18 @@ class MonitorBackHandler(BaseHandler):
         _fetch_m(cpu_metric, metrics, line_stack_style)
 
         # Mem
-        metrics = ['mem_total', 'mem_free', 'swap_total', 'swap_free']
+        metrics = ['mem_total', 'mem_free', 'swap_total', 'swap_free', 'mem_buffers', 'mem_cached']
         (x,ys) = self._fetch_host_metrics(rrd_wrapper, cluster_name, host, metrics, start, end)
         mem_metric['x'] = x
         def _my_sub(a, b):
             if a is None or b is None: 
                 return None
             return a - b  
-        mem_used  = map(_my_sub, ys[0], ys[1]) 
+        def _my_sub3(a, b, c, d):
+            if a is None or b is None or c is None or d is None: 
+                return None
+            return a - b - c - d 
+        mem_used  = map(_my_sub3, ys[0], ys[1], ys[4],ys[5]) 
         mem_free  = ys[1]
         swap_used = map(_my_sub, ys[2], ys[3])
         
@@ -761,7 +765,7 @@ class MonitorBackHandler(BaseHandler):
         mem_metric['series'].append({'name':'swap_used', 'type':'line', 'stack':'total', 'data':swap_used})
         for temp in mem_metric['series']: 
             temp.update(line_area_style)
-        self._metric_unit_convert(mem_metric,1024,MGT)
+        self._metric_unit_convert(mem_metric,1024,KMGT)
 
         # Net
         metrics = ['bytes_in', 'bytes_out']
@@ -873,14 +877,17 @@ class MonitorBackHandler(BaseHandler):
     # 服务健康度：进程，端口，响应，性能
     def _service_instance_current_health(self, rrd_wrapper, cluster_name, service, role, host):
         session = database.getSession()
-        for instance in session.query(Instance).filter(and_(Instance.service==service, Instance.role==role,
-            Instance.host==host)):
-            if instance.status != 'start':
-                return 100
-            if instance.health == Instance.HEALTH_HEALTHY:
-                return 100
-            if instance.health == Instance.HEALTH_UNKNOW:
-                return -1
+        try:
+            for instance in session.query(Instance).filter(and_(Instance.service==service, Instance.role==role,
+                Instance.host==host)):
+                if instance.status != 'start':
+                    return 100
+                if instance.health == Instance.HEALTH_HEALTHY:
+                    return 100
+                if instance.health == Instance.HEALTH_UNKNOW:
+                    return -1
+        finally:
+            session.close()
         return 0
 
     # 当前的监控指标
@@ -1153,7 +1160,7 @@ class MonitorBackHandler(BaseHandler):
 
         ret = {"data":data}
         self.ret("ok", "", ret);
-
+    
     # 获取最新报警列表数据
     def query_alarms(self):
         search  = self.get_argument("search", "")
@@ -1197,6 +1204,45 @@ class MonitorBackHandler(BaseHandler):
 
             # alarms
             alarms = {'columns':columns, 'rows':data, 'total': total, 'totalPage':int(total/limit)+1}
+            self.ret("ok", "", {"data": alarms})
+        finally:
+            session.close()
+
+    # 获取当前报警
+    def query_alarms_now(self):
+        orderby = "id"
+        dir     = "desc"
+        offset  = "0"
+        limit   = "50"
+        offset  = int(offset)
+        limit   = int(limit)
+
+        session = database.getSession()
+        try:
+            columns = []
+            columns = [col.name for col in AlarmNow.__table__.columns]
+            data    = []
+
+            query = session.query(AlarmNow)
+
+            if dir == "asc":
+                query = query.order_by(asc(orderby))[offset:offset+limit]
+            else:
+                query = query.order_by(desc(orderby))[offset:offset+limit]
+                
+            for record in query:
+                temp = []
+                for col in columns:
+                    v = getattr(record, col)
+                    # 特别的，时间转化
+                    if v is not None and col == 'ctime':
+                        t = time.localtime(int(v))
+                        v = time.strftime("%Y-%m-%d %H:%M:%S", t)
+                    temp.append(v)
+                data.append(temp)
+
+            # alarms
+            alarms = {'columns':columns, 'rows':data}
             self.ret("ok", "", {"data": alarms})
         finally:
             session.close()
@@ -1316,6 +1362,8 @@ class MonitorBackHandler(BaseHandler):
             bytes_out    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'bytes_out')
             mem_total    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_total')
             mem_free     = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_free')
+            mem_buffers  = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_buffers')
+            mem_cached   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'mem_cached')
             swap_total   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'swap_total')
             swap_free    = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'swap_free')
             disk_total   = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'disk_total')
@@ -1356,8 +1404,8 @@ class MonitorBackHandler(BaseHandler):
             #if mem_total is not None: mem_total = int(mem_total)/1024
             #if mem_free  is not None: mem_free  = int(mem_free)/1024
             mem_used = None
-            if mem_total is not None and mem_free is not None:
-                mem_used = mem_total - mem_free
+            if mem_total is not None and mem_free is not None and mem_buffers is not None and mem_cached is not None:
+                mem_used = mem_total - mem_free - mem_buffers - mem_cached
             mem_metric_mem_used.append(mem_used)
             mem_metric_mem_free.append(mem_free)
             
@@ -1511,11 +1559,11 @@ class MonitorBackHandler(BaseHandler):
         host_overview.append({'name':'总磁盘数量','value':total_disk_numb,'unit':'个'})
         host_overview.append(self._value_unit_convert({'name':'总磁盘容量','value':total_disk_capacity,'unit':'G'},1024,GT))
         host_overview.append(self._value_unit_convert({'name':'总磁盘使用','value':total_disk_used,'unit':'G'},1024,GT))
-        host_overview.append(self._value_unit_convert({'name':'总内存容量','value':total_mem_capacity,'unit':'M'},1024,MGT))
-        host_overview.append(self._value_unit_convert({'name':'总内存使用','value':total_mem_used,'unit':'M'},1024,MGT))
+        host_overview.append(self._value_unit_convert({'name':'总内存容量','value':total_mem_capacity,'unit':'M'},1024,KMGT))
+        host_overview.append(self._value_unit_convert({'name':'总内存使用','value':total_mem_used,'unit':'M'},1024,KMGT))
         host_overview.append({'name':'总CPU数量','value':total_cpu_numb,'unit':'个'})
-        host_overview.append(self._value_unit_convert({'name':'总网卡流入','value':total_net_in,'unit':'M'},1024,MGT))
-        host_overview.append(self._value_unit_convert({'name':'总网卡流出','value':total_net_out,'unit':'M'},1024,MGT))
+        host_overview.append(self._value_unit_convert({'name':'总网卡流入','value':total_net_in,'unit':'M'},1024,BKMGT))
+        host_overview.append(self._value_unit_convert({'name':'总网卡流出','value':total_net_out,'unit':'M'},1024,BKMGT))
 
         ret = {"data":data, 'diskData':disk_data, "hostOverview":host_overview, 'loadDist':load_metric_dist}
         self.ret("ok", "", ret);
@@ -1696,35 +1744,38 @@ class MonitorBackHandler(BaseHandler):
             sql = ("select round(happenTime/%s)*%s as printTime %s from rm where %s group by printTime" % (happenTimeSplit,happenTimeSplit,sqlFields,where) )
 
             session = database.getSession()
-            cursor  = session.execute(sql)
-            for record in cursor:
-                temp = []
-                for value in record:
-                    app_log.info(type(value))
-                    if isinstance(value,Decimal):
-                        app_log.info("into deci")
-                        temp.append(float(value))    
-                    else:
-                        temp.append(value)
-                queryResult.append(temp)
-            app_log.info(queryResult)
+            try:
+                cursor  = session.execute(sql)
+                for record in cursor:
+                    temp = []
+                    for value in record:
+                        app_log.info(type(value))
+                        if isinstance(value,Decimal):
+                            app_log.info("into deci")
+                            temp.append(float(value))    
+                        else:
+                            temp.append(value)
+                    queryResult.append(temp)
+                app_log.info(queryResult)
         
-            #特殊处理mapTime和reduceTime
-            #由于前面有一个printTime的查询，所以偏移一位
-            fieldOffset = 1 
-            if "mapTime" in fields and "mapNum" in fields :
-                timeIndex = fields.index("mapTime") + fieldOffset
-                numIndex = fields.index("mapNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex] 
+                #特殊处理mapTime和reduceTime
+                #由于前面有一个printTime的查询，所以偏移一位
+                fieldOffset = 1 
+                if "mapTime" in fields and "mapNum" in fields :
+                    timeIndex = fields.index("mapTime") + fieldOffset
+                    numIndex = fields.index("mapNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex] 
         
-            if "reduceTime" in fields and "reduceNum"  in fields :
-                timeIndex = fields.index("reduceTime") + fieldOffset
-                numIndex = fields.index("reduceNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex]
+                if "reduceTime" in fields and "reduceNum"  in fields :
+                    timeIndex = fields.index("reduceTime") + fieldOffset
+                    numIndex = fields.index("reduceNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex]
+            finally:
+                session.close()
 
         result = {"result":queryResult, "sql":sql}
         self.ret("ok","",result)               
@@ -1762,33 +1813,36 @@ class MonitorBackHandler(BaseHandler):
                   )
 
             session = database.getSession()
-            cursor  = session.execute(sql)
-            
-            for record in cursor:
-                temp = []
-                for value in record:
-                    if isinstance(value,Decimal):
-                        temp.append(float(value))    
-                    else:
-                        temp.append(value)
-                queryResult.append(temp)
+            try:
+                cursor  = session.execute(sql)
                 
-            #特殊处理mapTime和reduceTime
-            #由于前面有printTime和host两个位置，所以偏移两位
-            fieldOffset = 2
-            if "mapTime" in fields and "mapNum"  in fields :
-                timeIndex = fields.index("mapTime") + fieldOffset
-                numIndex = fields.index("mapNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex] 
-            
-            if "reduceTime" in fields and "reduceNum"  in fields :
-                timeIndex = fields.index("reduceTime") + fieldOffset
-                numIndex = fields.index("reduceNum") + fieldOffset
-                for record in queryResult:
-                    if record[numIndex] != None and record[numIndex] != 0:
-                        record[timeIndex] = record[timeIndex] / record[numIndex]
+                for record in cursor:
+                    temp = []
+                    for value in record:
+                        if isinstance(value,Decimal):
+                            temp.append(float(value))    
+                        else:
+                            temp.append(value)
+                    queryResult.append(temp)
+                    
+                #特殊处理mapTime和reduceTime
+                #由于前面有printTime和host两个位置，所以偏移两位
+                fieldOffset = 2
+                if "mapTime" in fields and "mapNum"  in fields :
+                    timeIndex = fields.index("mapTime") + fieldOffset
+                    numIndex = fields.index("mapNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex] 
+                
+                if "reduceTime" in fields and "reduceNum"  in fields :
+                    timeIndex = fields.index("reduceTime") + fieldOffset
+                    numIndex = fields.index("reduceNum") + fieldOffset
+                    for record in queryResult:
+                        if record[numIndex] != None and record[numIndex] != 0:
+                            record[timeIndex] = record[timeIndex] / record[numIndex]
+            finally:
+                session.close()
             
         result = {"result":queryResult,"sql":sql}
         self.ret("ok","",result)               
@@ -1797,30 +1851,32 @@ class MonitorBackHandler(BaseHandler):
     def app_sum(self):
         where = self.get_argument("where","1").replace("o|o","%")
         session = database.getSession()
-        sumKey=["mapsTotal","mapsCompleted","successfulMapAttempts","killedMapAttempts","failedMapAttempts",
-                "localMap","rackMap",
-                "reducesTotal","reducesCompleted","successfulReduceAttempts","killedReduceAttempts",
-                "failedReduceAttempts",
-                "fileRead","fileWrite","hdfsRead","hdfsWrite"]
-        select = "count(appid) as appidCount"
-        for key in sumKey:
-            select = select +" , sum("+key+") as "+key+"Sum "
-        sql = (("select "+select+" from app where %s ") % (where))
-        app_log.info(sql)
-        cursor = session.execute(sql)
-        resultRecord = {}
-        temp = []
-        for record in cursor:
-            app_log.info(record)
-            for value in record:
-                temp.append(value)
-                app_log.info(value)
-        for (key,value) in zip(cursor.keys(),temp):
-            if value != None:
-                resultRecord[key]=int(value)
-            else:
-                resultRecord[key]=0
-        session.close()
+        try:
+            sumKey=["mapsTotal","mapsCompleted","successfulMapAttempts","killedMapAttempts","failedMapAttempts",
+                    "localMap","rackMap",
+                    "reducesTotal","reducesCompleted","successfulReduceAttempts","killedReduceAttempts",
+                    "failedReduceAttempts",
+                    "fileRead","fileWrite","hdfsRead","hdfsWrite"]
+            select = "count(appid) as appidCount"
+            for key in sumKey:
+                select = select +" , sum("+key+") as "+key+"Sum "
+            sql = (("select "+select+" from app where %s ") % (where))
+            app_log.info(sql)
+            cursor = session.execute(sql)
+            resultRecord = {}
+            temp = []
+            for record in cursor:
+                app_log.info(record)
+                for value in record:
+                    temp.append(value)
+                    app_log.info(value)
+            for (key,value) in zip(cursor.keys(),temp):
+                if value != None:
+                    resultRecord[key]=int(value)
+                else:
+                    resultRecord[key]=0
+        finally:
+            session.close()
         result={"resultRecord":resultRecord}
         
         self.ret("ok","",result)
@@ -1833,25 +1889,27 @@ class MonitorBackHandler(BaseHandler):
         orderDirection = self.get_argument("orderDirection","desc")
 
         session = database.getSession()
-        selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
-                   "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",
-                   "fileRead","fileWrite","hdfsRead","hdfsWrite"]
-        if orderField=="appid" :
-            selectKeyArray.append("CAST(SUBSTR(appid,27 ) AS SIGNED) as appnum")
-            orderby = "appnum "+orderDirection
-        else:
-            orderby = orderField+" "+orderDirection 
-        selectKey = ",".join(selectKeyArray)
-        sql = ("select "+selectKey+" from app where %s order by %s LIMIT %s OFFSET %s " % (where,orderby,limit,offset))
-        cursor = session.execute(sql)
-        queryResult = []
-        for record in cursor:
-            temp = []
-            for v in record:
-                temp.append(v)
-            queryResult.append(temp)
-        #queryResult = cursor.fetchall()
-        session.close()
+        try:
+            selectKeyArray=["appid","user","name","queue","startedTime","finishedTime","state","finalStatus",
+                       "attemptNumber","mapsTotal","mapsCompleted","localMap","reducesTotal","reducesCompleted",
+                       "fileRead","fileWrite","hdfsRead","hdfsWrite"]
+            if orderField=="appid" :
+                selectKeyArray.append("CAST(SUBSTR(appid,27 ) AS SIGNED) as appnum")
+                orderby = "appnum "+orderDirection
+            else:
+                orderby = orderField+" "+orderDirection 
+            selectKey = ",".join(selectKeyArray)
+            sql = ("select "+selectKey+" from app where %s order by %s LIMIT %s OFFSET %s " % (where,orderby,limit,offset))
+            cursor = session.execute(sql)
+            queryResult = []
+            for record in cursor:
+                temp = []
+                for v in record:
+                    temp.append(v)
+                queryResult.append(temp)
+            #queryResult = cursor.fetchall()
+        finally:
+            session.close()
         result={"applist":queryResult,"rmhost":self._get_rmhost(),"rmport":self._get_rmport()}
         self.ret("ok","",result)
 
@@ -1864,25 +1922,31 @@ class MonitorBackHandler(BaseHandler):
         result={"data":result}
         self.ret("ok","",result)
 
-#def metrics_query():
-#    fields          = self.get_arguments("fields",[])
-#    recordTimeMax   = self.get_argument("recordTimeMax",0)
-#    recordTimeMin   = self.get_argumentget("recordTimeMin",0)
-#    recordTimeSplit = self.get_argumentget("recordTimeSplit",600)
-#    if len(fields)!=0 :
-#        recordTimeFilter = " ( recordTime % " + str(recordTimeSplit) + " = 0 ) ";
-#        where = ( "recordTime >= %d and recordTime <= %d and %s" % ( recordTimeMin , recordTimeMax , recordTimeFilter ) )
-#        sqlFields=""
-#        for field in fields:
-#            sqlFields = sqlFields+" , "+field;
-#        sql = ("select recordTime %s from metrics where %s " % (sqlFields,where) )
-#        cursor = database.getCursor()
-#        cursor.execute(sql)
-#        sqlResult = cursor.fetchall()
-#        queryResult = []
-#
-#        for record in sqlResult:
-#            queryResult.append(list(record))
-#
-#    result= {"result":queryResult,"sql":sql}
-#    return json.dumps(result)
+    # 作业历史状态查询
+    def metrics_query(self):
+        fields          = self.get_arguments("fields",[])
+        recordTimeMin   = self.get_argument("recordTimeMin")
+        recordTimeMax   = self.get_argument("recordTimeMax")
+        recordTimeSplit = self.get_argument("recordTimeSplit","10")
+
+        recordTimeMin = int(recordTimeMin)
+        recordTimeMin = 0 
+        recordTimeMax = int(recordTimeMax)
+
+        queryResult = []
+        if fields:
+            recordTimeFilter = " ( recordTime % " + str(recordTimeSplit) + " = 0 ) ";
+            where = ( "recordTime >= %d and recordTime <= %d and %s" % ( recordTimeMin , recordTimeMax , recordTimeFilter ) )
+            sqlFields=",".join(fields)
+            sql = ("select recordTime, %s from metrics where %s " % (sqlFields,where) )
+        
+            session = database.getSession()
+            try:
+                cursor = session.execute(sql)
+                for record in cursor:
+                    queryResult.append(list(record))
+            finally:
+                session.close()
+
+        result = {"result":queryResult,"sql":sql}
+        self.ret("ok","",result)               
