@@ -5,12 +5,15 @@ DIR=$(cd $(dirname "$0"); cd ..; pwd)
 
 if [ "$UHP_HOME" == "" ] ; then 
     echo "export UHP_HOME=$DIR" >> ~/.bash_profile
-    echo "export ANSIBLE_CONFIG=\$HUP_HOME/conf/ansible.cfg" >> ~/.bash_profile
+    #echo "export ANSIBLE_CONFIG=\$HUP_HOME/conf/ansible.cfg" >> ~/.bash_profile
     echo "export PATH=\$UHP_HOME/bin:\$PATH" >> ~/.bash_profile
     export UHP_HOME=$DIR
 fi
 
 cd $DIR
+
+rm -rf $HOME/.ansible.cfg
+cp $DIR/conf/ansible.cfg $HOME/.ansible.cfg
 
 chmod a+x bin/*.sh
 
@@ -31,6 +34,19 @@ coms=(
     "mysql-devel"
     )
 
+#rh_ver=$(lsb_release -a |sed -n 4p|awk '{print $2}')
+py_ver=$( python -V 2>&1|awk '{print $2}' )
+if [ $py_ver >= "2.6.0" ]; then
+    coms+=(
+        "python2-devel"
+    )
+else
+    coms+=(
+        "python26"
+        "python26-devel"
+    )
+fi
+
 for com in ${coms[@]}; do
     echo "###############################################"
     echo "# install: $com"
@@ -38,6 +54,14 @@ for com in ${coms[@]}; do
     sudo yum install -y $com
     echo "###############################################"
 done 
+
+if [ $py_ver >= "2.6.0" ]; then
+    ;
+else
+    sudo mv -f /usr/bin/python /usr/bin/python.bk
+    sudo ln -s /usr/bin/python2.6 /usr/bin/python
+fi
+
 
 echo 
 echo "Install vpy ..."

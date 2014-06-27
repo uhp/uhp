@@ -1526,7 +1526,7 @@ class MonitorBackHandler(BaseHandler):
     # return (value, unit)
     def _unit_convert(self, value,div,units):
         ui = 0
-        ulen = len(units)
+        ulen = len(units) - 1
         while ui < ulen and value > div:
             value = value / div
             ui += 1
@@ -1551,7 +1551,7 @@ class MonitorBackHandler(BaseHandler):
         ui = 0
         dm = [d for d in data if d is not None]
         if dm:
-            ulen = len(units)
+            ulen = len(units) - 1
             dm_min = min(dm)
             while ui < ulen and dm_min > div:
                 dm_min = dm_min / div
@@ -1576,7 +1576,7 @@ class MonitorBackHandler(BaseHandler):
                 # all_data_min = min(all_data)
                 all_data.sort()
                 all_data_min = all_data[(len(all_data)-1)/2]
-                ulen = len(units)
+                ulen = len(units) - 1
                 while ui < ulen and all_data_min > div:
                     all_data_min = all_data_min / div
                     ui += 1
@@ -1863,3 +1863,26 @@ class MonitorBackHandler(BaseHandler):
             result[appId]=(status, output)
         result={"data":result}
         self.ret("ok","",result)
+
+#def metrics_query():
+#    fields          = self.get_arguments("fields",[])
+#    recordTimeMax   = self.get_argument("recordTimeMax",0)
+#    recordTimeMin   = self.get_argumentget("recordTimeMin",0)
+#    recordTimeSplit = self.get_argumentget("recordTimeSplit",600)
+#    if len(fields)!=0 :
+#        recordTimeFilter = " ( recordTime % " + str(recordTimeSplit) + " = 0 ) ";
+#        where = ( "recordTime >= %d and recordTime <= %d and %s" % ( recordTimeMin , recordTimeMax , recordTimeFilter ) )
+#        sqlFields=""
+#        for field in fields:
+#            sqlFields = sqlFields+" , "+field;
+#        sql = ("select recordTime %s from metrics where %s " % (sqlFields,where) )
+#        cursor = database.getCursor()
+#        cursor.execute(sql)
+#        sqlResult = cursor.fetchall()
+#        queryResult = []
+#
+#        for record in sqlResult:
+#            queryResult.append(list(record))
+#
+#    result= {"result":queryResult,"sql":sql}
+#    return json.dumps(result)
