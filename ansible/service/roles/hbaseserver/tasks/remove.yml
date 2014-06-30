@@ -1,7 +1,9 @@
 ---
 
-- name: remove hbase thrift
-  sudo: yes
-  service: name=hbase-thrift state=removed
+#由于没有removed的状态 所以注释掉防止出错
+#
+#- name: remove hbase thrift
+#  sudo: yes
+#  service: name=hbase-thrift state=removed
 
 

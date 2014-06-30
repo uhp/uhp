@@ -1,6 +1,6 @@
 
 
-uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$fileUploader','$timeout',function($scope,$rootScope,$http,$fileUploader,$timeout){
+uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$fileUploader','$timeout','$filter',function($scope,$rootScope,$http,$fileUploader,$timeout,$filter){
 	
 	
 	$scope.init=function(){
@@ -573,9 +573,6 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$fileUploader','
 				$scope.chosenInstance[temp['name']] = false;
 			}
 		}
-		if( $scope.chosenAllInstance == null){
-			$scope.chosenAllInstance=false
-		}
 	}
 	
 	$scope.initConf=function(){
@@ -664,6 +661,22 @@ uhpApp.controller('ServiceCtrl',['$scope','$rootScope','$http','$fileUploader','
 			$scope.chosenInstance[name]=newValue
 		}
 	})
+  $scope.removeAll=function(){
+    for(var name in $scope.chosenInstance){
+      $scope.chosenInstance[name] = false
+    }
+  }
+  $scope.chosenAllWithFilter=function(){
+    var chosen_name_array = []
+    for(var index in $scope.filter_instances){
+      chosen_name_array.push($scope.filter_instances[index].name)
+    }
+    for(var name in $scope.chosenInstance){
+      if(inArray(chosen_name_array,name)){
+        $scope.chosenInstance[name] = true
+      }
+    }
+  }
 	$scope.readySendInstanceAction=function(action){
 		$scope.todoAction = action;
 		$scope.actionType = "instance";

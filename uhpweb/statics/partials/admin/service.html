@@ -105,7 +105,8 @@
             <thead>
               <tr>
                 <th>
-                  <input type="checkbox" ng-model="chosenAllInstance">
+                  <button style="padding:0px;" ng-click="chosenAllWithFilter()"><i class="fa fa-check"></i></button>
+                  <button style="padding:0px;" ng-click="removeAll()"><i class="fa fa-ban"></i></button>
                 </th>
                 <th>名称</th>
                 <!--
@@ -121,8 +122,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="instance in instances|filter:instanceSearchText">
-                <td>
+              <tr ng-repeat="instance in (filter_instances = (instances|filter:instanceSearchText))">
+                <td align=center>
                   <input type="checkbox" ng-model="chosenInstance[instance.name]"></td>
                 <td>[[instance.name]]</td>
                 <!-- 
