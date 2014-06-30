@@ -36,7 +36,7 @@
             <tr ng-dblclick="editConfVar(var)" ng-repeat="var in confVar|filter:confSearchText">
               <td>[[var.group]]</td>
               <td>[[var.name]]</td>
-            <td><pre>[[var.value]]</pre></td>
+              <td><pre>[[showValue(var)]]</pre></td>
               <td>[[var.type]]</td>
               <td>[[var.text]]</td>
             </tr>
