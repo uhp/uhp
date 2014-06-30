@@ -1930,7 +1930,6 @@ class MonitorBackHandler(BaseHandler):
         recordTimeSplit = self.get_argument("recordTimeSplit","10")
 
         recordTimeMin = int(recordTimeMin)
-        recordTimeMin = 0 
         recordTimeMax = int(recordTimeMax)
 
         queryResult = []

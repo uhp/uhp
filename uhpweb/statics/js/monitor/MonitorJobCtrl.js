@@ -150,7 +150,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.has_query=true
     }
 
-    function convertResult(fields, result){
+    function convertResult(fields, result, xfunc){
       // [ [time, value,...] ]
       // [ {metric:,x:[],y:[]} ]
       metrics = [];
@@ -170,6 +170,13 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
               }
           });
       });
+
+      if(bool(xfunc)){
+          $.each(metrics, function(i, n){
+              n.x = $.map(n.x, xfunc);
+          });
+      }
+
       return metrics;
     }
 
@@ -190,13 +197,10 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             $scope.rm = response
             // 数据格式转换 [[]] => [{}]
             // [ {metric:,x:[],y:[]} ]
-            $scope.rm.metrics = convertResult(fields, $scope.rm.result);
             xfunc=function(n){
                 return $scope.rm_time>1440 ? date('n-j/H:i', n): date('H:i', n);
             }
-            $.each($scope.rm.metrics, function(i, n){
-                n.x = $.map(n.x, xfunc);
-            });
+            $scope.rm.metrics = convertResult(fields, $scope.rm.result, xfunc);
         }).error(function(data, status) {
             $rootScope.alert("发送app_running请求失败");
         });
@@ -590,16 +594,16 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             {"value":1440,"dis":"24小时"}
         ];
         
-        $scope.rmQuery();
-        $scope.appQuery();
-
         $scope.selected_metrics_type = ['app'];
         $scope.selected_metrics_time = '180';
         $scope.selected_metrics_split = '10';
-
-        //$scope.metricsQuery();
+        
+        $scope.rmQuery();
+        $scope.appQuery();
+        $scope.metricsQuery();
 
         //定时刷新正在运行的作业
+        $scope.runningQuery();
         timer = $interval(function(){
           $scope.runningQuery();
         },10000);
@@ -630,6 +634,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         });
         return temp;
     }
+
     function getMetricsRecordTimeMinParams(){
         //var temp = datetime_to_unix($("#metrics-params-recordTime-min")[0].value);
         var temp = $scope.selected_metrics_time
@@ -640,6 +645,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         }
         return temp;
     }
+
     function getMetricsRecordTimeMaxParams(){
         //var temp = datetime_to_unix($("#metrics-params-recordTime-max")[0].value);
         var temp = null;
@@ -648,6 +654,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         }
         return temp;
     } 
+
     function getMetricsRecordTimeSplitParams(){
         //var pick = $("#metrics-params-recordTime-split-select option:selected");
         //return pick[0].value*60;
@@ -656,49 +663,6 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             temp = 10;
         }
         return temp * 60;
-    }
-    function showMetricsData(fields,beginTime,endTime,timeSplit,data){
-        //分隔数据到各个指标
-        //转换data的result的记录形式从[time,xx,xx...]转换为[time][xx,xx...]
-        var dataPool = {}
-        for(var key in data){
-            var temp = data[key];
-            var time = temp[0]
-            if( !(time in dataPool) ){
-              dataPool[time] = {}
-            }
-            for(var i=1;i<temp.length;i++){
-                dataPool[time][i-1]=temp[i];
-            }
-        }
-        var htmlid = "metrics-draw-div";
-        // TODO
-        //drawMetricsHighChart(htmlid,fields,dataPool,beginTime,endTime,timeSplit)
-    }
-    function drawMetricsHighChart(htmlid,fields,dataPool,beginTime,endTime,split){
-        var begin = Math.floor(beginTime/split)*split;
-        var end = Math.floor(endTime/split)*split;
-        var xAxis = [];
-        for(var i = begin;i<=end;i+=split){
-            xAxis.push(unix_to_datetimeInHighchart(i*1000))
-        }
-        var series = [];
-        for(var index=0;index<fields.length;index++){
-            var field = fields[index]
-            var temp = new Array();
-            for(var nowTime = begin;nowTime<=end;nowTime+=split){
-                if( (nowTime in dataPool) ){
-                    if( dataPool[nowTime][index] != null){
-                        temp.push(formatValue(field,dataPool[nowTime][index]))
-                        continue;
-                    }
-                }
-                temp.push(0)
-            }
-            series.push({name:field,data:temp})
-        }
-        console.log(series)
-        buildLineCharts(htmlid,field,xAxis,getValueFormatter,series)
     }
 
     $scope.metricsQuery = function(){
@@ -711,8 +675,11 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
           {fields:fields, recordTimeMin:recordTimeMin, recordTimeMax:recordTimeMax, recordTimeSplit:recordTimeSplit}, 
           function(res){
               mqs = res['result']
-              // [[]]
-              showMetricsData(fields,recordTimeMin,recordTimeMax,recordTimeSplit,mqs);
+              // [[time,f1,f2...]]
+              xfunc=function(n){
+                  return $scope.selected_metrics_time>1440 ? date('n-j/H:i', n): date('H:i', n);
+              }
+              $scope.history_metrics = convertResult(fields,mqs,xfunc)
           }
       );
     }
