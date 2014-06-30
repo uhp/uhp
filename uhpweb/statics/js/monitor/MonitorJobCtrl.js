@@ -150,7 +150,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.has_query=true
     }
 
-    function convertResult(fields, result){
+    function convertResult(fields, result, xfunc){
       // [ [time, value,...] ]
       // [ {metric:,x:[],y:[]} ]
       metrics = [];
@@ -170,6 +170,13 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
               }
           });
       });
+
+      if(bool(xfunc)){
+          $.each(metrics, function(i, n){
+              n.x = $.map(n.x, xfunc);
+          });
+      }
+
       return metrics;
     }
 
@@ -190,13 +197,10 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             $scope.rm = response
             // 数据格式转换 [[]] => [{}]
             // [ {metric:,x:[],y:[]} ]
-            $scope.rm.metrics = convertResult(fields, $scope.rm.result);
             xfunc=function(n){
                 return $scope.rm_time>1440 ? date('n-j/H:i', n): date('H:i', n);
             }
-            $.each($scope.rm.metrics, function(i, n){
-                n.x = $.map(n.x, xfunc);
-            });
+            $scope.rm.metrics = convertResult(fields, $scope.rm.result, xfunc);
         }).error(function(data, status) {
             $rootScope.alert("发送app_running请求失败");
         });
@@ -590,33 +594,94 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             {"value":1440,"dis":"24小时"}
         ];
         
+        $scope.selected_metrics_type = ['app'];
+        $scope.selected_metrics_time = '180';
+        $scope.selected_metrics_split = '10';
+        
         $scope.rmQuery();
         $scope.appQuery();
+        $scope.metricsQuery();
 
         //定时刷新正在运行的作业
+        $scope.runningQuery();
         timer = $interval(function(){
           $scope.runningQuery();
         },10000);
     }
 
     // 历史查询
+    function getMetricsFieldParams(){
+        var temp = []
+        $.each($scope.selected_metrics_type,function(i,n){
+            var value=n;
+            if( value == "app" ) {
+                temp.push("appsCompleted")
+                temp.push("appsPending")
+                temp.push("appsRunning")
+                temp.push("appsFailed")
+                temp.push("appsKilled")
+            } else if( value == "resource" ) {
+                //temp.push("totalMB")
+                temp.push("availableMB")
+                temp.push("allocatedMB")
+                temp.push("containersAllocated")
+            } else if( value == "node" ) {
+                temp.push("totalNodes")
+                temp.push("activeNodes")
+            } else {
+                temp.push(value)
+            }
+        });
+        return temp;
+    }
+
+    function getMetricsRecordTimeMinParams(){
+        //var temp = datetime_to_unix($("#metrics-params-recordTime-min")[0].value);
+        var temp = $scope.selected_metrics_time
+        if(temp == null){
+            temp = get_unix_time()-24*3600;
+        } else {
+            temp = get_unix_time()-(temp * 60);
+        }
+        return temp;
+    }
+
+    function getMetricsRecordTimeMaxParams(){
+        //var temp = datetime_to_unix($("#metrics-params-recordTime-max")[0].value);
+        var temp = null;
+        if(temp == null){
+            temp = get_unix_time();
+        }
+        return temp;
+    } 
+
+    function getMetricsRecordTimeSplitParams(){
+        //var pick = $("#metrics-params-recordTime-split-select option:selected");
+        //return pick[0].value*60;
+        var temp = $scope.selected_metrics_split;
+        if(temp == null){
+            temp = 10;
+        }
+        return temp * 60;
+    }
+
     $scope.metricsQuery = function(){
-      //var fields = getMetricsFieldParams();
-      //var recordTimeMin = getMetricsRecordTimeMinParams();
-      //var recordTimeMax = getMetricsRecordTimeMaxParams();
-      //var recordTimeSplit = getMetricsRecordTimeSplitParams();
-      //
-      //var appQuery;
-      //appQuery = new XMLHttpRequest();
-      //appQuery.onreadystatechange=function(){
-      //  if (appQuery.readyState==4 && appQuery.status==200){
-      //    showMetricsData(JSON.parse(appQuery.responseText));
-      //  }
-      //}
-      //var url = "db/metricsQuery?fields="+fields+"&recordTimeSplit="+recordTimeSplit
-      //        +"&recordTimeMax="+recordTimeMax+"&recordTimeMin="+recordTimeMin
-      //appQuery.open("GET",url,true);
-      //appQuery.send();
+      var fields = getMetricsFieldParams();
+      var recordTimeMin = getMetricsRecordTimeMinParams();
+      var recordTimeMax = getMetricsRecordTimeMaxParams();
+      var recordTimeSplit = getMetricsRecordTimeSplitParams();
+      
+      $rootScope.myHttp('GET', '/monitorback/metrics_query', 
+          {fields:fields, recordTimeMin:recordTimeMin, recordTimeMax:recordTimeMax, recordTimeSplit:recordTimeSplit}, 
+          function(res){
+              mqs = res['result']
+              // [[time,f1,f2...]]
+              xfunc=function(n){
+                  return $scope.selected_metrics_time>1440 ? date('n-j/H:i', n): date('H:i', n);
+              }
+              $scope.history_metrics = convertResult(fields,mqs,xfunc)
+          }
+      );
     }
     
     $scope.needKillApp = function(appId){

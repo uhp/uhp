@@ -1921,3 +1921,31 @@ class MonitorBackHandler(BaseHandler):
             result[appId]=(status, output)
         result={"data":result}
         self.ret("ok","",result)
+
+    # 作业历史状态查询
+    def metrics_query(self):
+        fields          = self.get_arguments("fields",[])
+        recordTimeMin   = self.get_argument("recordTimeMin")
+        recordTimeMax   = self.get_argument("recordTimeMax")
+        recordTimeSplit = self.get_argument("recordTimeSplit","10")
+
+        recordTimeMin = int(recordTimeMin)
+        recordTimeMax = int(recordTimeMax)
+
+        queryResult = []
+        if fields:
+            recordTimeFilter = " ( recordTime % " + str(recordTimeSplit) + " = 0 ) ";
+            where = ( "recordTime >= %d and recordTime <= %d and %s" % ( recordTimeMin , recordTimeMax , recordTimeFilter ) )
+            sqlFields=",".join(fields)
+            sql = ("select recordTime, %s from metrics where %s " % (sqlFields,where) )
+        
+            session = database.getSession()
+            try:
+                cursor = session.execute(sql)
+                for record in cursor:
+                    queryResult.append(list(record))
+            finally:
+                session.close()
+
+        result = {"result":queryResult,"sql":sql}
+        self.ret("ok","",result)               

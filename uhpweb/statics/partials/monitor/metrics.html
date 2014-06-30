@@ -1,0 +1,75 @@
+<div class="row">
+
+  <div class="col-md-10">
+    <div class="input-group imput-group-sm">
+      <span class="input-group-addon">指标</span>
+      <select id="metrics-params-type-select" class="select-block" multiple ng-model="selected_metrics_type">
+        <option value="app">App完成状况</option>
+        <option value="resource">资源分配状况</option>
+        <option value="node">结点状况</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <button class="btn btn-block btn-info" ng-click="metricsQuery()">查询</button>
+  </div>
+
+</div>
+
+<div class="row" style="margin-top:20px;">
+
+  <div class="col-md-5">
+    <div class="input-group imput-group-sm">
+      <span class="input-group-addon">时间</span>
+      <select id="metrics-params-recordTime-select" class="select-block" ng-model="selected_metrics_time">
+        <!-- <option selected="selected" value ="-1">无</option>  -->
+        <option value ="180">最近3小时</option>
+        <option value="720">最近12小时</option>
+        <option value="1440">最近1天</option>
+        <option value="4320">最近3天</option>
+        <option value="10080">最近7天</option>
+        <!-- <option value ="-2">自定义</option> -->
+      </select>
+    </div>
+
+    <div style="display:none" id="metrics-params-recordTime-divs">
+      <input id="metrics-params-recordTime-min" type="text" style="width:130px;height:30px;" class="form_datetime"  value="">
+      <lebal> &lt; recordTime &lt; </lebal>
+      <input id="metrics-params-recordTime-max" type="text"  style="width:130px;height:30px;" class="form_datetime"  value="">
+    </div>
+  </div>
+
+  <div class="col-md-5">
+    <div class="input-group imput-group-sm">
+      <span class="input-group-addon">间隔</span>
+      <select id="metrics-params-recordTime-split-select" class="select-block" ng-model="selected_metrics_split">
+        <option value="10">10分钟</option>
+        <option value="60">1小时</option>
+        <option value="180">3小时</option>
+        <option value="360">6小时</option>
+        <option value="1440">1天</option>
+      </select>
+    </div>
+  </div>
+
+</div>
+
+<div class="row" style="margin-top:20px;">
+  <div class="col-md-12">
+
+    <div class="pull-left" style="margin-right:20px;" ng-dblclick="showBig(metric)" ng-repeat="metric in history_metrics" ng-init="ID=formatIdName()">
+
+      <!-- panel -->
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">[[metric.metric]]</h3></div>
+        <div class="panel-body">
+          <div id="[[ID]]" style="width:420px;" ng-init="draw('#'+ID, metric)"></div>
+        </div>
+      </div>
+      <!-- ~panel -->
+
+    </div>
+
+  </div>
+</div>

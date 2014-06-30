@@ -1,4 +1,11 @@
 uhpApp.controller('SettingCtrl',['$scope','$rootScope','$http',function($scope,$rootScope,$http){
+
+  $scope.showValue=function(v){
+    if(v && v.name && v.name.length>5 && v.name.slice(-5) == '_pass'){
+      return "********";
+    }
+    return v.value;
+  }
 	
 	$scope.initConf=function(){
 		$http({
