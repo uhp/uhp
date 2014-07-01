@@ -84,7 +84,8 @@ class AlarmCallbackManager(Manager):
             for auto_fix in session.query(AlarmAutofix):
                 fix_list.append( auto_fix.format() )
 
-            for (key_word,count) in self.key_word_map.items():
+            for (key_word,info) in self.key_word_map.items():
+                count = info['count']
                 for auto_fix in fix_list:
                     match = auto_fix['pattern'].match(key_word)
                     if match and ( count == auto_fix['count'] or count == auto_fix['count']*2 ) :
