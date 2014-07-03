@@ -1,0 +1,11 @@
+---
+
+- name: Install the fuse package
+  sudo: yes
+  yum: name={{item}} state=installed
+  with_items: 
+   - hadoop-hdfs
+   - hadoop-libhdfs
+   - hadoop-lzo-cdh4
+   - hadoop-hdfs-fuse
+

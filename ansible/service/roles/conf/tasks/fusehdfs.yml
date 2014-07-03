@@ -1,0 +1,5 @@
+
+- name: copy the conf
+  sudo: yes
+  template: src=fusehdfs/hadoop-fuse dest=/etc/default/hadoop-fuse 
+    

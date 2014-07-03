@@ -1,0 +1,10 @@
+
+
+- include: ../../conf/tasks/hdfs.yml
+- include: ../../conf/tasks/fusehdfs.yml
+
+- name: mount the fuse
+  sudo: yes
+  shell: sudo hadoop-fuse-dfs -oserver=hdfs://{{ hdfs__nameservice_id }} -oprotected=/user:/tmp:/var -obig_writes /mnt/dfs
+
+

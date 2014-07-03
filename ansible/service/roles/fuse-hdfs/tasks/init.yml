@@ -1,0 +1,7 @@
+---
+
+- name: Create the mount directory
+  sudo: yes
+  shell: mkdir -p /mnt/dfs
+
+

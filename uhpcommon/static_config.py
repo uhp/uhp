@@ -109,7 +109,7 @@ services = [
      "dependence" : []
      },
     {"name":"hdfs", 
-     "role": ["qjm","namenode","datanode","httpfs"],
+     "role": ["qjm","namenode","datanode","httpfs","fuse-hdfs"],
      "actions":[{"name":"format","display":"格式化","tooptip":"格式化所有组件。谨慎执行！"},
                 {"name":"init","display":"初始化","tooptip":"创建角色需要的目录"},
                 {"name":"start","display":"启动","tooptip":""},

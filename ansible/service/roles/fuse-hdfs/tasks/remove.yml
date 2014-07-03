@@ -1,0 +1,8 @@
+---
+
+- name: remove the packages
+  sudo: yes
+  yum: name={{item}} state=removed
+  with_items: 
+   - hadoop-hdfs-fuse
+

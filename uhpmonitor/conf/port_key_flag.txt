@@ -29,6 +29,10 @@
         "httpfs":{
             "httpfs_http_port" : true,
             "key":"httpfs"
+        },
+        "fuse-hdfs":{
+            "key":"fuse_dfs",
+            "httpfs_http_port":false
         }
     },
     "yarn": {
