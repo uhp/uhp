@@ -32,11 +32,10 @@ ganglia__gmetad_xml_port: 8651
 ganglia__cluster_name: "test_hadoop"
 ganglia__gmond_python: ""
 ganglia__gmetad_rras: 
-    - RRA:AVERAGE:0.5:4:120
+    - RRA:AVERAGE:0.5:4:1440
     - RRA:AVERAGE:0.5:40:1008
-    - RRA:AVERAGE:0.5:240:336
-    - RRA:AVERAGE:0.5:5760:376
-
+    - RRA:AVERAGE:0.5:120:1488
+    - RRA:AVERAGE:0.5:240:8784
 
 #for zookeeper
 zookeeper__ZOOKEEPER_OPTS: " -Xmx1024m "
