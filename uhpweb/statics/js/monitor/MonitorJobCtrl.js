@@ -606,7 +606,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.runningQuery();
         timer = $interval(function(){
           $scope.runningQuery();
-        },10000);
+        },30000);
     }
 
     // 历史查询
