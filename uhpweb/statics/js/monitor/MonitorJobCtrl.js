@@ -603,10 +603,10 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.metricsQuery();
 
         //定时刷新正在运行的作业
-        $scope.runningQuery();
-        timer = $interval(function(){
-          $scope.runningQuery();
-        },30000);
+        //$scope.runningQuery();
+        //timer = $interval(function(){
+        //  $scope.runningQuery();
+        //},30000);
     }
 
     // 历史查询
