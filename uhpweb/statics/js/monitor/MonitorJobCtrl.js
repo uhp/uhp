@@ -594,7 +594,11 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
             {"value":1440,"dis":"24小时"}
         ];
         
+        //init metrics params
         $scope.selected_metrics_type = ['app'];
+        $scope.metrics_fields= {app:"App完成状况",resource:"资源分配状况",node:"节点状况"};
+        //$scope.rm_time=1440
+        //$scope.rm_split=60
         $scope.selected_metrics_time = '180';
         $scope.selected_metrics_split = '10';
         

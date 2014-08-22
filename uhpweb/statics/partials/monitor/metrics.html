@@ -3,10 +3,12 @@
   <div class="col-md-10">
     <div class="input-group imput-group-sm">
       <span class="input-group-addon">指标</span>
-      <select id="metrics-params-type-select" class="select-block" multiple ng-model="selected_metrics_type">
+      <select class="select-block" multiple ng-model="selected_metrics_type" ng-options="k as v for (k,v) in metrics_fields">
+        <!--
         <option value="app">App完成状况</option>
         <option value="resource">资源分配状况</option>
         <option value="node">结点状况</option>
+        -->
       </select>
     </div>
   </div>
