@@ -1519,13 +1519,14 @@ class MonitorBackHandler(BaseHandler):
                 dev2 = dev.rstrip('0123456789')
                 #path = "/dev/%s" % dev
                 disks['x'].append(dev)
-
+                
+                # used是百分比值， total是G
                 disk_used = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_used' % dev)
                 disk_total = self._fetch_host_last_metric(rrd_wrapper, cluster_name, host, 'dev_%s_disk_total' % dev)
-                if disk_total is not None: disk_total = int(disk_total)
-                if disk_free  is not None: disk_free  = int(disk_free)
+                # if disk_total is not None: disk_total = int(disk_total)
                 disk_free = None
                 if disk_total is not None and disk_used is not None:
+                    disk_used = disk_total * disk_used / 100
                     disk_free = disk_total - disk_used
 
                 disk_useds.append(disk_used)
@@ -1548,7 +1549,7 @@ class MonitorBackHandler(BaseHandler):
                     info_disk.append({'name':'UDMA CRC错误','value':disk_smartctl_udma_crc_error_count,'unit':'次'})
                     info['disks'][dev2] = info_disk
                 
-            info['overview'] = "本机包含%d个磁盘,%d个卷" % (len(info['disks']),len(names)), 
+            info['overview'] = "本机包含%d个磁盘,%d个卷" % (len(info['disks']),len(names))
             disks['series'].append({'name':'disk_used','type':'bar','stack':'disk','data':disk_useds})
             disks['series'].append({'name':'disk_free','type':'bar','stack':'disk','data':disk_frees})
             self._metric_unit_convert(disks,1024,GT)
