@@ -108,6 +108,7 @@ class Collector:
         session = database.getSession()
         session.merge(meRecord)
         session.commit()
+        session.close()
          
     def collectApp(self):
                 
@@ -164,6 +165,7 @@ class Collector:
         endFlushTime = time.time()
         
         log.info("using %d ms to push to the db" % ((endFlushTime - startFlushTime)*1000))
+        session.close()
             
         
     def getJobHistory(self,jobid):
