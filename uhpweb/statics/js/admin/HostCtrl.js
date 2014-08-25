@@ -456,7 +456,8 @@ uhpApp.controller('HostsCtrl',['$scope','$rootScope','$http','$timeout',function
         {"name":"repo","display":"分发仓库文件","tooptip":""},
         {"name":"movelog","display":"移动日志","tooptip":""},
         {"name":"deployhosts","display":"分发hosts","tooptip":""},
-        {"name":"jmxetric","display":"分发jmxetric","tooptip":""}
+        {"name":"jmxetric","display":"分发jmxetric","tooptip":""},
+        {"name":"uaewa","display":"配置uaewa用户","tooptip":""}
     ]
 	
 	//tab操作和跳转

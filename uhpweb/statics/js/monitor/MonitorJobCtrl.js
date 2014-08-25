@@ -210,6 +210,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         var temp = []
         for(var index in $scope.selected_rm_fields){
             var value = $scope.selected_rm_fields[index]
+            console.log(value)
             if( value == "app" ){
                 temp.push("appNum")
                 temp.push("finishedApp")
@@ -607,10 +608,10 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         $scope.metricsQuery();
 
         //定时刷新正在运行的作业
-        //$scope.runningQuery();
-        //timer = $interval(function(){
-        //  $scope.runningQuery();
-        //},30000);
+        $scope.runningQuery();
+        timer = $interval(function(){
+          $scope.runningQuery();
+        },30000);
     }
 
     // 历史查询
@@ -618,6 +619,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
         var temp = []
         $.each($scope.selected_metrics_type,function(i,n){
             var value=n;
+            console.log("metrics"+value)
             if( value == "app" ) {
                 temp.push("appsCompleted")
                 temp.push("appsPending")
@@ -671,6 +673,7 @@ uhpApp.controller('MoniJobCtrl', ['$scope', '$rootScope', '$http', '$sce', '$tim
 
     $scope.metricsQuery = function(){
       var fields = getMetricsFieldParams();
+      console.log(fields)
       var recordTimeMin = getMetricsRecordTimeMinParams();
       var recordTimeMax = getMetricsRecordTimeMaxParams();
       var recordTimeSplit = getMetricsRecordTimeSplitParams();

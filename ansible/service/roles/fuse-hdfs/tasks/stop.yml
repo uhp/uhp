@@ -2,5 +2,5 @@
 
 - name: stop the mount hdfs
   sudo: yes
-  shell fusermount -u /mnt/dfs
+  shell: fusermount -u /mnt/dfs
 

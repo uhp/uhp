@@ -129,6 +129,7 @@ yarn__mapreduce_reduce_java_opts: " -Xmx400m "
 yarn__mapreduce_reduce_memory_mb: 640
 yarn__mapreduce_admin_map_child_java_opts: " -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN "
 yarn__mapreduce_admin_reduce_child_java_opts: " -Dclient.encoding.override=UTF-8 -Dfile.encoding=UTF-8 -Duser.language=zh -Duser.region=CN "
+yarn__mapreduce_slowstart_completedmaps: "0.8"
 
 #Variables for <yarn-site_xml> 
 

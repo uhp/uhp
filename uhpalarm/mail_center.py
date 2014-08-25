@@ -111,7 +111,7 @@ def _send_mail(template_name,dict):
     to_list = _get_mail_to()
     title = u"%s:UHP告警邮件" % config.mail_cluster
     log.info("send mail to"+str(to_list))
-    mail.send_mail(to_list, title , html, "html")
+    mail.send_ssl_mail(to_list, title , html, "html")
 
 if __name__ == "__main__" :
     print "x"

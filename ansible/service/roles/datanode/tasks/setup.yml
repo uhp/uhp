@@ -4,6 +4,7 @@
   sudo: yes
   yum: name={{item}} state=installed
   with_items: 
+   - lzo
    - hadoop-hdfs-datanode
    - hadoop-lzo-cdh4
    - bigtop-utils
