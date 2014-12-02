@@ -28,7 +28,7 @@ def send_mail(to_list, sub, content,type = 'plain'):
 
  
 if __name__ == '__main__': 
-    if send_mail(['qiujw@ucweb.com'],'hello','<h1>haha</h1>','html'):
+    if send_mail(['qiujw@xxxx.com'],'hello','<h1>haha</h1>','html'):
         print "ok"
     else:
         print "error"
